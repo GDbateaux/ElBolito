@@ -40,29 +40,17 @@ class Floor(private val numRoom: Int) {
 
     while(currentNumRoom < numRoom){
       val rdmNbre: Int = Random.nextInt(100)
-      val availableRoom: ArrayBuffer[String] = getFreeDoor(floorInt, currentRoomX, currentRoomY)
+      val availableRoom: ArrayBuffer[Position] = getFreeRoom(floorInt, Position(currentRoomX, currentRoomY))
 
       if(availableRoom.nonEmpty){
-        val direction: String = availableRoom(Random.nextInt(availableRoom.length))
+        val pos: Position = availableRoom(Random.nextInt(availableRoom.length))
         previousRoomX = currentRoomX
         previousRoomY = currentRoomY
 
-        if(direction == "north"){
-          currentRoomY -= 1
-          floorInt(currentRoomY)(currentRoomX) = 1
-        }
-        else if(direction == "west"){
-          currentRoomX -= 1
-          floorInt(currentRoomY)(currentRoomX) = 1
-        }
-        else if (direction == "south") {
-          currentRoomY += 1
-          floorInt(currentRoomY)(currentRoomX) = 1
-        }
-        else {
-          currentRoomX += 1
-          floorInt(currentRoomY)(currentRoomX) = 1
-        }
+        currentRoomX = pos.x
+        currentRoomY = pos.y
+        floorInt(currentRoomY)(currentRoomX) = 1
+
         currentNumRoom += 1
       }
 
@@ -105,7 +93,7 @@ class Floor(private val numRoom: Int) {
     floor(arraySide/2)(arraySide/2) = 2
     for(y: Int <- floor.indices){
       for(x: Int <- floor(0).indices){
-        if(floor(y)(x) == 1 && getFreeDoor(floor, x, y).length == 3){
+        if(floor(y)(x) == 1 && getFreeRoom(floor, Position(x,y)).length == 3){
           floor(y)(x) = 3
         }
       }
@@ -159,21 +147,20 @@ class Floor(private val numRoom: Int) {
     return res
   }
 
+  private def getFreeRoom(floor: Array[Array[Int]], pos: Position): ArrayBuffer[Position] = {
+    val res: ArrayBuffer[Position] = new ArrayBuffer[Position]()
 
-  private def getFreeDoor(floor: Array[Array[Int]], x: Int, y: Int): ArrayBuffer[String] = {
-    val res: ArrayBuffer[String] = new ArrayBuffer[String]()
-
-    if(y > 0 && floor(y-1)(x) == 0){
-      res.append("north")
+    if(pos.y > 0 && floor(pos.y-1)(pos.x) == 0){
+      res.append(Position(pos.x, pos.y-1))
     }
-    if(x > 0 && floor(y)(x-1) == 0){
-      res.append("west")
+    if(pos.x > 0 && floor(pos.y)(pos.x-1) == 0){
+      res.append(Position(pos.x-1, pos.y))
     }
-    if(y < arraySide - 1 && floor(y+1)(x) == 0){
-      res.append("south")
+    if(pos.y < arraySide - 1 && floor(pos.y+1)(pos.x) == 0){
+      res.append(Position(pos.x, pos.y+1))
     }
-    if(x < arraySide - 1 && floor(y)(x+1) == 0){
-      res.append("east")
+    if(pos.x < arraySide - 1 && floor(pos.y)(pos.x+1) == 0){
+      res.append(Position(pos.x+1, pos.y))
     }
     return res
   }
