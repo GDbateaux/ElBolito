@@ -16,11 +16,12 @@ class Floor(private val numRoom: Int) {
   }
 
   def generateFloor(): Unit = {
-    var a: Array[Array[Int]] = addRoomType(generateBlueprint())
+    val floor: Array[Array[Int]] = generateBlueprint()
+    addRoomType(floor)
 
-    for(y: Int <- a.indices){
-      for(x: Int <- a(0).indices){
-        print(a(y)(x))
+    for(y: Int <- floor.indices){
+      for(x: Int <- floor(0).indices){
+        print(floor(y)(x))
       }
       println()
     }
@@ -33,61 +34,50 @@ class Floor(private val numRoom: Int) {
     var previousRoomY: Int = arraySide/2
     var currentRoomX: Int = arraySide/2
     var currentRoomY: Int = arraySide/2
+    val RANDOM_PERCENTAGE: Double = 0.25
+    val PREVIOUS_PERCENTAGE: Double = 0.35
     floorInt(currentRoomY)(currentRoomX) = 1
 
     while(currentNumRoom < numRoom){
       val rdmNbre: Int = Random.nextInt(100)
-      val availableRoom: ArrayBuffer[String] = getFreeDoor(floorInt, currentRoomX, currentRoomY)
+      val availableRoom: ArrayBuffer[Position] = getFreeRoom(floorInt, Position(currentRoomX, currentRoomY))
 
       if(availableRoom.nonEmpty){
-        val direction: String = availableRoom(Random.nextInt(availableRoom.length))
+        val pos: Position = availableRoom(Random.nextInt(availableRoom.length))
         previousRoomX = currentRoomX
         previousRoomY = currentRoomY
 
-        if(direction == "north"){
-          currentRoomY -= 1
-          floorInt(currentRoomY)(currentRoomX) = 1
-        }
-        else if(direction == "west"){
-          currentRoomX -= 1
-          floorInt(currentRoomY)(currentRoomX) = 1
-        }
-        else if (direction == "south") {
-          currentRoomY += 1
-          floorInt(currentRoomY)(currentRoomX) = 1
-        }
-        else {
-          currentRoomX += 1
-          floorInt(currentRoomY)(currentRoomX) = 1
-        }
+        currentRoomX = pos.x
+        currentRoomY = pos.y
+        floorInt(currentRoomY)(currentRoomX) = 1
+
         currentNumRoom += 1
       }
 
-
       if(availableRoom.isEmpty){
-        if (rdmNbre < 59) {
+        if (rdmNbre < ((PREVIOUS_PERCENTAGE / (PREVIOUS_PERCENTAGE + RANDOM_PERCENTAGE))*100).round.toInt) {
           currentRoomX = previousRoomX
           currentRoomY = previousRoomY
         }
         else {
-          val rdmRoom: Array[Int] = getRandomRoom(floorInt, currentNumRoom)
+          val rdmRoom: Position = getRandomRoom(floorInt, currentNumRoom)
           previousRoomX = currentRoomX
           previousRoomY = currentRoomY
-          currentRoomX = rdmRoom(0)
-          currentRoomY = rdmRoom(1)
+          currentRoomX = rdmRoom.x
+          currentRoomY = rdmRoom.y
         }
       }
       else{
-        if (rdmNbre < 35) {
+        if (rdmNbre < PREVIOUS_PERCENTAGE * 100) {
           currentRoomX = previousRoomX
           currentRoomY = previousRoomY
         }
-        else if(rdmNbre >= 75) {
-          val rdmRoom: Array[Int] = getRandomRoom(floorInt, currentNumRoom)
+        else if(rdmNbre >= 100-RANDOM_PERCENTAGE*100) {
+          val rdmRoom: Position = getRandomRoom(floorInt, currentNumRoom)
           previousRoomX = currentRoomX
           previousRoomY = currentRoomY
-          currentRoomX = rdmRoom(0)
-          currentRoomY = rdmRoom(1)
+          currentRoomX = rdmRoom.x
+          currentRoomY = rdmRoom.y
         }
       }
     }
@@ -95,41 +85,88 @@ class Floor(private val numRoom: Int) {
   }
 
   //0: No room; 1: Simple room; 2: Start room; 3: Alone room; 4: Boss room
-  def addRoomType(floor: Array[Array[Int]]): Array[Array[Int]] = {
-    val res: Array[Array[Int]] = floor.clone()
+  private def addRoomType(floor: Array[Array[Int]]): Unit = {
+    val farthestRoom: ArrayBuffer[Position] = getFarthestPos(floor)
+    val rdmNbre: Int = Random.nextInt(farthestRoom.length)
+    val pos: Position = farthestRoom(rdmNbre)
 
+    floor(arraySide/2)(arraySide/2) = 2
     for(y: Int <- floor.indices){
       for(x: Int <- floor(0).indices){
-        if(getFreeDoor(floor, x, y).length == 1){
-          res(y)(x) = 3
+        if(floor(y)(x) == 1 && getFreeRoom(floor, Position(x,y)).length == 3){
+          floor(y)(x) = 3
         }
       }
     }
-    res(arraySide/2)(arraySide/2) = 2
+    floor(pos.y)(pos.x) = 4
+  }
 
+  private def getFarthestPos(floor: Array[Array[Int]]): ArrayBuffer[Position] = {
+    var currentPos: ArrayBuffer[Position] = new ArrayBuffer[Position]()
+    var isFinish: Boolean = false
+    val arr: Array[Array[Int]] = Array.ofDim(floor.length, floor(0).length)
+    for(i: Int <- floor.indices){
+      arr(i) = floor(i).clone()
+    }
+    currentPos.append(Position(arraySide/2, arraySide/2))
+
+    while(!isFinish){
+      val tmpPos: ArrayBuffer[Position] = new ArrayBuffer[Position]()
+
+      for(p: Position <- currentPos){
+        for(n <- getNeighbor(arr, p)){
+          tmpPos.append(n)
+        }
+        arr(p.y)(p.x) = 0
+      }
+      if(tmpPos.isEmpty){
+        isFinish = true
+      }
+      else{
+        currentPos = tmpPos.distinct
+      }
+    }
+    return currentPos
+  }
+
+  private def getNeighbor(floor: Array[Array[Int]], pos: Position): ArrayBuffer[Position] = {
+    val res: ArrayBuffer[Position] = new ArrayBuffer[Position]()
+
+    if (pos.y > 0 && floor(pos.y - 1)(pos.x) != 0) {
+      res.append(Position(pos.x, pos.y-1))
+    }
+    if (pos.x > 0 && floor(pos.y)(pos.x - 1) != 0) {
+      res.append(Position(pos.x-1, pos.y))
+    }
+    if (pos.y < arraySide - 1 && floor(pos.y + 1)(pos.x) != 0) {
+      res.append(Position(pos.x, pos.y+1))
+    }
+    if (pos.x < arraySide - 1 && floor(pos.y)(pos.x + 1) != 0) {
+      res.append(Position(pos.x+1, pos.y))
+    }
     return res
   }
 
-  private def getFreeDoor(floor: Array[Array[Int]], x: Int, y: Int): ArrayBuffer[String] = {
-    val res: ArrayBuffer[String] = new ArrayBuffer[String]()
+  private def getFreeRoom(floor: Array[Array[Int]], pos: Position): ArrayBuffer[Position] = {
+    val res: ArrayBuffer[Position] = new ArrayBuffer[Position]()
 
-    if(y > 0 && floor(y-1)(x) == 0){
-      res.append("north")
+    if(pos.y > 0 && floor(pos.y-1)(pos.x) == 0){
+      res.append(Position(pos.x, pos.y-1))
     }
-    if(x > 0 && floor(y)(x-1) == 0){
-      res.append("west")
+    if(pos.x > 0 && floor(pos.y)(pos.x-1) == 0){
+      res.append(Position(pos.x-1, pos.y))
     }
-    if(y < arraySide - 1 && floor(y+1)(x) == 0){
-      res.append("south")
+    if(pos.y < arraySide - 1 && floor(pos.y+1)(pos.x) == 0){
+      res.append(Position(pos.x, pos.y+1))
     }
-    if(x < arraySide - 1 && floor(y)(x+1) == 0){
-      res.append("east")
+    if(pos.x < arraySide - 1 && floor(pos.y)(pos.x+1) == 0){
+      res.append(Position(pos.x+1, pos.y))
     }
     return res
   }
 
-  private def getRandomRoom(floor: Array[Array[Int]], numActualRoom: Int): Array[Int] = {
-    val res: Array[Int] = Array(0, 0)
+  private def getRandomRoom(floor: Array[Array[Int]], numActualRoom: Int): Position = {
+    val res: Position = Position(0, 0)
     var count: Int = 0
     val rdmNbre: Int = Random.nextInt(numActualRoom) + 1
 
@@ -140,8 +177,8 @@ class Floor(private val numRoom: Int) {
         }
 
         if(rdmNbre == count){
-          res(0) = x
-          res(1) = y
+          res.x = x
+          res.y = y
           count += 1
         }
       }
