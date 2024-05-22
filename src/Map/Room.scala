@@ -49,10 +49,11 @@ class Room(val roomNbr: Int, val floorNbr: Int, val roomType: Int, val doorEnter
     //Les obstacles doivent être écarté les un des autres (1 carré d'écart)
     var obstaclesRemain = ROOM_WIDTH * ROOM_HEIGHT / 100 * NUMBER_OBSTACLE_PERCENTAGE
 
+    //Aléatoire et symétrique
     while(obstaclesRemain > 0) {
       var obstacleSize = Random.nextInt(OBSTACLE_SIZE_MAX + 1)
 
-
+      //Random dans un arraybuffer et supprimer les positions de celui-ci une fois les obstacles placé
 
       obstaclesRemain = obstaclesRemain - obstacleSize
     }
