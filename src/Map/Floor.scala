@@ -1,5 +1,8 @@
 package Map
 
+
+import Utils.Position
+
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
