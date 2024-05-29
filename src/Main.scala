@@ -27,7 +27,6 @@ class Main extends PortableApplication(1900, 1000) {
 
   private var h: Hero = _
   private var m: Monster = _
-  private var fightRoom: FightRoom = _
   private val keyStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
   private var currentTime: Float = 0
   private var invincibilityTime: Float = 0
@@ -43,14 +42,6 @@ class Main extends PortableApplication(1900, 1000) {
     h = new Hero(Coordinate(0, 0), 200)
     m = new Monster(Coordinate(200, 200), 200)
     m.setSpeed(0.5)
-
-    var doorsDir: ArrayBuffer[Direction] = new ArrayBuffer[Direction]();
-    doorsDir.addOne(Direction.WEST);
-    doorsDir.addOne(Direction.EAST);
-    doorsDir.addOne(Direction.NORTH);
-    doorsDir.addOne(Direction.SOUTH);
-    fightRoom = new FightRoom(20, Direction.WEST, doorsDir);
-    fightRoom.createRoom();
 
 
     keyStatus(KEY_UP) = false
@@ -76,7 +67,6 @@ class Main extends PortableApplication(1900, 1000) {
     m.draw(g)
     m.hitbox.draw(g)
 
-    fightRoom.draw(g);
     g.drawFPS()
   }
 

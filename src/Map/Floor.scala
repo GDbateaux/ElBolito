@@ -1,15 +1,20 @@
 package Map
 
 
-import Utils.Position
+import Utils.Direction.Direction
+import Utils.{Direction, Position}
+import ch.hevs.gdx2d.lib.GdxGraphics
+import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-class Floor(private val numRoom: Int) {
+class Floor(private val numRoom: Int) extends DrawableObject{
   private var arraySide: Int = 0
   private val PRODUCT_SIDE_ROOME: Double = 0.8
   private val tmpSide: Int = (numRoom * PRODUCT_SIDE_ROOME).toInt
+  var currentRoom: Position = Position(0,0)
+  var RoomDifficulty: Int = 1
 
   if(tmpSide % 2 == 0){
     arraySide = tmpSide + 1
@@ -28,6 +33,30 @@ class Floor(private val numRoom: Int) {
       }
       println()
     }
+  }
+
+  private def generateFloorArray(f: Array[Array[Int]]): Array[Array[Room]] = {
+    val res: Array[Array[Room]] = Array.ofDim(arraySide, arraySide)
+
+    for (y: Int <- f.indices) {
+      for (x: Int <- f(0).indices) {
+        val neighborRooms: ArrayBuffer[Direction] = getNeighborDirections(f, Position(x,y))
+        if(f(y)(x) == 1){
+          res(y)(x) = new FightRoom(RoomDifficulty, neighborRooms)
+        }
+        else if(f(y)(x) == 2){
+          currentRoom = Position(x,y)
+          res(y)(x) = new StartRoom(neighborRooms)
+        }
+        else if(f(y)(x) == 3){
+          res(y)(x) = new SpecialRoom(neighborRooms)
+        }
+        else if(f(y)(x) == 4){
+          res(y)(x) = new BossRoom(RoomDifficulty, neighborRooms)
+        }
+      }
+    }
+    return res
   }
 
   private def generateBlueprint(): Array[Array[Int]] ={
@@ -132,6 +161,24 @@ class Floor(private val numRoom: Int) {
     return currentPos
   }
 
+  private def getNeighborDirections(floor: Array[Array[Int]], pos: Position): ArrayBuffer[Direction] = {
+    val res: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+
+    if (pos.y > 0 && floor(pos.y - 1)(pos.x) != 0) {
+      res.append(Direction.NORTH)
+    }
+    if (pos.x > 0 && floor(pos.y)(pos.x - 1) != 0) {
+      res.append(Direction.WEST)
+    }
+    if (pos.y < arraySide - 1 && floor(pos.y + 1)(pos.x) != 0) {
+      res.append(Direction.SOUTH)
+    }
+    if (pos.x < arraySide - 1 && floor(pos.y)(pos.x + 1) != 0) {
+      res.append(Direction.EAST)
+    }
+    return res
+  }
+
   private def getNeighbor(floor: Array[Array[Int]], pos: Position): ArrayBuffer[Position] = {
     val res: ArrayBuffer[Position] = new ArrayBuffer[Position]()
 
@@ -188,6 +235,11 @@ class Floor(private val numRoom: Int) {
     }
     return res
   }
+
+  override def draw(gdxGraphics: GdxGraphics): Unit = {
+
+  }
+
 }
 
 object FloorTest extends App {

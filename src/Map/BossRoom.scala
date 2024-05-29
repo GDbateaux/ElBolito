@@ -1,10 +1,13 @@
 package Map
 
+import Utils.Direction
 import Utils.Direction.Direction
 
 import scala.collection.mutable.ArrayBuffer
 
-class BossRoom(val diffulty: Int, val characterDir: Direction, val doorsDir: ArrayBuffer[Direction]) extends Room {
+class BossRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends Room {
+  val characterDir: Direction = Direction.NORTH
+
   override def createRoom(): Unit = {
 
   }

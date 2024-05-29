@@ -1,6 +1,6 @@
 package Map
 
-import Characters.Monster
+import Characters.{Hero, Monster}
 import Utils.Direction
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.lib.GdxGraphics
@@ -57,28 +57,28 @@ trait Room extends DrawableObject {
       spaceWidth = (g.getScreenWidth - width) / 2
     }
 
-    var wallTop = new Texture(Gdx.files.local("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_top.png"))
-    var wallLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_left.png"))
-    var wallBot = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_bot.png"))
-    var wallRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_right.png"))
-    var wallTopCornerLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_topCorner_left.png"))
-    var wallTopCornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_topCorner_right.png"))
-    var wallBotCornerLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_botCorner_left.png"))
-    var wallBotCornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_botCorner_right.png"))
-    var wallOverTop = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_1.png"))
-    var wallOverLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_left.png"))
-    var wallOverBot = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_bot_1.png"))
-    var wallOverRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_right.png"))
-    var wallOverTop_cornerLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_inner_left.png"))
-    var wallOverTop_cornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_inner_right.png"))
-    var wallOverBot_cornerLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_bot_inner_left.png"))
-    var wallOverBot_cornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_bot_inner_right.png"))
-    var floor = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\floor\\floor_2.png"))
-    var obstacle = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\props_itens\\barrel.png"))
-    var doorTop = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_top_closed.png"))
-    var doorLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_left_closed.png"))
-    var doorBot = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_bot_closed.png"))
-    var doorRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_right_closed.png"))
+    val wallTop = new Texture(Gdx.files.local("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_top.png"))
+    val wallLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_left.png"))
+    val wallBot = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_bot.png"))
+    val wallRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_right.png"))
+    val wallTopCornerLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_topCorner_left.png"))
+    val wallTopCornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_topCorner_right.png"))
+    val wallBotCornerLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_botCorner_left.png"))
+    val wallBotCornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_botCorner_right.png"))
+    val wallOverTop = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_1.png"))
+    val wallOverLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_left.png"))
+    val wallOverBot = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_bot_1.png"))
+    val wallOverRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_right.png"))
+    val wallOverTop_cornerLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_inner_left.png"))
+    val wallOverTop_cornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_top_inner_right.png"))
+    val wallOverBot_cornerLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_bot_inner_left.png"))
+    val wallOverBot_cornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_bot_inner_right.png"))
+    val floor = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\floor\\floor_2.png"))
+    val obstacle = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\props_itens\\barrel.png"))
+    val doorTop = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_top_closed.png"))
+    val doorLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_left_closed.png"))
+    val doorBot = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_bot_closed.png"))
+    val doorRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_right_closed.png"))
 
 
     for (y: Int <- 0 until nbrSquareY) {
