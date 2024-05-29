@@ -1,6 +1,6 @@
 package Characters
 
-import Utils.{Coordinate, Direction}
+import Utils.{Coordinate, Direction, Position}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
@@ -8,10 +8,15 @@ import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 
 import scala.collection.mutable.ArrayBuffer
 
-class Hero(initialPos: Coordinate) extends DrawableObject{
+class Hero(initialPos: Coordinate, width: Int) extends DrawableObject{
   private val SPRITE_WIDTH: Int = 32
-  private val SPRITE_HEIGHT: Int = 32
+  private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
+  private val HITBOX_WIDTH: Int = 20 * width / SPRITE_WIDTH
+  private val HITBOX_HEIGHT: Int = width/2
+  private val RELATIVE_CENTER_HITBOX: Coordinate = Coordinate((width-HITBOX_WIDTH)/2 + HITBOX_WIDTH/2,
+    HITBOX_HEIGHT/2)
 
+  private val GROW_FACTOR = width / SPRITE_WIDTH
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
@@ -22,6 +27,7 @@ class Hero(initialPos: Coordinate) extends DrawableObject{
   private var speed: Double = 1
   private var move: Boolean = false
   val position: Coordinate = initialPos
+  val hitbox: Hitbox = new Hitbox(position, RELATIVE_CENTER_HITBOX, HITBOX_WIDTH, HITBOX_HEIGHT)
 
   private var dt: Double = 0
 
@@ -71,10 +77,10 @@ class Hero(initialPos: Coordinate) extends DrawableObject{
 
     for(d: Direction <- directions){
       d match {
-        case Direction.SOUTH => position.y -= length * speed.toFloat
-        case Direction.WEST => position.x -= length * speed.toFloat
-        case Direction.EAST => position.x += length * speed.toFloat
-        case Direction.NORTH => position.y += length * speed.toFloat
+        case Direction.SOUTH => position.y -= length * GROW_FACTOR * speed.toFloat
+        case Direction.WEST => position.x -= length * GROW_FACTOR * speed.toFloat
+        case Direction.EAST => position.x += length * GROW_FACTOR * speed.toFloat
+        case Direction.NORTH => position.y += length * GROW_FACTOR * speed.toFloat
         case _ =>
       }
     }
@@ -89,8 +95,6 @@ class Hero(initialPos: Coordinate) extends DrawableObject{
   }
 
   override def draw(g: GdxGraphics): Unit = {
-    g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y)
-
-    //g.draw(runSs.sprites(textureY)(currentFrame))
+    g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
   }
 }
