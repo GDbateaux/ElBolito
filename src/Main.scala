@@ -1,4 +1,5 @@
 import Characters.{Hero, Monster}
+import Map.FightRoom
 import Utils.Direction.Direction
 import Utils.{Coordinate, Direction}
 import ch.hevs.gdx2d.desktop.PortableApplication
@@ -22,9 +23,10 @@ object Main {
   }
 }
 
-class Main extends PortableApplication(1920, 1080) {
+class Main extends PortableApplication(1900, 1000) {
   private var h: Hero = _
   private var m: Monster = _
+  private var fightRoom: FightRoom = _
   private val keyStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
 
   private val KEY_UP = Input.Keys.W
@@ -38,6 +40,14 @@ class Main extends PortableApplication(1920, 1080) {
     h = new Hero(Coordinate(100,100))
     m = new Monster(Coordinate(200,200))
     m.setSpeed(0.8)
+    var doorsDir: ArrayBuffer[Direction] = new ArrayBuffer[Direction]();
+    doorsDir.addOne(Direction.WEST);
+    doorsDir.addOne(Direction.EAST);
+    doorsDir.addOne(Direction.NORTH);
+    doorsDir.addOne(Direction.SOUTH);
+    fightRoom = new FightRoom(20, Direction.WEST, doorsDir);
+    fightRoom.createRoom();
+
     keyStatus(KEY_UP) = false
     keyStatus(KEY_RIGHT) = false
     keyStatus(KEY_DOWN) = false
@@ -52,6 +62,8 @@ class Main extends PortableApplication(1920, 1080) {
   override def onGraphicRender(g: GdxGraphics): Unit = {
     // Clears the screen
     g.clear()
+
+    /*
     manageHero()
 
     h.animate(Gdx.graphics.getDeltaTime)
@@ -60,8 +72,11 @@ class Main extends PortableApplication(1920, 1080) {
     m.animate(Gdx.graphics.getDeltaTime)
     m.go(h.position)
     m.draw(g)
+    */
 
     // Draw everything
+
+    fightRoom.draw(g);
     g.drawFPS()
   }
 

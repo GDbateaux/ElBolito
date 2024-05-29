@@ -90,5 +90,7 @@ class Hero(initialPos: Coordinate) extends DrawableObject{
 
   override def draw(g: GdxGraphics): Unit = {
     g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y)
+
+    //g.draw(runSs.sprites(textureY)(currentFrame))
   }
 }

@@ -1,182 +1,170 @@
 package Map
 
-
-import Utils.Position
+import Utils.Direction
+import Utils.Direction.Direction
+import ch.hevs.gdx2d.lib.GdxGraphics
+import ch.hevs.gdx2d.lib.interfaces.DrawableObject
+import com.badlogic.gdx.{ApplicationAdapter, Gdx}
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.Texture.TextureFilter
 
 import scala.collection.mutable.ArrayBuffer
-import scala.util.Random
 
 //Type de room: 0: Chill, 1: Battle, 2: Boss, 3: BigFoot (pas sûr pour le 3)
-//Room door: 0: NORTH, 1: WEST, 2: SOUTH, 3: EAST
-class Room(val roomNbr: Int, val floorNbr: Int, val roomType: Int, val doorEnterPos: Int, val doorExitPos: Int) {
-  private val ROOM_HEIGHT: Int = 11
-  private val ROOM_WIDTH: Int = 19
+trait Room extends DrawableObject {
+  protected val ROOM_HEIGHT: Int = 11
+  protected val ROOM_WIDTH: Int = 19
 
-  private val ROOM_CHARACTER: Int = 1
-  private val ROOM_MONSTER: Int = 2
-  private val ROOM_OBSTACLE: Int = 3
+  protected val ROOM_CHARACTER: Int = 1
+  protected val ROOM_MONSTER: Int = 2
+  protected val ROOM_OBSTACLE: Int = 3
 
-  private val NUMBER_OBSTACLE_MAX_PERCENTAGE = 20
-  private val NUMBER_OBSTACLE_MIN_PERCENTAGE = 15
-  private val OBSTACLE_SIZE_MAX = 5
+  protected var room: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
+  protected var doorsPositions: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+  protected var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
 
-  private val NORTH: Int = 0
-  private val WEST: Int = 1
-  private val SOUTH: Int = 2
-  private val EAST: Int = 3
+  def createRoom(): Unit;
 
-  private val difficulty = roomNbr + floorNbr;
-  private var room: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
-  //private var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
+  override def draw(g: GdxGraphics): Unit = {
+    //Mettre les différents murs
+    //Ajouter les portes (trou pour les portes sur les coté et en bas). Porte du haut avec animation (déterminer si elle doit être ouverte ou fermée)
+    //Ajouter le sol et les obstacles
+    //Sol aléatoire ? En fonction de l'étage ? En fonction du type de salle ?
+    //Affiche le perso dans la salle
 
-  def createRoom(): Unit = {
-    //generateMonsters()
+    //new Texture(Gdx.files.internal("res/lib/logo_hes.png"));
+    //texture.setFilter(TextureFilter.Linear, TextureFilter.Linear)
 
-    //Le character est devant la porte d'entrée
-    var characterPos: Position = Position(0, 0);
-    var exitDoorPos: Position = Position(0, 0);
-    if(doorEnterPos == NORTH) {
-      room(0)((ROOM_WIDTH - 1) / 2) = ROOM_CHARACTER
-      characterPos = Position((ROOM_WIDTH - 1) / 2, 0);
-      exitDoorPos = Position((ROOM_WIDTH - 1) / 2, ROOM_HEIGHT - 1);
-    }
-    else if(doorEnterPos == WEST) {
-      room((ROOM_HEIGHT - 1) / 2)(ROOM_WIDTH - 1) = ROOM_CHARACTER
-      characterPos = Position(ROOM_WIDTH - 1, (ROOM_HEIGHT - 1) / 2);
-      exitDoorPos = Position(0, (ROOM_HEIGHT - 1) / 2);
-    }
-    else if (doorEnterPos == SOUTH) {
-      room(ROOM_HEIGHT - 1)((ROOM_WIDTH - 1) / 2) = ROOM_CHARACTER
-      characterPos = Position((ROOM_WIDTH - 1) / 2, ROOM_HEIGHT - 1);
-      exitDoorPos = Position((ROOM_WIDTH - 1) / 2, 0);
-    }
-    else if (doorEnterPos == EAST) {
-      room((ROOM_HEIGHT - 1) / 2)(0) = ROOM_CHARACTER
-      characterPos = Position(0, (ROOM_HEIGHT - 1) / 2);
-      exitDoorPos = Position(ROOM_WIDTH - 1, (ROOM_HEIGHT - 1) / 2);
+    val nbrSquareX: Int = ROOM_WIDTH + 4 // 2 = les murs droites et gauches (+ over)
+    val nbrSquareY: Int = ROOM_HEIGHT + 4 // 2 = les murs en haut et en bas (+ over)
+    val sizeByX: Double = g.getScreenWidth.toDouble / nbrSquareX
+    val sizeByY: Double = g.getScreenHeight.toDouble / (nbrSquareY - 0.4)
+    var pixelSize: Double = 0;
+    var height: Double = 0;
+    var width: Double = 0;
+    var spaceWidth: Double = 0;
+    var spaceHeight: Double = 0;
+
+    if(sizeByX <= sizeByY) {
+      pixelSize = sizeByX;
+      height = pixelSize * nbrSquareY;
+      width = g.getScreenWidth;
+      spaceHeight = (g.getScreenHeight - height) / 2;
+    } else {
+      pixelSize = sizeByY;
+      height = g.getScreenHeight;
+      width = pixelSize * nbrSquareX;
+      spaceWidth = (g.getScreenWidth - width) / 2;
     }
 
-    //Les obstacles sont génééré aléatoirement
-    //Les obstacles ne bloque pas les porte
-    //Les obstacles peuvent être de simple à 5
-    //Il y a un maximum de pixel que les obstacle peuvent prendre en fonction des dimensions de la room
-    //Les obstacles doivent être écarté les un des autres (1 carré d'écart)
-    val nbrObstaclePercentage = Random.nextInt(NUMBER_OBSTACLE_MAX_PERCENTAGE - NUMBER_OBSTACLE_MIN_PERCENTAGE + 1) + NUMBER_OBSTACLE_MIN_PERCENTAGE;
-    var obstaclesRemain = ROOM_WIDTH * ROOM_HEIGHT / 100 * nbrObstaclePercentage
+    var wallTop = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_1_top.png"))
+    var wallLeft = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_1_left.png"))
+    var wallBot = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_1_bot.png"))
+    var wallRight = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_1_right.png"))
+    var wallTopCornerLeft = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_1_topCorner_left.png"))
+    var wallTopCornerRight = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_1_topCorner_right.png"))
+    var wallBotCornerLeft = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_1_botCorner_left.png"))
+    var wallBotCornerRight = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_1_botCorner_right.png"))
+    var wallOverTop = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_top_1.png"))
+    var wallOverLeft = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_top_left.png"))
+    var wallOverBot = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_bot_1.png"))
+    var wallOverRight = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_top_right.png"))
+    var wallOverTop_cornerLeft = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_top_inner_left.png"))
+    var wallOverTop_cornerRight = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_top_inner_right.png"))
+    var wallOverBot_cornerLeft = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_bot_inner_left.png"))
+    var wallOverBot_cornerRight = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_bot_inner_right.png"))
+    var floor = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\floor\\floor_2.png"))
+    var obstacle = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\props_itens\\barrel.png"))
+    var doorTop = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\door_top_closed.png"))
+    var doorLeft = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\door_left_closed.png"))
+    var doorBot = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\door_bot_closed.png"))
+    var doorRight = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\door_right_closed.png"))
 
-    var positionRemain: ArrayBuffer[Position] = new ArrayBuffer[Position]();
-    for(y <- 0 until ROOM_HEIGHT) {
-      for(x <-0 until ROOM_WIDTH) {
-        positionRemain.addOne(Position(x, y));
-      }
-    }
 
-    //Remove Character and neighbors positions
-    positionRemain.subtractOne(characterPos);
-    for (posToRemove <- getNeighbor(positionRemain, characterPos)) {
-      positionRemain.subtractOne(posToRemove);
-    }
+    for (y: Int <- 0 until nbrSquareY) {
+      for (x: Int <- 0 until nbrSquareX) {
+        var posX: Float = (x.toDouble * pixelSize).toFloat + spaceWidth.toFloat;
+        var posY: Float = ((nbrSquareY - 1 - y).toDouble * pixelSize).toFloat + spaceHeight.toFloat;
 
-    //Remove Exit Door and neighbors positions
-    positionRemain.subtractOne(exitDoorPos);
-    for (posToRemove <- getNeighbor(positionRemain, exitDoorPos)) {
-      positionRemain.subtractOne(posToRemove);
-    }
-
-    //Aléatoire et symétrique
-    while(obstaclesRemain > 0) {
-      var obstacleSize = Random.nextInt(OBSTACLE_SIZE_MAX) + 1
-      if(OBSTACLE_SIZE_MAX > obstaclesRemain) {
-        obstacleSize = Random.nextInt(obstaclesRemain) + 1
-      }
-      obstaclesRemain = obstaclesRemain - obstacleSize
-
-      var obstaclesPos: ArrayBuffer[Position] = new ArrayBuffer[Position]();
-
-      if(positionRemain.isEmpty) {
-         obstaclesRemain = 0;
-      }
-      else {
-        // First Wall
-        var newPositionId = Random.nextInt(positionRemain.length)
-        var pos = positionRemain(newPositionId);
-        obstaclesPos.addOne(pos);
-        positionRemain.subtractOne(pos);
-        room(pos.y)(pos.x) = ROOM_OBSTACLE;
-        obstacleSize = obstacleSize - 1;
-
-        //Other walls
-        while (obstacleSize > 0) {
-          newPositionId = Random.nextInt(obstaclesPos.length);
-          var posPossible: ArrayBuffer[Position] = getNeighbor(positionRemain, obstaclesPos(newPositionId));
-          if (posPossible.nonEmpty) {
-            newPositionId = Random.nextInt(posPossible.length);
-            pos = posPossible(newPositionId);
-            obstaclesPos.addOne(pos);
-            positionRemain.subtractOne(pos);
-            room(pos.y)(pos.x) = ROOM_OBSTACLE;
-            obstacleSize = obstacleSize - 1;
-          }
-          else {
-            obstaclesRemain = obstaclesRemain + obstacleSize;
-            obstacleSize = 0;
+        if (y == 1 && x >= 2 && x < nbrSquareX - 2) {
+          g.draw(wallTop, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          if(x == 11 && doorsPositions.contains(Direction.NORTH)) {
+            g.draw(doorTop, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
           }
         }
+        else if (x == 1 && y >= 2 && y < nbrSquareY - 2) {
+          g.draw(wallLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          if (y == 7 && doorsPositions.contains(Direction.WEST)) {
+            g.draw(doorLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          }
+        }
+        else if (y == nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
+          g.draw(wallBot, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          if (x == 11 && doorsPositions.contains(Direction.SOUTH)) {
+            g.draw(doorBot, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          }
+        }
+        else if (x == nbrSquareX - 2 && y >= 2 && y < nbrSquareY - 2) {
+          g.draw(wallRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          if (y == 7 && doorsPositions.contains(Direction.EAST)) {
+            g.draw(doorRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          }
+        }
+        else if (x == 0 && y != 0 && y < nbrSquareY - 1) {
+          g.draw(wallOverLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if (x == nbrSquareX - 1 && y != 0 && y < nbrSquareY - 1) {
+          g.draw(wallOverRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if (y == 0 && x != 0 && x < nbrSquareX - 1) {
+          g.draw(wallOverTop, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if (y == nbrSquareY - 1 && x != 0 && x < nbrSquareX - 1) {
+          g.draw(wallOverBot, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if (x == 0 && y == nbrSquareY - 1) {
+          g.draw(wallOverBot_cornerLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if (x == nbrSquareX - 1 && y == nbrSquareY - 1) {
+          g.draw(wallOverBot_cornerRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if (x == 0 && y == 0) {
+          g.draw(wallOverTop_cornerLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if (x == nbrSquareX - 1 && y == 0) {
+          g.draw(wallOverTop_cornerRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if(x == 1 && y == 1) {
+          g.draw(wallTopCornerLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if(x == nbrSquareX - 2 && y == 1) {
+          g.draw(wallTopCornerRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if (x == 1 && y == nbrSquareY - 2) {
+          g.draw(wallBotCornerLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if (x == nbrSquareX - 2 && y == nbrSquareY - 2) {
+          g.draw(wallBotCornerRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+        }
+        else if(y >= 2 && y < nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
+          g.draw(floor, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+           if (room(y - 2)(x - 2) == ROOM_OBSTACLE) {
+            g.draw(obstacle, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          }
+          else if (room(y - 2)(x - 2) == ROOM_MONSTER) {
 
-        //Remove wall neighbor
-        for (obstacle <- obstaclesPos) {
-          for (posToRemove <- getNeighbor(positionRemain, obstacle)) {
-            positionRemain.subtractOne(posToRemove);
+          }
+          else if (room(y - 2)(x - 2) == ROOM_CHARACTER) {
+
           }
         }
       }
     }
 
-    for (y: Int <- room.indices) {
-      for (x: Int <- room(0).indices) {
-        print(room(y)(x))
-      }
-      println()
-    }
   }
 
-  private def getNeighbor(posPossible: ArrayBuffer[Position], pos: Position): ArrayBuffer[Position] = {
-    val res: ArrayBuffer[Position] = new ArrayBuffer[Position]()
+  def openDoor(): Unit = {
 
-    if (posPossible.contains(Position(pos.x, pos.y - 1))) {
-      res.append(Position(pos.x, pos.y - 1))
-    }
-    if (posPossible.contains(Position(pos.x - 1, pos.y))) {
-      res.append(Position(pos.x - 1, pos.y))
-    }
-    if (posPossible.contains(Position(pos.x, pos.y + 1))) {
-      res.append(Position(pos.x, pos.y + 1))
-    }
-    if (posPossible.contains(Position(pos.x + 1, pos.y))) {
-      res.append(Position(pos.x + 1, pos.y))
-    }
-    if (posPossible.contains(Position(pos.x - 1, pos.y - 1))) {
-      res.append(Position(pos.x - 1, pos.y - 1));
-    }
-    if (posPossible.contains(Position(pos.x + 1, pos.y + 1))) {
-      res.append(Position(pos.x + 1, pos.y + 1));
-    }
-    if (posPossible.contains(Position(pos.x + 1, pos.y - 1))) {
-      res.append(Position(pos.x + 1, pos.y - 1));
-    }
-    if (posPossible.contains(Position(pos.x - 1, pos.y + 1))) {
-      res.append(Position(pos.x - 1, pos.y + 1));
-    }
-
-    return res
-  }
-
-  def generateMonsters(): Unit = {
-    // TODO
   }
 }
 
-object RoomTest extends App {
-  val r: Room = new Room(2, 1, 1, 2, 0)
-  r.createRoom()
-}
