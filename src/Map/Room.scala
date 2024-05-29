@@ -1,12 +1,12 @@
 package Map
 
+import Characters.Monster
 import Utils.Direction
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
-import com.badlogic.gdx.{ApplicationAdapter, Gdx}
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.Texture.TextureFilter
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -23,7 +23,7 @@ trait Room extends DrawableObject {
   protected var doorsPositions: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
   protected var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
 
-  def createRoom(): Unit;
+  def createRoom(): Unit
 
   override def draw(g: GdxGraphics): Unit = {
     //Mettre les différents murs
@@ -32,29 +32,29 @@ trait Room extends DrawableObject {
     //Sol aléatoire ? En fonction de l'étage ? En fonction du type de salle ?
     //Affiche le perso dans la salle
 
-    //new Texture(Gdx.files.internal("res/lib/logo_hes.png"));
+    //new Texture(Gdx.files.internal("res/lib/logo_hes.png"))
     //texture.setFilter(TextureFilter.Linear, TextureFilter.Linear)
 
     val nbrSquareX: Int = ROOM_WIDTH + 4 // 2 = les murs droites et gauches (+ over)
     val nbrSquareY: Int = ROOM_HEIGHT + 4 // 2 = les murs en haut et en bas (+ over)
     val sizeByX: Double = g.getScreenWidth.toDouble / nbrSquareX
     val sizeByY: Double = g.getScreenHeight.toDouble / (nbrSquareY - 0.4)
-    var pixelSize: Double = 0;
-    var height: Double = 0;
-    var width: Double = 0;
-    var spaceWidth: Double = 0;
-    var spaceHeight: Double = 0;
+    var pixelSize: Double = 0
+    var height: Double = 0
+    var width: Double = 0
+    var spaceWidth: Double = 0
+    var spaceHeight: Double = 0
 
     if(sizeByX <= sizeByY) {
-      pixelSize = sizeByX;
-      height = pixelSize * nbrSquareY;
-      width = g.getScreenWidth;
-      spaceHeight = (g.getScreenHeight - height) / 2;
+      pixelSize = sizeByX
+      height = pixelSize * nbrSquareY
+      width = g.getScreenWidth
+      spaceHeight = (g.getScreenHeight - height) / 2
     } else {
-      pixelSize = sizeByY;
-      height = g.getScreenHeight;
-      width = pixelSize * nbrSquareX;
-      spaceWidth = (g.getScreenWidth - width) / 2;
+      pixelSize = sizeByY
+      height = g.getScreenHeight
+      width = pixelSize * nbrSquareX
+      spaceWidth = (g.getScreenWidth - width) / 2
     }
 
     var wallTop = new Texture(Gdx.files.absolute("C:\\Users\\simas\\Desktop\\JeuBOLI\\v1.1 dungeon crawler 16X16 pixel pack\\tiles\\wall\\wall_1_top.png"))
@@ -83,8 +83,8 @@ trait Room extends DrawableObject {
 
     for (y: Int <- 0 until nbrSquareY) {
       for (x: Int <- 0 until nbrSquareX) {
-        var posX: Float = (x.toDouble * pixelSize).toFloat + spaceWidth.toFloat;
-        var posY: Float = ((nbrSquareY - 1 - y).toDouble * pixelSize).toFloat + spaceHeight.toFloat;
+        var posX: Float = (x.toDouble * pixelSize).toFloat + spaceWidth.toFloat
+        var posY: Float = ((nbrSquareY - 1 - y).toDouble * pixelSize).toFloat + spaceHeight.toFloat
 
         if (y == 1 && x >= 2 && x < nbrSquareX - 2) {
           g.draw(wallTop, posX, posY, pixelSize.toFloat, pixelSize.toFloat)

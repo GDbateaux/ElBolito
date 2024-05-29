@@ -23,10 +23,14 @@ object Main {
 }
 
 class Main extends PortableApplication(1900, 1000) {
+  private val ANIMATION_LENGTH_DAMAGE: Float = 1
+
   private var h: Hero = _
   private var m: Monster = _
   private var fightRoom: FightRoom = _
   private val keyStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
+  private var currentTime: Float = 0
+  private var invincibilityTime: Float = 0
 
   private val KEY_UP = Input.Keys.W
   private val KEY_RIGHT = Input.Keys.D
@@ -64,26 +68,26 @@ class Main extends PortableApplication(1900, 1000) {
     // Clears the screen
     g.clear()
 
-    /*
     manageHero()
-
-    h.animate(Gdx.graphics.getDeltaTime)
     h.draw(g)
     h.hitbox.draw(g)
 
-    m.animate(Gdx.graphics.getDeltaTime)
-    m.go(h.position)
+    manageMonster()
     m.draw(g)
-<<<<<<< HEAD
-    */
-
     m.hitbox.draw(g)
-    m.hitbox.interect(h.hitbox)
-
-    // Draw everything
 
     fightRoom.draw(g);
     g.drawFPS()
+  }
+
+  private def manageMonster(): Unit = {
+    m.animate(Gdx.graphics.getDeltaTime)
+
+    if(m.hitbox.interect(h.hitbox)){
+      h.setInvisibility(true)
+    }
+
+    m.go(h.hitbox.center)
   }
 
   private def manageHero(): Unit = {
@@ -110,6 +114,17 @@ class Main extends PortableApplication(1900, 1000) {
       !keyStatus(KEY_LEFT) && !keyStatus(KEY_RIGHT)){
       h.setMove(false)
     }
+
+    if(invincibilityTime >= h.INVINCIBILITY_TIME){
+      invincibilityTime = 0
+      h.setInvisibility(false)
+    }
+
+    if(h.isInvincible){
+      invincibilityTime += Gdx.graphics.getDeltaTime
+    }
+
+    h.animate(Gdx.graphics.getDeltaTime)
   }
 
   override def onKeyUp(keyCode: Int): Unit = {

@@ -1,5 +1,0 @@
-package Map
-
-class Monster {
-
-}

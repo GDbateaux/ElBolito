@@ -7,6 +7,7 @@ import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 class Hero(initialPos: Coordinate, width: Int) extends DrawableObject{
   private val SPRITE_WIDTH: Int = 32
@@ -15,6 +16,8 @@ class Hero(initialPos: Coordinate, width: Int) extends DrawableObject{
   private val HITBOX_HEIGHT: Int = width/2
   private val RELATIVE_CENTER_HITBOX: Coordinate = Coordinate((width-HITBOX_WIDTH)/2 + HITBOX_WIDTH/2,
     HITBOX_HEIGHT/2)
+
+  var INVINCIBILITY_TIME: Double = 1
 
   private val GROW_FACTOR = width / SPRITE_WIDTH
   private val NUM_FRAME_RUN: Int = 4
@@ -28,11 +31,17 @@ class Hero(initialPos: Coordinate, width: Int) extends DrawableObject{
   private var move: Boolean = false
   val position: Coordinate = initialPos
   val hitbox: Hitbox = new Hitbox(position, RELATIVE_CENTER_HITBOX, HITBOX_WIDTH, HITBOX_HEIGHT)
+  var isInvincible: Boolean = false
+
 
   private var dt: Double = 0
 
   def setSpeed(s: Double): Unit = {
     speed = s
+  }
+
+  def setInvisibility(i: Boolean): Unit = {
+    isInvincible = i
   }
 
   def animate(elapsedTime: Double): Unit = {

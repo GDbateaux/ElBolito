@@ -15,7 +15,7 @@ class FightRoom(val diffulty: Int, val characterDir: Direction, val doorsDir: Ar
   override def createRoom(): Unit = {
       //generateMonsters()
 
-      doorsPositions = doorsDir;
+      doorsPositions = doorsDir
 
       if (characterDir == Direction.NORTH) {
         room(0)((ROOM_WIDTH - 1) / 2) = ROOM_CHARACTER
@@ -35,35 +35,35 @@ class FightRoom(val diffulty: Int, val characterDir: Direction, val doorsDir: Ar
       //Les obstacles peuvent être de simple à 5
       //Il y a un maximum de pixel que les obstacle peuvent prendre en fonction des dimensions de la room
       //Les obstacles doivent être écarté les un des autres (1 carré d'écart)
-      val nbrObstaclePercentage = Random.nextInt(NUMBER_OBSTACLE_MAX_PERCENTAGE - NUMBER_OBSTACLE_MIN_PERCENTAGE + 1) + NUMBER_OBSTACLE_MIN_PERCENTAGE;
+      val nbrObstaclePercentage = Random.nextInt(NUMBER_OBSTACLE_MAX_PERCENTAGE - NUMBER_OBSTACLE_MIN_PERCENTAGE + 1) + NUMBER_OBSTACLE_MIN_PERCENTAGE
       var obstaclesRemain = ROOM_WIDTH * ROOM_HEIGHT / 100 * nbrObstaclePercentage
 
-      var positionRemain: ArrayBuffer[Position] = new ArrayBuffer[Position]();
+      var positionRemain: ArrayBuffer[Position] = new ArrayBuffer[Position]()
       for (y <- 0 until ROOM_HEIGHT) {
         for (x <- 0 until ROOM_WIDTH) {
-          positionRemain.addOne(Position(x, y));
+          positionRemain.addOne(Position(x, y))
         }
       }
 
       for (doorDir <- doorsDir) {
-        var doorPos: Position = Position(0, 0);
+        var doorPos: Position = Position(0, 0)
         if (doorDir == Direction.NORTH) {
-          doorPos = Position((ROOM_WIDTH - 1) / 2, 0);
+          doorPos = Position((ROOM_WIDTH - 1) / 2, 0)
         }
         else if (doorDir == Direction.EAST) {
-          doorPos = Position(ROOM_WIDTH - 1, (ROOM_HEIGHT - 1) / 2);
+          doorPos = Position(ROOM_WIDTH - 1, (ROOM_HEIGHT - 1) / 2)
         }
         else if (doorDir == Direction.SOUTH) {
-          doorPos = Position((ROOM_WIDTH - 1) / 2, ROOM_HEIGHT - 1);
+          doorPos = Position((ROOM_WIDTH - 1) / 2, ROOM_HEIGHT - 1)
         }
         else if (doorDir == Direction.WEST) {
-          doorPos = Position(0, (ROOM_HEIGHT - 1) / 2);
+          doorPos = Position(0, (ROOM_HEIGHT - 1) / 2)
         }
 
         //Remove doors and neighbors positions
-        positionRemain.subtractOne(doorPos);
+        positionRemain.subtractOne(doorPos)
         for (posToRemove <- getNeighbor(positionRemain, doorPos)) {
-          positionRemain.subtractOne(posToRemove);
+          positionRemain.subtractOne(posToRemove)
         }
       }
 
@@ -75,42 +75,42 @@ class FightRoom(val diffulty: Int, val characterDir: Direction, val doorsDir: Ar
         }
         obstaclesRemain = obstaclesRemain - obstacleSize
 
-        var obstaclesPos: ArrayBuffer[Position] = new ArrayBuffer[Position]();
+        var obstaclesPos: ArrayBuffer[Position] = new ArrayBuffer[Position]()
 
         if (positionRemain.isEmpty) {
-          obstaclesRemain = 0;
+          obstaclesRemain = 0
         }
         else {
           // First Wall
           var newPositionId = Random.nextInt(positionRemain.length)
-          var pos = positionRemain(newPositionId);
-          obstaclesPos.addOne(pos);
-          positionRemain.subtractOne(pos);
-          room(pos.y)(pos.x) = ROOM_OBSTACLE;
-          obstacleSize = obstacleSize - 1;
+          var pos = positionRemain(newPositionId)
+          obstaclesPos.addOne(pos)
+          positionRemain.subtractOne(pos)
+          room(pos.y)(pos.x) = ROOM_OBSTACLE
+          obstacleSize = obstacleSize - 1
 
           //Other walls
           while (obstacleSize > 0) {
-            newPositionId = Random.nextInt(obstaclesPos.length);
-            var posPossible: ArrayBuffer[Position] = getNeighbor(positionRemain, obstaclesPos(newPositionId));
+            newPositionId = Random.nextInt(obstaclesPos.length)
+            var posPossible: ArrayBuffer[Position] = getNeighbor(positionRemain, obstaclesPos(newPositionId))
             if (posPossible.nonEmpty) {
-              newPositionId = Random.nextInt(posPossible.length);
-              pos = posPossible(newPositionId);
-              obstaclesPos.addOne(pos);
-              positionRemain.subtractOne(pos);
-              room(pos.y)(pos.x) = ROOM_OBSTACLE;
-              obstacleSize = obstacleSize - 1;
+              newPositionId = Random.nextInt(posPossible.length)
+              pos = posPossible(newPositionId)
+              obstaclesPos.addOne(pos)
+              positionRemain.subtractOne(pos)
+              room(pos.y)(pos.x) = ROOM_OBSTACLE
+              obstacleSize = obstacleSize - 1
             }
             else {
-              obstaclesRemain = obstaclesRemain + obstacleSize;
-              obstacleSize = 0;
+              obstaclesRemain = obstaclesRemain + obstacleSize
+              obstacleSize = 0
             }
           }
 
           //Remove wall neighbor
           for (obstacle <- obstaclesPos) {
             for (posToRemove <- getNeighbor(positionRemain, obstacle)) {
-              positionRemain.subtractOne(posToRemove);
+              positionRemain.subtractOne(posToRemove)
             }
           }
         }
@@ -140,16 +140,16 @@ class FightRoom(val diffulty: Int, val characterDir: Direction, val doorsDir: Ar
         res.append(Position(pos.x + 1, pos.y))
       }
       if (posPossible.contains(Position(pos.x - 1, pos.y - 1))) {
-        res.append(Position(pos.x - 1, pos.y - 1));
+        res.append(Position(pos.x - 1, pos.y - 1))
       }
       if (posPossible.contains(Position(pos.x + 1, pos.y + 1))) {
-        res.append(Position(pos.x + 1, pos.y + 1));
+        res.append(Position(pos.x + 1, pos.y + 1))
       }
       if (posPossible.contains(Position(pos.x + 1, pos.y - 1))) {
-        res.append(Position(pos.x + 1, pos.y - 1));
+        res.append(Position(pos.x + 1, pos.y - 1))
       }
       if (posPossible.contains(Position(pos.x - 1, pos.y + 1))) {
-        res.append(Position(pos.x - 1, pos.y + 1));
+        res.append(Position(pos.x - 1, pos.y + 1))
       }
 
       return res
@@ -163,10 +163,10 @@ class FightRoom(val diffulty: Int, val characterDir: Direction, val doorsDir: Ar
 
 /*
 object RoomTest extends App {
-  private var doors: ArrayBuffer[Direction] = new ArrayBuffer[Direction]();
-  doors.addOne(Direction.NORTH);
-  doors.addOne(Direction.WEST);
-  doors.addOne(Direction.EAST);
+  private var doors: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+  doors.addOne(Direction.NORTH)
+  doors.addOne(Direction.WEST)
+  doors.addOne(Direction.EAST)
   private val r: FightRoom = new FightRoom(20, Direction.WEST, doors)
   r.createRoom()
 }

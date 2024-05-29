@@ -33,7 +33,6 @@ class Hitbox(charPos: Coordinate, relativeCenterPos: Coordinate, width: Double, 
     val overlapY = h.pos1.y < pos2.y && h.pos2.y > pos1.y
 
     if (overlapX && overlapY) {
-      println(Random.nextInt(1000))
       return true
     }
     return false

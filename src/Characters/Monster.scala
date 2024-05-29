@@ -4,6 +4,7 @@ import Utils.Coordinate
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
+import com.badlogic.gdx.math.Interpolation
 
 import scala.util.Random
 
@@ -43,8 +44,20 @@ class Monster(initialPos: Coordinate, width: Int) extends DrawableObject{
     }
   }
 
-  def go(heroCoordinate: Coordinate): Unit = {
-    val relativeVector: Coordinate = Coordinate(heroCoordinate.x - position.x, heroCoordinate.y - position.y)
+  def goBack(CoordinateCenterHeroBase: Coordinate, CoordinateCenterBase: Coordinate, percentage: Float): Unit = {
+    val relativeVector: Coordinate = Coordinate(-(CoordinateCenterHeroBase.x - hitbox.center.x),
+      -(CoordinateCenterHeroBase.y - hitbox.center.y))
+    val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
+    val finalPos: Coordinate = Coordinate((math.cos(angle) * GROW_FACTOR * 10).toFloat,
+      (math.sin(angle) * GROW_FACTOR * 10).toFloat)
+
+    position.x = Interpolation.linear.apply(CoordinateCenterBase.x, finalPos.x, percentage)
+    position.y = Interpolation.linear.apply(CoordinateCenterBase.y, finalPos.y, percentage)
+  }
+
+  def go(CoordinateCenter: Coordinate): Unit = {
+    val relativeVector: Coordinate = Coordinate(CoordinateCenter.x - hitbox.center.x,
+      CoordinateCenter.y - hitbox.center.y)
     val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
 
     position.x += (math.cos(angle) * speed * GROW_FACTOR).toFloat
