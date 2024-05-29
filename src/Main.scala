@@ -16,7 +16,6 @@ import scala.collection.mutable.ArrayBuffer
  * @version 1.0
  */
 object Main {
-
   def main(args: Array[String]): Unit = {
     new Main
   }
@@ -35,9 +34,9 @@ class Main extends PortableApplication(1920, 1080) {
   override def onInit(): Unit = {
     setTitle("El Bolito")
 
-    h = new Hero(Coordinate(100,100))
-    m = new Monster(Coordinate(200,200))
-    m.setSpeed(0.8)
+    h = new Hero(Coordinate(0,0), 200)
+    m = new Monster(Coordinate(200,200), 200)
+    m.setSpeed(0.5)
     keyStatus(KEY_UP) = false
     keyStatus(KEY_RIGHT) = false
     keyStatus(KEY_DOWN) = false
@@ -46,7 +45,7 @@ class Main extends PortableApplication(1920, 1080) {
 
   /**
    * This method is called periodically by the engine
-   *
+   *ww
    * @param g
    */
   override def onGraphicRender(g: GdxGraphics): Unit = {
@@ -56,10 +55,13 @@ class Main extends PortableApplication(1920, 1080) {
 
     h.animate(Gdx.graphics.getDeltaTime)
     h.draw(g)
+    h.hitbox.draw(g)
 
     m.animate(Gdx.graphics.getDeltaTime)
     m.go(h.position)
     m.draw(g)
+    m.hitbox.draw(g)
+    m.hitbox.interect(h.hitbox)
 
     // Draw everything
     g.drawFPS()

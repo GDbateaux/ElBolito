@@ -5,10 +5,17 @@ import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 
-class Monster(initialPos: Coordinate) extends DrawableObject{
-  private val SPRITE_WIDTH: Int = 32
-  private val SPRITE_HEIGHT: Int = 32
+import scala.util.Random
 
+class Monster(initialPos: Coordinate, width: Int) extends DrawableObject{
+  private val SPRITE_WIDTH: Int = 32
+  private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
+  private val HITBOX_WIDTH: Int = width / 2
+  private val HITBOX_HEIGHT: Int = 12 * width / SPRITE_WIDTH
+  private val RELATIVE_CENTER_HITBOX: Coordinate = Coordinate((width - HITBOX_WIDTH) / 2 + HITBOX_WIDTH / 2,
+    (width - HITBOX_HEIGHT) / 2 + HITBOX_HEIGHT / 2)
+
+  private val GROW_FACTOR = width / SPRITE_WIDTH
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
@@ -18,6 +25,7 @@ class Monster(initialPos: Coordinate) extends DrawableObject{
 
   private var speed: Double = 1
   val position: Coordinate = initialPos
+  val hitbox: Hitbox = new Hitbox(position, RELATIVE_CENTER_HITBOX, HITBOX_WIDTH, HITBOX_HEIGHT)
 
   private var dt: Double = 0
 
@@ -39,33 +47,11 @@ class Monster(initialPos: Coordinate) extends DrawableObject{
     val relativeVector: Coordinate = Coordinate(heroCoordinate.x - position.x, heroCoordinate.y - position.y)
     val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
 
-    position.x += (math.cos(angle) * speed).toFloat
-    position.y += (math.sin(angle) * speed).toFloat
-
+    position.x += (math.cos(angle) * speed * GROW_FACTOR).toFloat
+    position.y += (math.sin(angle) * speed * GROW_FACTOR).toFloat
   }
 
-  /*def turn(d: Dire): Unit = {
-    d match {
-      case Direction.SOUTH => textureY = 0
-      case Direction.WEST => textureY = 1
-      case Direction.EAST => textureY = 2
-      case Direction.NORTH => textureY = 3
-      case _ =>
-    }
-  }*/
-
-  /*def go(d: Direction): Unit = {
-    move = true
-    d match {
-      case Direction.SOUTH => position.y -= 1
-      case Direction.WEST => position.x -= 1
-      case Direction.EAST => position.x += 1
-      case Direction.NORTH => position.y += 1
-      case _ =>
-    }
-  }*/
-
   override def draw(g: GdxGraphics): Unit = {
-    g.draw(runSs.sprites(0)(currentFrame), position.x, position.y)
+    g.draw(runSs.sprites(0)(currentFrame), position.x, position.y, width, width)
   }
 }
