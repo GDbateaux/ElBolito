@@ -13,7 +13,10 @@ class Floor(private val numRoom: Int) extends DrawableObject{
   private var arraySide: Int = 0
   private val PRODUCT_SIDE_ROOME: Double = 0.8
   private val tmpSide: Int = (numRoom * PRODUCT_SIDE_ROOME).toInt
-  var currentRoom: Position = Position(0,0)
+  private var floorInt: Array[Array[Int]] = _
+  private var floor: Array[Array[Room]] = _
+  private var currentRoomPos: Position = Position(0,0)
+  var currentRoom: Room = _
   var RoomDifficulty: Int = 1
 
   if(tmpSide % 2 == 0){
@@ -22,13 +25,53 @@ class Floor(private val numRoom: Int) extends DrawableObject{
   else{
     arraySide = tmpSide
   }
+  generateFloor()
+  displayRooms()
 
-  def generateFloor(): Unit = {
-    val floor: Array[Array[Int]] = generateBlueprint()
-    addRoomType(floor)
+  def changeRoom(d: Direction): Unit = {
+    var nextRoomPos: Position = Position(0, 0)
 
-    for(y: Int <- floor.indices){
-      for(x: Int <- floor(0).indices){
+    if(d == Direction.NORTH){
+      nextRoomPos = Position(currentRoomPos.x, currentRoomPos.y-1)
+    }
+    else if(d == Direction.SOUTH){
+      nextRoomPos = Position(currentRoomPos.x, currentRoomPos.y+1)
+    }
+    else if (d == Direction.WEST) {
+      nextRoomPos = Position(currentRoomPos.x - 1, currentRoomPos.y)
+    }
+    else if (d == Direction.EAST) {
+      nextRoomPos = Position(currentRoomPos.x + 1, currentRoomPos.y)
+    }
+
+    if (nextRoomPos.x >= 0 && nextRoomPos.x < arraySide && nextRoomPos.y >= 0 && nextRoomPos.y < arraySide) {
+      if (floor(nextRoomPos.y)(nextRoomPos.x) != null) {
+        currentRoomPos = nextRoomPos
+        currentRoom = floor(currentRoomPos.y)(currentRoomPos.x)
+      }
+    }
+  }
+
+  private def generateFloor(): Unit = {
+    floorInt = generateBlueprint()
+    addRoomType(floorInt)
+    floor = generateFloorArray(floorInt)
+    currentRoom = floor(currentRoomPos.y)(currentRoomPos.x)
+  }
+
+  def displayRooms(): Unit = {
+    for (y: Int <- floorInt.indices) {
+      for (x: Int <- floorInt(0).indices) {
+        print(floorInt(y)(x))
+      }
+      println()
+    }
+
+    println()
+    println()
+
+    for (y: Int <- floor.indices) {
+      for (x: Int <- floor(0).indices) {
         print(floor(y)(x))
       }
       println()
@@ -45,7 +88,7 @@ class Floor(private val numRoom: Int) extends DrawableObject{
           res(y)(x) = new FightRoom(RoomDifficulty, neighborRooms)
         }
         else if(f(y)(x) == 2){
-          currentRoom = Position(x,y)
+          currentRoomPos = Position(x,y)
           res(y)(x) = new StartRoom(neighborRooms)
         }
         else if(f(y)(x) == 3){
@@ -236,13 +279,15 @@ class Floor(private val numRoom: Int) extends DrawableObject{
     return res
   }
 
-  override def draw(gdxGraphics: GdxGraphics): Unit = {
-
+  override def draw(g: GdxGraphics): Unit = {
+    val currentRoom: Room = this.currentRoom
+    if(currentRoom != null){
+      currentRoom.draw(g)
+    }
   }
 
 }
 
 object FloorTest extends App {
   val f: Floor = new Floor(15)
-  f.generateFloor()
 }

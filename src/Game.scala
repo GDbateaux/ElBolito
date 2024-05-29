@@ -1,7 +1,7 @@
 import Characters.{Hero, Monster}
-import Map.FightRoom
+import Map.{FightRoom, Floor}
 import Utils.Direction.Direction
-import Utils.{Coordinate, Direction}
+import Utils.{Coordinate, Direction, Screen}
 import ch.hevs.gdx2d.desktop.PortableApplication
 import ch.hevs.gdx2d.lib.GdxGraphics
 import com.badlogic.gdx.{Gdx, Input}
@@ -16,17 +16,20 @@ import scala.collection.mutable.ArrayBuffer
  * @author Pierre-André Mudry (mui)
  * @version 1.0
  */
-object Main {
+object Game {
   def main(args: Array[String]): Unit = {
-    new Main
+    new Game(Screen.WIDTH, Screen.HEIGHT)
   }
 }
 
-class Main extends PortableApplication(1900, 1000) {
+class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windowWidth, windowHeigth) {
   private val ANIMATION_LENGTH_DAMAGE: Float = 1
+  private val NUM_ROOM: Int = 10
+  private val DRAW_HITBOX: Boolean = true
 
   private var h: Hero = _
   private var m: Monster = _
+  private var f: Floor = _
   private val keyStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
   private var currentTime: Float = 0
   private var invincibilityTime: Float = 0
@@ -39,8 +42,10 @@ class Main extends PortableApplication(1900, 1000) {
   override def onInit(): Unit = {
     setTitle("El Bolito")
 
-    h = new Hero(Coordinate(0, 0), 200)
-    m = new Monster(Coordinate(200, 200), 200)
+    f = new Floor(NUM_ROOM)
+    //val heroCoordinate: Coordinate = f.currentRoom.
+    h = new Hero(Coordinate(0, 0), f.currentRoom.squareWidth)
+    m = new Monster(Coordinate(200, 200), f.currentRoom.squareWidth)
     m.setSpeed(0.5)
 
 
@@ -59,13 +64,18 @@ class Main extends PortableApplication(1900, 1000) {
     // Clears the screen
     g.clear()
 
+    f.draw(g)
+
     manageHero()
     h.draw(g)
-    h.hitbox.draw(g)
 
     manageMonster()
     m.draw(g)
-    m.hitbox.draw(g)
+
+    if(DRAW_HITBOX){
+      h.hitbox.draw(g)
+      m.hitbox.draw(g)
+    }
 
     g.drawFPS()
   }

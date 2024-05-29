@@ -8,11 +8,11 @@ import com.badlogic.gdx.math.Interpolation
 
 import scala.util.Random
 
-class Monster(initialPos: Coordinate, width: Int) extends DrawableObject{
+class Monster(initialPos: Coordinate, width: Float) extends DrawableObject{
   private val SPRITE_WIDTH: Int = 32
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
-  private val HITBOX_WIDTH: Int = width / 2
-  private val HITBOX_HEIGHT: Int = 12 * width / SPRITE_WIDTH
+  private val HITBOX_WIDTH: Float = width / 2
+  private val HITBOX_HEIGHT: Float = 12 * width / SPRITE_WIDTH
   private val RELATIVE_CENTER_HITBOX: Coordinate = Coordinate((width - HITBOX_WIDTH) / 2 + HITBOX_WIDTH / 2,
     (width - HITBOX_HEIGHT) / 2 + HITBOX_HEIGHT / 2)
 

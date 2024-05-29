@@ -1,6 +1,6 @@
 package Map
 
-import Utils.{Direction, Position}
+import Utils.{Coordinate, Direction, Position}
 import Utils.Direction.Direction
 
 import scala.collection.mutable.ArrayBuffer
@@ -16,9 +16,6 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
 
   override def createRoom(): Unit = {
       //generateMonsters()
-
-      doorsPositions = doorsDir
-
       if (characterDir == Direction.NORTH) {
         room(0)((ROOM_WIDTH - 1) / 2) = ROOM_CHARACTER
       }
@@ -117,14 +114,13 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
           }
         }
       }
-
-      for (y: Int <- room.indices) {
-        for (x: Int <- room(0).indices) {
-          print(room(y)(x))
-        }
-        println()
-      }
     }
+
+  override def monsterAttack(c: Coordinate): Unit = {
+    for (m <- monsters) {
+      m.go(c)
+    }
+  }
 
     private def getNeighbor(posPossible: ArrayBuffer[Position], pos: Position): ArrayBuffer[Position] = {
       val res: ArrayBuffer[Position] = new ArrayBuffer[Position]()

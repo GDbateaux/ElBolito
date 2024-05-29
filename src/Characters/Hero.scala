@@ -9,11 +9,11 @@ import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-class Hero(initialPos: Coordinate, width: Int) extends DrawableObject{
+class Hero(initialPos: Coordinate, width: Float) extends DrawableObject{
   private val SPRITE_WIDTH: Int = 32
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
-  private val HITBOX_WIDTH: Int = 20 * width / SPRITE_WIDTH
-  private val HITBOX_HEIGHT: Int = width/2
+  private val HITBOX_WIDTH: Float = 20 * width / SPRITE_WIDTH
+  private val HITBOX_HEIGHT: Float = width/2
   private val RELATIVE_CENTER_HITBOX: Coordinate = Coordinate((width-HITBOX_WIDTH)/2 + HITBOX_WIDTH/2,
     HITBOX_HEIGHT/2)
 

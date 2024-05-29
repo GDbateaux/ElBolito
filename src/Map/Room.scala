@@ -1,7 +1,7 @@
 package Map
 
 import Characters.{Hero, Monster}
-import Utils.Direction
+import Utils.{Coordinate, Direction, Screen}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
@@ -23,7 +23,41 @@ trait Room extends DrawableObject {
   protected var doorsPositions: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
   protected var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
 
+  private val nbrSquareX: Int = ROOM_WIDTH + 4 // 2 = les murs droites et gauches (+ over)
+  private val nbrSquareY: Int = ROOM_HEIGHT + 4 // 2 = les murs en haut et en bas (+ over)
+  private var spaceWidth: Double = 0
+  private var spaceHeight: Double = 0
+
+  var squareWidth: Float = 0
+  init()
+
   def createRoom(): Unit
+
+  def monsterAttack(c: Coordinate): Unit = {
+
+  }
+
+  private def init(): Unit = {
+    val SCREEN_WIDTH = Screen.WIDTH.toDouble
+    val SCREEN_HEIGHT = Screen.HEIGHT.toDouble
+
+    val sizeByX: Double = SCREEN_WIDTH / nbrSquareX
+    val sizeByY: Double = SCREEN_HEIGHT / (nbrSquareY - 0.4)
+    var height: Double = 0
+    var width: Double = 0
+
+    if (sizeByX <= sizeByY) {
+      squareWidth = sizeByX.toFloat
+      height = squareWidth * nbrSquareY
+      width = SCREEN_WIDTH
+      spaceHeight = (SCREEN_HEIGHT - height) / 2
+    } else {
+      squareWidth = sizeByY.toFloat
+      height = SCREEN_HEIGHT
+      width = squareWidth * nbrSquareX
+      spaceWidth = (SCREEN_WIDTH - width) / 2
+    }
+  }
 
   override def draw(g: GdxGraphics): Unit = {
     //Mettre les différents murs
@@ -34,28 +68,6 @@ trait Room extends DrawableObject {
 
     //new Texture(Gdx.files.internal("res/lib/logo_hes.png"))
     //texture.setFilter(TextureFilter.Linear, TextureFilter.Linear)
-
-    val nbrSquareX: Int = ROOM_WIDTH + 4 // 2 = les murs droites et gauches (+ over)
-    val nbrSquareY: Int = ROOM_HEIGHT + 4 // 2 = les murs en haut et en bas (+ over)
-    val sizeByX: Double = g.getScreenWidth.toDouble / nbrSquareX
-    val sizeByY: Double = g.getScreenHeight.toDouble / (nbrSquareY - 0.4)
-    var pixelSize: Double = 0
-    var height: Double = 0
-    var width: Double = 0
-    var spaceWidth: Double = 0
-    var spaceHeight: Double = 0
-
-    if(sizeByX <= sizeByY) {
-      pixelSize = sizeByX
-      height = pixelSize * nbrSquareY
-      width = g.getScreenWidth
-      spaceHeight = (g.getScreenHeight - height) / 2
-    } else {
-      pixelSize = sizeByY
-      height = g.getScreenHeight
-      width = pixelSize * nbrSquareX
-      spaceWidth = (g.getScreenWidth - width) / 2
-    }
 
     val wallTop = new Texture(Gdx.files.local("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_top.png"))
     val wallLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_1_left.png"))
@@ -83,73 +95,73 @@ trait Room extends DrawableObject {
 
     for (y: Int <- 0 until nbrSquareY) {
       for (x: Int <- 0 until nbrSquareX) {
-        var posX: Float = (x.toDouble * pixelSize).toFloat + spaceWidth.toFloat
-        var posY: Float = ((nbrSquareY - 1 - y).toDouble * pixelSize).toFloat + spaceHeight.toFloat
+        var posX: Float = (x.toDouble * squareWidth).toFloat + spaceWidth.toFloat
+        var posY: Float = ((nbrSquareY - 1 - y).toDouble * squareWidth).toFloat + spaceHeight.toFloat
 
         if (y == 1 && x >= 2 && x < nbrSquareX - 2) {
-          g.draw(wallTop, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if(x == 11 && doorsPositions.contains(Direction.NORTH)) {
-            g.draw(doorTop, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+            g.draw(doorTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == 1 && y >= 2 && y < nbrSquareY - 2) {
-          g.draw(wallLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (y == 7 && doorsPositions.contains(Direction.WEST)) {
-            g.draw(doorLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+            g.draw(doorLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (y == nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
-          g.draw(wallBot, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (x == 11 && doorsPositions.contains(Direction.SOUTH)) {
-            g.draw(doorBot, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+            g.draw(doorBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == nbrSquareX - 2 && y >= 2 && y < nbrSquareY - 2) {
-          g.draw(wallRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (y == 7 && doorsPositions.contains(Direction.EAST)) {
-            g.draw(doorRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+            g.draw(doorRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == 0 && y != 0 && y < nbrSquareY - 1) {
-          g.draw(wallOverLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallOverLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if (x == nbrSquareX - 1 && y != 0 && y < nbrSquareY - 1) {
-          g.draw(wallOverRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallOverRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if (y == 0 && x != 0 && x < nbrSquareX - 1) {
-          g.draw(wallOverTop, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallOverTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if (y == nbrSquareY - 1 && x != 0 && x < nbrSquareX - 1) {
-          g.draw(wallOverBot, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallOverBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if (x == 0 && y == nbrSquareY - 1) {
-          g.draw(wallOverBot_cornerLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallOverBot_cornerLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if (x == nbrSquareX - 1 && y == nbrSquareY - 1) {
-          g.draw(wallOverBot_cornerRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallOverBot_cornerRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if (x == 0 && y == 0) {
-          g.draw(wallOverTop_cornerLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallOverTop_cornerLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if (x == nbrSquareX - 1 && y == 0) {
-          g.draw(wallOverTop_cornerRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallOverTop_cornerRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if(x == 1 && y == 1) {
-          g.draw(wallTopCornerLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallTopCornerLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if(x == nbrSquareX - 2 && y == 1) {
-          g.draw(wallTopCornerRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallTopCornerRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if (x == 1 && y == nbrSquareY - 2) {
-          g.draw(wallBotCornerLeft, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallBotCornerLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if (x == nbrSquareX - 2 && y == nbrSquareY - 2) {
-          g.draw(wallBotCornerRight, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(wallBotCornerRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if(y >= 2 && y < nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
-          g.draw(floor, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+          g.draw(floor, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
            if (room(y - 2)(x - 2) == ROOM_OBSTACLE) {
-            g.draw(obstacle, posX, posY, pixelSize.toFloat, pixelSize.toFloat)
+            g.draw(obstacle, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
           else if (room(y - 2)(x - 2) == ROOM_MONSTER) {
 
@@ -167,4 +179,3 @@ trait Room extends DrawableObject {
 
   }
 }
-
