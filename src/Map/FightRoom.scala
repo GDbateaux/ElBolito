@@ -1,6 +1,6 @@
 package Map
 
-import Utils.{Coordinate, Direction, Position}
+import Utils.{Vector2d, Direction, Position}
 import Utils.Direction.Direction
 
 import scala.collection.mutable.ArrayBuffer
@@ -116,7 +116,7 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
       }
     }
 
-  override def monsterAttack(c: Coordinate): Unit = {
+  override def monsterAttack(c: Vector2d): Unit = {
     for (m <- monsters) {
       m.go(c)
     }

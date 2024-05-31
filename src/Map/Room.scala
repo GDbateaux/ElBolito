@@ -1,7 +1,7 @@
 package Map
 
 import Characters.{Hero, Monster}
-import Utils.{Coordinate, Direction, Screen}
+import Utils.{Vector2d, Direction, Screen}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
@@ -33,7 +33,7 @@ trait Room extends DrawableObject {
 
   def createRoom(): Unit
 
-  def monsterAttack(c: Coordinate): Unit = {
+  def monsterAttack(c: Vector2d): Unit = {
 
   }
 

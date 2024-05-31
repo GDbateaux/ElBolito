@@ -1,11 +1,12 @@
 import Characters.{Hero, Monster}
 import Map.{FightRoom, Floor}
 import Utils.Direction.Direction
-import Utils.{Coordinate, Direction, Screen}
+import Utils.{Vector2d, Direction, Screen}
 import ch.hevs.gdx2d.desktop.PortableApplication
 import ch.hevs.gdx2d.lib.GdxGraphics
 import com.badlogic.gdx.{Gdx, Input}
 
+import scala.collection.immutable.Vector2
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -43,11 +44,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     setTitle("El Bolito")
 
     f = new Floor(NUM_ROOM)
-    //val heroCoordinate: Coordinate = f.currentRoom.
-    h = new Hero(Coordinate(0, 0), f.currentRoom.squareWidth)
-    m = new Monster(Coordinate(200, 200), f.currentRoom.squareWidth)
+    h = new Hero(new Vector2d(0, 0), f.currentRoom.squareWidth)
+    m = new Monster(new Vector2d(200, 200), f.currentRoom.squareWidth)
     m.setSpeed(0.5)
-
 
     keyStatus(KEY_UP) = false
     keyStatus(KEY_RIGHT) = false
@@ -57,7 +56,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
   /**
    * This method is called periodically by the engine
-   *ww
+   *
    * @param g
    */
   override def onGraphicRender(g: GdxGraphics): Unit = {
