@@ -1,12 +1,13 @@
 package Map
 
 import Characters.{Hero, Monster}
-import Utils.{Vector2d, Direction, Screen}
+import Utils.{Direction, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.math.Vector2
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -28,7 +29,9 @@ trait Room extends DrawableObject {
   private var spaceWidth: Double = 0
   private var spaceHeight: Double = 0
 
+  val roomObstacles: ArrayBuffer[Obstacle] = new ArrayBuffer[Obstacle]()
   var squareWidth: Float = 0
+  //var squareCoordinate: Array[Array[Coordinate]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   init()
 
   def createRoom(): Unit
@@ -57,6 +60,15 @@ trait Room extends DrawableObject {
       width = squareWidth * nbrSquareX
       spaceWidth = (SCREEN_WIDTH - width) / 2
     }
+
+    /*for (y: Int <- 0 until nbrSquareY) {
+      for (x: Int <- 0 until nbrSquareX) {
+        var posX: Float = (x.toDouble * squareWidth).toFloat + spaceWidth.toFloat
+        var posY: Float = ((nbrSquareY - 1 - y).toDouble * squareWidth).toFloat + spaceHeight.toFloat
+
+        squareCoordinate(y)(x) = Coordinate(posX, posY)
+      }
+    }*/
   }
 
   override def draw(g: GdxGraphics): Unit = {
@@ -161,7 +173,8 @@ trait Room extends DrawableObject {
         else if(y >= 2 && y < nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
           g.draw(floor, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
            if (room(y - 2)(x - 2) == ROOM_OBSTACLE) {
-            g.draw(obstacle, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
+             roomObstacles.append(new Obstacle(new Vector2d(posX, posY), squareWidth))
+             g.draw(obstacle, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
           else if (room(y - 2)(x - 2) == ROOM_MONSTER) {
 

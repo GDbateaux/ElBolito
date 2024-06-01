@@ -63,7 +63,11 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     // Clears the screen
     g.clear()
 
+    f.changeRoom(Direction.NORTH)
     f.draw(g)
+    /*for (d <- f.currentRoom.roomObstacles){
+      d.hitbox.draw(g)
+    }*/
 
     manageHero()
     h.draw(g)

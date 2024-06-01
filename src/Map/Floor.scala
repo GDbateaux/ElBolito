@@ -285,7 +285,6 @@ class Floor(private val numRoom: Int) extends DrawableObject{
       currentRoom.draw(g)
     }
   }
-
 }
 
 object FloorTest extends App {
