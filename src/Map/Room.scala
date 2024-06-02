@@ -31,6 +31,7 @@ trait Room extends DrawableObject {
   private var spaceHeight: Double = 0
   private var firstDraw: Boolean = true
 
+  val roomDoors: ArrayBuffer[Hitbox] = new ArrayBuffer[Hitbox]()
   val roomObstacles: ArrayBuffer[Obstacle] = new ArrayBuffer[Obstacle]()
   var squareWidth: Float = 0
   //var squareCoordinate: Array[Array[Coordinate]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
@@ -90,7 +91,12 @@ trait Room extends DrawableObject {
   }
 
   def doorContact(heroHitbox: Hitbox): Direction = {
-    var res: Direction = Direction.NORTH
+    var res: Direction = Direction.NULL
+    for(door: Hitbox <- roomDoors) {
+      if (heroHitbox.interect(door)){
+        res = heroHitbox.neighborDirection(door)
+      }
+    }
     return res
   }
 
@@ -139,6 +145,10 @@ trait Room extends DrawableObject {
           }
           g.draw(wallTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if(x == ROOM_WIDTH/2+2 && doorsPositions.contains(Direction.NORTH)) {
+            if(firstDraw){
+              roomDoors.append(new Hitbox(new Vector2d(posX + squareWidth/2, posY + squareWidth/2),
+                squareWidth, squareWidth))
+            }
             g.draw(doorTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
@@ -148,6 +158,10 @@ trait Room extends DrawableObject {
           }
           g.draw(wallLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (y == ROOM_HEIGHT/2+2 && doorsPositions.contains(Direction.WEST)) {
+            if(firstDraw){
+              roomDoors.append(new Hitbox(new Vector2d(posX + squareWidth/2, posY + squareWidth/2),
+                squareWidth, squareWidth))
+            }
             g.draw(doorLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
@@ -157,6 +171,10 @@ trait Room extends DrawableObject {
           }
           g.draw(wallBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (x == ROOM_WIDTH/2+2 && doorsPositions.contains(Direction.SOUTH)) {
+            if(firstDraw){
+              roomDoors.append(new Hitbox(new Vector2d(posX + squareWidth/2, posY + squareWidth/2),
+                squareWidth, squareWidth))
+            }
             g.draw(doorBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
@@ -166,6 +184,10 @@ trait Room extends DrawableObject {
           }
           g.draw(wallRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (y == ROOM_HEIGHT/2+2 && doorsPositions.contains(Direction.EAST)) {
+            if(firstDraw){
+              roomDoors.append(new Hitbox(new Vector2d(posX + squareWidth/2, posY + squareWidth/2),
+                squareWidth, squareWidth))
+            }
             g.draw(doorRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }

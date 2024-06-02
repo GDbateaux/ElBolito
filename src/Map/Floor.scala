@@ -38,10 +38,10 @@ class Floor(private val numRoom: Int) extends DrawableObject{
       nextRoomPos = Position(currentRoomPos.x, currentRoomPos.y+1)
     }
     else if (d == Direction.EAST) {
-      nextRoomPos = Position(currentRoomPos.x - 1, currentRoomPos.y)
+      nextRoomPos = Position(currentRoomPos.x + 1, currentRoomPos.y)
     }
     else if (d == Direction.WEST) {
-      nextRoomPos = Position(currentRoomPos.x + 1, currentRoomPos.y)
+      nextRoomPos = Position(currentRoomPos.x - 1, currentRoomPos.y)
     }
 
     if (nextRoomPos.x >= 0 && nextRoomPos.x < arraySide && nextRoomPos.y >= 0 && nextRoomPos.y < arraySide) {

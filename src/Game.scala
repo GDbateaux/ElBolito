@@ -63,7 +63,6 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     // Clears the screen
     g.clear()
 
-    f.changeRoom(Direction.NORTH)
     f.draw(g)
     /*for (d <- f.currentRoom.roomObstacles){
       d.hitbox.draw(g)
@@ -96,6 +95,11 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private def manageHero(): Unit = {
     var goDir: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
     val dirNoGo: ArrayBuffer[Direction] = f.currentRoom.wallContact(h.hitbox)
+    val dirSwitchRoom: Direction = f.currentRoom.doorContact(h.hitbox)
+    if(dirSwitchRoom != Direction.NULL){
+      h.position.x = 400
+      f.changeRoom(dirSwitchRoom)
+    }
 
     if (keyStatus(KEY_UP)) {
       h.turn(Direction.NORTH)
