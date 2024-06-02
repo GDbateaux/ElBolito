@@ -1,6 +1,6 @@
 package Map
 
-import Characters.{Hero, Monster}
+import Characters.{Hero, Hitbox, Monster}
 import Utils.{Direction, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.lib.GdxGraphics
@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector2
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 //Type de room: 0: Chill, 1: Battle, 2: Boss, 3: BigFoot (pas sûr pour le 3)
@@ -28,6 +29,7 @@ trait Room extends DrawableObject {
   private val nbrSquareY: Int = ROOM_HEIGHT + 4 // 2 = les murs en haut et en bas (+ over)
   private var spaceWidth: Double = 0
   private var spaceHeight: Double = 0
+  private var firstDraw: Boolean = true
 
   val roomObstacles: ArrayBuffer[Obstacle] = new ArrayBuffer[Obstacle]()
   var squareWidth: Float = 0
@@ -71,6 +73,25 @@ trait Room extends DrawableObject {
     }*/
   }
 
+  def wallContact(heroHitbox: Hitbox): ArrayBuffer[Direction] = {
+    val res: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+
+    for(obstacle <- roomObstacles) {
+      if (heroHitbox.interect(obstacle.hitbox)){
+        res.addOne(heroHitbox.neighborDirection(obstacle.hitbox))
+      }
+    }
+    if(!res.isEmpty){
+      println(res.mkString(";"))
+    }
+    return res
+  }
+
+  def doorContact(heroHitbox: Hitbox): Direction = {
+    var res: Direction = Direction.NORTH
+    return res
+  }
+
   override def draw(g: GdxGraphics): Unit = {
     //Mettre les différents murs
     //Ajouter les portes (trou pour les portes sur les coté et en bas). Porte du haut avec animation (déterminer si elle doit être ouverte ou fermée)
@@ -112,25 +133,25 @@ trait Room extends DrawableObject {
 
         if (y == 1 && x >= 2 && x < nbrSquareX - 2) {
           g.draw(wallTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
-          if(x == 11 && doorsPositions.contains(Direction.NORTH)) {
+          if(x == ROOM_WIDTH/2+2 && doorsPositions.contains(Direction.NORTH)) {
             g.draw(doorTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == 1 && y >= 2 && y < nbrSquareY - 2) {
           g.draw(wallLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
-          if (y == 7 && doorsPositions.contains(Direction.WEST)) {
+          if (y == ROOM_HEIGHT/2+2 && doorsPositions.contains(Direction.WEST)) {
             g.draw(doorLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (y == nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
           g.draw(wallBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
-          if (x == 11 && doorsPositions.contains(Direction.SOUTH)) {
+          if (x == ROOM_WIDTH/2+2 && doorsPositions.contains(Direction.SOUTH)) {
             g.draw(doorBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == nbrSquareX - 2 && y >= 2 && y < nbrSquareY - 2) {
           g.draw(wallRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
-          if (y == 7 && doorsPositions.contains(Direction.EAST)) {
+          if (y == ROOM_HEIGHT/2+2 && doorsPositions.contains(Direction.EAST)) {
             g.draw(doorRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
@@ -173,7 +194,9 @@ trait Room extends DrawableObject {
         else if(y >= 2 && y < nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
           g.draw(floor, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
            if (room(y - 2)(x - 2) == ROOM_OBSTACLE) {
-             roomObstacles.append(new Obstacle(new Vector2d(posX, posY), squareWidth))
+             if(firstDraw){
+               roomObstacles.append(new Obstacle(new Vector2d(posX, posY), squareWidth))
+             }
              g.draw(obstacle, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
           else if (room(y - 2)(x - 2) == ROOM_MONSTER) {
@@ -185,7 +208,7 @@ trait Room extends DrawableObject {
         }
       }
     }
-
+    firstDraw = false
   }
 
   def openDoor(): Unit = {

@@ -26,7 +26,7 @@ class Floor(private val numRoom: Int) extends DrawableObject{
     arraySide = tmpSide
   }
   generateFloor()
-  displayRooms()
+  //displayRooms()
 
   def changeRoom(d: Direction): Unit = {
     var nextRoomPos: Position = Position(0, 0)
@@ -37,10 +37,10 @@ class Floor(private val numRoom: Int) extends DrawableObject{
     else if(d == Direction.SOUTH){
       nextRoomPos = Position(currentRoomPos.x, currentRoomPos.y+1)
     }
-    else if (d == Direction.WEST) {
+    else if (d == Direction.EAST) {
       nextRoomPos = Position(currentRoomPos.x - 1, currentRoomPos.y)
     }
-    else if (d == Direction.EAST) {
+    else if (d == Direction.WEST) {
       nextRoomPos = Position(currentRoomPos.x + 1, currentRoomPos.y)
     }
 

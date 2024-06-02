@@ -1,7 +1,7 @@
 import Characters.{Hero, Monster}
-import Map.{FightRoom, Floor}
+import Map.{FightRoom, Floor, Obstacle}
 import Utils.Direction.Direction
-import Utils.{Vector2d, Direction, Screen}
+import Utils.{Direction, Screen, Vector2d}
 import ch.hevs.gdx2d.desktop.PortableApplication
 import ch.hevs.gdx2d.lib.GdxGraphics
 import com.badlogic.gdx.{Gdx, Input}
@@ -69,6 +69,10 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       d.hitbox.draw(g)
     }*/
 
+    for(c: Obstacle <- f.currentRoom.roomObstacles){
+      c.hitbox.draw(g)
+    }
+
     manageHero()
     h.draw(g)
 
@@ -94,7 +98,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   }
 
   private def manageHero(): Unit = {
-    val goDir: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+    var goDir: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+    val dirNoGo: ArrayBuffer[Direction] = f.currentRoom.wallContact(h.hitbox)
+
     if (keyStatus(KEY_UP)) {
       h.turn(Direction.NORTH)
       goDir.append(Direction.NORTH)
@@ -111,6 +117,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       h.turn(Direction.WEST)
       goDir.append(Direction.WEST)
     }
+    goDir = goDir.diff(dirNoGo)
     h.go(goDir)
 
     if(!keyStatus(KEY_UP) && !keyStatus(KEY_DOWN) &&

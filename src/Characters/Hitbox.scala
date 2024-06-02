@@ -1,10 +1,12 @@
 package Characters
 
-import Utils.Vector2d
+import Utils.Direction.Direction
+import Utils.{Direction, Vector2d}
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.graphics.Color
 
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 class Hitbox(private var centerPos: Vector2d, width: Double, height: Double) extends DrawableObject{
@@ -40,5 +42,16 @@ class Hitbox(private var centerPos: Vector2d, width: Double, height: Double) ext
       return true
     }
     return false
+  }
+
+  def neighborDirection(h: Hitbox): Direction = {
+    val verticalDif = h.center.y - center.y
+    val horizontalDif = h.center.x - center.x
+
+    if (math.abs(verticalDif) > math.abs(horizontalDif)) {
+      if (verticalDif > 0) Direction.NORTH else Direction.SOUTH
+    } else {
+      if (horizontalDif > 0) Direction.EAST else Direction.WEST
+    }
   }
 }

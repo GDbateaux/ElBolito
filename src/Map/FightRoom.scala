@@ -7,11 +7,11 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends Room {
-
   private val NUMBER_OBSTACLE_MAX_PERCENTAGE = 20
   private val NUMBER_OBSTACLE_MIN_PERCENTAGE = 15
   private val OBSTACLE_SIZE_MAX = 5
   var characterDir: Direction = Direction.NORTH
+  doorsPositions = doorsDir
   createRoom()
 
   override def createRoom(): Unit = {
