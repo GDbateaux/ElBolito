@@ -44,7 +44,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     setTitle("El Bolito")
 
     f = new Floor(NUM_ROOM)
-    h = new Hero(new Vector2d(0, 0), f.currentRoom.squareWidth)
+    h = new Hero(new Vector2d(400, 400), f.currentRoom.squareWidth)
     m = new Monster(new Vector2d(200, 200), f.currentRoom.squareWidth)
     m.setSpeed(0.5)
 

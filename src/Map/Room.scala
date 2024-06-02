@@ -134,24 +134,36 @@ trait Room extends DrawableObject {
         var posY: Float = ((nbrSquareY - 1 - y).toDouble * squareWidth).toFloat + spaceHeight.toFloat
 
         if (y == 1 && x >= 2 && x < nbrSquareX - 2) {
+          if(firstDraw){
+            roomObstacles.append(new Obstacle(new Vector2d(posX, posY), squareWidth))
+          }
           g.draw(wallTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if(x == ROOM_WIDTH/2+2 && doorsPositions.contains(Direction.NORTH)) {
             g.draw(doorTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == 1 && y >= 2 && y < nbrSquareY - 2) {
+          if(firstDraw){
+            roomObstacles.append(new Obstacle(new Vector2d(posX, posY), squareWidth))
+          }
           g.draw(wallLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (y == ROOM_HEIGHT/2+2 && doorsPositions.contains(Direction.WEST)) {
             g.draw(doorLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (y == nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
+          if(firstDraw){
+            roomObstacles.append(new Obstacle(new Vector2d(posX, posY), squareWidth))
+          }
           g.draw(wallBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (x == ROOM_WIDTH/2+2 && doorsPositions.contains(Direction.SOUTH)) {
             g.draw(doorBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == nbrSquareX - 2 && y >= 2 && y < nbrSquareY - 2) {
+          if(firstDraw){
+            roomObstacles.append(new Obstacle(new Vector2d(posX, posY), squareWidth))
+          }
           g.draw(wallRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (y == ROOM_HEIGHT/2+2 && doorsPositions.contains(Direction.EAST)) {
             g.draw(doorRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
