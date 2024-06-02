@@ -74,15 +74,17 @@ trait Room extends DrawableObject {
   }
 
   def wallContact(heroHitbox: Hitbox): ArrayBuffer[Direction] = {
-    val res: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+    var res: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+    var lastObstaclePos: Vector2d = new Vector2d(10,10)
 
     for(obstacle <- roomObstacles) {
       if (heroHitbox.interect(obstacle.hitbox)){
         res.addOne(heroHitbox.neighborDirection(obstacle.hitbox))
+        if(lastObstaclePos.x != obstacle.position.x && lastObstaclePos.y == obstacle.position.y){
+          res = res.diff(ArrayBuffer(Direction.WEST, Direction.EAST))
+        }
+        lastObstaclePos = obstacle.position
       }
-    }
-    if(!res.isEmpty){
-      println(res.mkString(";"))
     }
     return res
   }

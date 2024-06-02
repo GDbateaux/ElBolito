@@ -69,10 +69,6 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       d.hitbox.draw(g)
     }*/
 
-    for(c: Obstacle <- f.currentRoom.roomObstacles){
-      c.hitbox.draw(g)
-    }
-
     manageHero()
     h.draw(g)
 
