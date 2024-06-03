@@ -145,7 +145,6 @@ trait Room extends DrawableObject {
     val doorBot = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_bot_closed.png"))
     val doorRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_right_closed.png"))
 
-
     for (y: Int <- 0 until nbrSquareY) {
       for (x: Int <- 0 until nbrSquareX) {
         var posX: Float = (x.toDouble * squareWidth).toFloat + spaceWidth.toFloat
@@ -257,6 +256,28 @@ trait Room extends DrawableObject {
       }
     }
     firstDraw = false
+    wallTop.dispose()
+    wallLeft.dispose()
+    wallBot.dispose()
+    wallRight.dispose()
+    wallTopCornerLeft.dispose()
+    wallTopCornerRight.dispose()
+    wallBotCornerLeft.dispose()
+    wallBotCornerRight.dispose()
+    wallOverTop.dispose()
+    wallOverLeft.dispose()
+    wallOverBot.dispose()
+    wallOverRight.dispose()
+    wallOverTop_cornerLeft.dispose()
+    wallOverTop_cornerRight.dispose()
+    wallOverBot_cornerLeft.dispose()
+    wallOverBot_cornerRight.dispose()
+    floor.dispose()
+    obstacle.dispose()
+    doorTop.dispose()
+    doorLeft.dispose()
+    doorBot.dispose()
+    doorRight.dispose()
   }
 
   def openDoor(): Unit = {

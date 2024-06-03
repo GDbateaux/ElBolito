@@ -61,7 +61,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   override def onGraphicRender(g: GdxGraphics): Unit = {
     // Clears the screen
     g.clear()
-
+    
     f.draw(g)
     /*for (d <- f.currentRoom.roomObstacles){
       d.hitbox.draw(g)
