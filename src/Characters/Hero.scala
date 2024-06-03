@@ -10,7 +10,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
-  private val SPRITE_WIDTH: Int = 32
+  private val SPRITE_WIDTH: Int = 16
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
   private val HITBOX_WIDTH: Float = 20 * width / SPRITE_WIDTH
   private val HITBOX_HEIGHT: Float = width/2
@@ -20,12 +20,12 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var INVINCIBILITY_TIME: Double = 1
 
   private val GROW_FACTOR = width / SPRITE_WIDTH
-  private val NUM_FRAME_RUN: Int = 4
+  private val NUM_FRAME_RUN: Int = 6
   private val FRAME_TIME: Double = 0.1
 
   private var textureY: Int = 0
   private var currentFrame: Int = 0
-  private val runSs: Spritesheet = new Spritesheet("data/images/lumberjack_sheet32.png", SPRITE_WIDTH, SPRITE_HEIGHT)
+  private val runSs: Spritesheet = new Spritesheet("data/images/hero_run.png", SPRITE_WIDTH, SPRITE_HEIGHT)
 
   private var speed: Double = 1
   private var move: Boolean = false

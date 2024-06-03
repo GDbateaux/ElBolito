@@ -45,6 +45,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     f = new Floor(NUM_ROOM)
     h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
     m = new Monster(new Vector2d(200, 200), f.currentRoom.squareWidth)
+    h.setSpeed(1)
     m.setSpeed(0.5)
 
     keyStatus(KEY_UP) = false
