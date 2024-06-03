@@ -43,7 +43,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     setTitle("El Bolito")
 
     f = new Floor(NUM_ROOM)
-    h = new Hero(new Vector2d(400, 400), f.currentRoom.squareWidth)
+    h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
     m = new Monster(new Vector2d(200, 200), f.currentRoom.squareWidth)
     m.setSpeed(0.5)
 
@@ -114,7 +114,22 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     }
 
     if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom)) {
-      h.position.x = 400
+      if(dirSwitchRoom == Direction.SOUTH) {
+        h.position.x = f.currentRoom.ROOM_NORTH.x;
+        h.position.y = f.currentRoom.ROOM_NORTH.y;
+      }
+      else if (dirSwitchRoom == Direction.NORTH) {
+        h.position.x = f.currentRoom.ROOM_SOUTH.x;
+        h.position.y = f.currentRoom.ROOM_SOUTH.y;
+      }
+      else if (dirSwitchRoom == Direction.EAST) {
+        h.position.x = f.currentRoom.ROOM_WEST.x;
+        h.position.y = f.currentRoom.ROOM_WEST.y;
+      }
+      else if (dirSwitchRoom == Direction.WEST) {
+        h.position.x = f.currentRoom.ROOM_EAST.x;
+        h.position.y = f.currentRoom.ROOM_EAST.y;
+      }
       f.changeRoom(dirSwitchRoom)
     }
     goDir = goDir.diff(dirNoGo)

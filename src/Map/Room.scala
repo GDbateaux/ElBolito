@@ -31,6 +31,12 @@ trait Room extends DrawableObject {
   private var spaceHeight: Double = 0
   private var firstDraw: Boolean = true
 
+  var ROOM_EAST: Vector2d = _
+  var ROOM_WEST: Vector2d = _
+  var ROOM_NORTH: Vector2d = _
+  var ROOM_SOUTH: Vector2d = _
+  var ROOM_CENTER: Vector2d = _
+
   val roomDoors: ArrayBuffer[Door] = new ArrayBuffer[Door]()
   val roomObstacles: ArrayBuffer[Obstacle] = new ArrayBuffer[Obstacle]()
   var squareWidth: Float = 0
@@ -63,6 +69,12 @@ trait Room extends DrawableObject {
       width = squareWidth * nbrSquareX
       spaceWidth = (SCREEN_WIDTH - width) / 2
     }
+
+    ROOM_CENTER = new Vector2d(squareWidth * nbrSquareX / 2.0.toFloat + spaceWidth.toFloat - squareWidth / 2.0.toFloat, squareWidth * nbrSquareY / 2.0.toFloat - spaceHeight.toFloat - squareWidth / 2.0.toFloat);
+    ROOM_WEST = new Vector2d(squareWidth * 2 + spaceWidth.toFloat, squareWidth * nbrSquareY / 2.0.toFloat - spaceHeight.toFloat - squareWidth / 2.0.toFloat);
+    ROOM_EAST = new Vector2d(squareWidth * (nbrSquareX - 2) + spaceWidth.toFloat - squareWidth, squareWidth * nbrSquareY / 2.0.toFloat - spaceHeight.toFloat - squareWidth / 2.0.toFloat);
+    ROOM_NORTH = new Vector2d(squareWidth * nbrSquareX / 2.0.toFloat + spaceWidth.toFloat - squareWidth / 2.0.toFloat, squareWidth * (nbrSquareY - 2) - spaceHeight.toFloat - squareWidth);
+    ROOM_SOUTH = new Vector2d(squareWidth * nbrSquareX / 2.0.toFloat + spaceWidth.toFloat - squareWidth / 2.0.toFloat, squareWidth * 2 - spaceHeight.toFloat);
 
     /*for (y: Int <- 0 until nbrSquareY) {
       for (x: Int <- 0 until nbrSquareX) {
