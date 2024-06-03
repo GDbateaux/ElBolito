@@ -1,12 +1,11 @@
 import Characters.{Hero, Monster}
-import Map.{FightRoom, Floor, Obstacle}
+import Map.Floor
 import Utils.Direction.Direction
 import Utils.{Direction, Screen, Vector2d}
 import ch.hevs.gdx2d.desktop.PortableApplication
 import ch.hevs.gdx2d.lib.GdxGraphics
 import com.badlogic.gdx.{Gdx, Input}
 
-import scala.collection.immutable.Vector2
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -96,10 +95,6 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     var goDir: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
     val dirNoGo: ArrayBuffer[Direction] = f.currentRoom.wallContact(h.hitbox)
     val dirSwitchRoom: Direction = f.currentRoom.doorContact(h.hitbox)
-    if(dirSwitchRoom != Direction.NULL){
-      h.position.x = 400
-      f.changeRoom(dirSwitchRoom)
-    }
 
     if (keyStatus(KEY_UP)) {
       h.turn(Direction.NORTH)
@@ -117,7 +112,13 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       h.turn(Direction.WEST)
       goDir.append(Direction.WEST)
     }
+
+    if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom)) {
+      h.position.x = 400
+      f.changeRoom(dirSwitchRoom)
+    }
     goDir = goDir.diff(dirNoGo)
+
     h.go(goDir)
 
     if(!keyStatus(KEY_UP) && !keyStatus(KEY_DOWN) &&
