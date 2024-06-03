@@ -1,30 +1,35 @@
 package Characters
 
-import Utils.Coordinate
+import Utils.Direction.Direction
+import Utils.{Direction, Vector2d}
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.graphics.Color
 
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-class Hitbox(charPos: Coordinate, relativeCenterPos: Coordinate, width: Double, height: Double) extends DrawableObject{
-  var pos1: Coordinate = _
-  var pos2: Coordinate = _
-  var center: Coordinate = _
+class Hitbox(private var centerPos: Vector2d, width: Double, height: Double) extends DrawableObject{
+  var pos1: Vector2d = _
+  var pos2: Vector2d = _
+  var center: Vector2d = _
   updateCoordinates()
 
+  def updateCenter(center: Vector2d): Unit = {
+    centerPos = center
+  }
+
   private def updateCoordinates(): Unit = {
-    pos1 = Coordinate((charPos.x + relativeCenterPos.x - width / 2).toFloat,
-      (charPos.y + relativeCenterPos.y - height / 2).toFloat)
-    pos2 = Coordinate((charPos.x + relativeCenterPos.x + width / 2).toFloat,
-      (charPos.y + relativeCenterPos.y + height / 2).toFloat)
-    center = Coordinate((pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2)
+    pos1 = new Vector2d((centerPos.x - width / 2).toFloat,
+      (centerPos.y - height / 2).toFloat)
+    pos2 = new Vector2d((centerPos.x + width / 2).toFloat,
+      (centerPos.y + height / 2).toFloat)
+    center = new Vector2d((pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2)
   }
   override def draw(gdxGraphics: GdxGraphics): Unit = {
     updateCoordinates()
-
     gdxGraphics.setColor(Color.RED)
-    gdxGraphics.drawRectangle(charPos.x + relativeCenterPos.x, charPos.y + relativeCenterPos.y,
+    gdxGraphics.drawRectangle(centerPos.x, centerPos.y,
       width.toFloat, height.toFloat, 0)
   }
 
@@ -36,5 +41,16 @@ class Hitbox(charPos: Coordinate, relativeCenterPos: Coordinate, width: Double, 
       return true
     }
     return false
+  }
+
+  def neighborDirection(h: Hitbox): Direction = {
+    val verticalDif = h.center.y - center.y
+    val horizontalDif = h.center.x - center.x
+
+    if (math.abs(verticalDif) > math.abs(horizontalDif)) {
+      if (verticalDif > 0) Direction.NORTH else Direction.SOUTH
+    } else {
+      if (horizontalDif > 0) Direction.EAST else Direction.WEST
+    }
   }
 }

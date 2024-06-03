@@ -1,6 +1,6 @@
 package Characters
 
-import Utils.{Coordinate, Direction, Position}
+import Utils.{Vector2d, Direction, Position}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
@@ -9,12 +9,12 @@ import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-class Hero(initialPos: Coordinate, width: Int) extends DrawableObject{
+class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val SPRITE_WIDTH: Int = 32
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
-  private val HITBOX_WIDTH: Int = 20 * width / SPRITE_WIDTH
-  private val HITBOX_HEIGHT: Int = width/2
-  private val RELATIVE_CENTER_HITBOX: Coordinate = Coordinate((width-HITBOX_WIDTH)/2 + HITBOX_WIDTH/2,
+  private val HITBOX_WIDTH: Float = 20 * width / SPRITE_WIDTH
+  private val HITBOX_HEIGHT: Float = width/2
+  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d((width-HITBOX_WIDTH)/2 + HITBOX_WIDTH/2,
     HITBOX_HEIGHT/2)
 
   var INVINCIBILITY_TIME: Double = 1
@@ -29,8 +29,8 @@ class Hero(initialPos: Coordinate, width: Int) extends DrawableObject{
 
   private var speed: Double = 1
   private var move: Boolean = false
-  val position: Coordinate = initialPos
-  val hitbox: Hitbox = new Hitbox(position, RELATIVE_CENTER_HITBOX, HITBOX_WIDTH, HITBOX_HEIGHT)
+  val position: Vector2d = initialPos
+  val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
   var isInvincible: Boolean = false
 
 
@@ -93,6 +93,8 @@ class Hero(initialPos: Coordinate, width: Int) extends DrawableObject{
         case _ =>
       }
     }
+
+    hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
 
   def isMoving: Boolean = {

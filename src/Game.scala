@@ -1,7 +1,7 @@
 import Characters.{Hero, Monster}
-import Map.FightRoom
+import Map.Floor
 import Utils.Direction.Direction
-import Utils.{Coordinate, Direction}
+import Utils.{Direction, Screen, Vector2d}
 import ch.hevs.gdx2d.desktop.PortableApplication
 import ch.hevs.gdx2d.lib.GdxGraphics
 import com.badlogic.gdx.{Gdx, Input}
@@ -16,17 +16,20 @@ import scala.collection.mutable.ArrayBuffer
  * @author Pierre-André Mudry (mui)
  * @version 1.0
  */
-object Main {
+object Game {
   def main(args: Array[String]): Unit = {
-    new Main
+    new Game(Screen.WIDTH, Screen.HEIGHT)
   }
 }
 
-class Main extends PortableApplication(1900, 1000) {
+class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windowWidth, windowHeigth) {
   private val ANIMATION_LENGTH_DAMAGE: Float = 1
+  private val NUM_ROOM: Int = 10
+  private val DRAW_HITBOX: Boolean = true
 
   private var h: Hero = _
   private var m: Monster = _
+  private var f: Floor = _
   private val keyStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
   private var currentTime: Float = 0
   private var invincibilityTime: Float = 0
@@ -39,10 +42,10 @@ class Main extends PortableApplication(1900, 1000) {
   override def onInit(): Unit = {
     setTitle("El Bolito")
 
-    h = new Hero(Coordinate(0, 0), 200)
-    m = new Monster(Coordinate(200, 200), 200)
+    f = new Floor(NUM_ROOM)
+    h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
+    m = new Monster(new Vector2d(200, 200), f.currentRoom.squareWidth)
     m.setSpeed(0.5)
-
 
     keyStatus(KEY_UP) = false
     keyStatus(KEY_RIGHT) = false
@@ -52,20 +55,28 @@ class Main extends PortableApplication(1900, 1000) {
 
   /**
    * This method is called periodically by the engine
-   *ww
+   *
    * @param g
    */
   override def onGraphicRender(g: GdxGraphics): Unit = {
     // Clears the screen
     g.clear()
+    
+    f.draw(g)
+    /*for (d <- f.currentRoom.roomObstacles){
+      d.hitbox.draw(g)
+    }*/
 
     manageHero()
     h.draw(g)
-    h.hitbox.draw(g)
 
     manageMonster()
     m.draw(g)
-    m.hitbox.draw(g)
+
+    if(DRAW_HITBOX){
+      h.hitbox.draw(g)
+      m.hitbox.draw(g)
+    }
 
     g.drawFPS()
   }
@@ -81,7 +92,10 @@ class Main extends PortableApplication(1900, 1000) {
   }
 
   private def manageHero(): Unit = {
-    val goDir: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+    var goDir: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
+    val dirNoGo: ArrayBuffer[Direction] = f.currentRoom.wallContact(h.hitbox)
+    val dirSwitchRoom: Direction = f.currentRoom.doorContact(h.hitbox)
+
     if (keyStatus(KEY_UP)) {
       h.turn(Direction.NORTH)
       goDir.append(Direction.NORTH)
@@ -98,6 +112,28 @@ class Main extends PortableApplication(1900, 1000) {
       h.turn(Direction.WEST)
       goDir.append(Direction.WEST)
     }
+
+    if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom)) {
+      if(dirSwitchRoom == Direction.SOUTH) {
+        h.position.x = f.currentRoom.ROOM_NORTH.x;
+        h.position.y = f.currentRoom.ROOM_NORTH.y;
+      }
+      else if (dirSwitchRoom == Direction.NORTH) {
+        h.position.x = f.currentRoom.ROOM_SOUTH.x;
+        h.position.y = f.currentRoom.ROOM_SOUTH.y;
+      }
+      else if (dirSwitchRoom == Direction.EAST) {
+        h.position.x = f.currentRoom.ROOM_WEST.x;
+        h.position.y = f.currentRoom.ROOM_WEST.y;
+      }
+      else if (dirSwitchRoom == Direction.WEST) {
+        h.position.x = f.currentRoom.ROOM_EAST.x;
+        h.position.y = f.currentRoom.ROOM_EAST.y;
+      }
+      f.changeRoom(dirSwitchRoom)
+    }
+    goDir = goDir.diff(dirNoGo)
+
     h.go(goDir)
 
     if(!keyStatus(KEY_UP) && !keyStatus(KEY_DOWN) &&

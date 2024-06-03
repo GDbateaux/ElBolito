@@ -1,24 +1,21 @@
 package Map
 
-import Utils.{Direction, Position}
+import Utils.{Vector2d, Direction, Position}
 import Utils.Direction.Direction
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends Room {
-
   private val NUMBER_OBSTACLE_MAX_PERCENTAGE = 20
   private val NUMBER_OBSTACLE_MIN_PERCENTAGE = 15
   private val OBSTACLE_SIZE_MAX = 5
   var characterDir: Direction = Direction.NORTH
+  doorsPositions = doorsDir
   createRoom()
 
   override def createRoom(): Unit = {
       //generateMonsters()
-
-      doorsPositions = doorsDir
-
       if (characterDir == Direction.NORTH) {
         room(0)((ROOM_WIDTH - 1) / 2) = ROOM_CHARACTER
       }
@@ -117,14 +114,13 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
           }
         }
       }
-
-      for (y: Int <- room.indices) {
-        for (x: Int <- room(0).indices) {
-          print(room(y)(x))
-        }
-        println()
-      }
     }
+
+  override def monsterAttack(c: Vector2d): Unit = {
+    for (m <- monsters) {
+      m.go(c)
+    }
+  }
 
     private def getNeighbor(posPossible: ArrayBuffer[Position], pos: Position): ArrayBuffer[Position] = {
       val res: ArrayBuffer[Position] = new ArrayBuffer[Position]()
