@@ -31,6 +31,8 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private var m: Monster = _
   private var f: Floor = _
   private val keyStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
+  private val buttonStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
+  private val pointerPos: Vector2d = new Vector2d(0, 0);
   private var currentTime: Float = 0
   private var invincibilityTime: Float = 0
 
@@ -38,6 +40,8 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val KEY_RIGHT = Input.Keys.D
   private val KEY_DOWN = Input.Keys.S
   private val KEY_LEFT = Input.Keys.A
+  private val BUTTON_LEFT = Input.Buttons.LEFT
+  private val BUTTON_RIGHT = Input.Buttons.RIGHT
 
   override def onInit(): Unit = {
     setTitle("El Bolito")
@@ -52,6 +56,8 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     keyStatus(KEY_RIGHT) = false
     keyStatus(KEY_DOWN) = false
     keyStatus(KEY_LEFT) = false
+    buttonStatus(BUTTON_LEFT) = false
+    buttonStatus(BUTTON_RIGHT) = false
   }
 
   /**
@@ -113,6 +119,13 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       h.turn(Direction.WEST)
       goDir.append(Direction.WEST)
     }
+    if(buttonStatus(BUTTON_RIGHT)) {
+      buttonStatus(BUTTON_RIGHT) = false;
+    }
+    if (buttonStatus(BUTTON_LEFT)) {
+      h.attack(pointerPos);
+      buttonStatus(BUTTON_LEFT) = false;
+    }
 
     if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom)) {
       if(dirSwitchRoom == Direction.SOUTH) {
@@ -133,9 +146,10 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       }
       f.changeRoom(dirSwitchRoom)
     }
-    goDir = goDir.diff(dirNoGo)
 
+    goDir = goDir.diff(dirNoGo)
     h.go(goDir)
+
 
     if(!keyStatus(KEY_UP) && !keyStatus(KEY_DOWN) &&
       !keyStatus(KEY_LEFT) && !keyStatus(KEY_RIGHT)){
@@ -162,5 +176,12 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   override def onKeyDown(keyCode: Int): Unit = {
     super.onKeyDown(keyCode)
     keyStatus(keyCode) = true
+  }
+
+  override def onClick(x: Int, y: Int, button: Int): Unit = {
+    super.onClick(x, y, button)
+    pointerPos.x = x;
+    pointerPos.y = y;
+    buttonStatus(button) = true
   }
 }

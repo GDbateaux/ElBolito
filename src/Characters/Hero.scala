@@ -10,25 +10,31 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
-  private val SPRITE_WIDTH: Int = 16
-  private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
-  private val HITBOX_WIDTH: Float = 20 * width / SPRITE_WIDTH
+  private val HERO_SPRITE_WIDTH: Int = 16
+  private val HERO_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH
+  private val ATTACK_SPRITE_WIDTH: Int = 48;
+  private val ATTACK_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH;
+  private val ATTACK_FRAME_NUMBER: Int = 4;
+  private val HITBOX_WIDTH: Float = 20 * width / HERO_SPRITE_WIDTH
   private val HITBOX_HEIGHT: Float = width/2
-  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d((width-HITBOX_WIDTH)/2 + HITBOX_WIDTH/2,
-    HITBOX_HEIGHT/2)
+  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d((width-HITBOX_WIDTH)/2 + HITBOX_WIDTH/2, HITBOX_HEIGHT/2)
 
   var INVINCIBILITY_TIME: Double = 1
 
-  private val GROW_FACTOR = width / SPRITE_WIDTH
+  private val GROW_FACTOR = width / HERO_SPRITE_WIDTH
   private val NUM_FRAME_RUN: Int = 6
   private val FRAME_TIME: Double = 0.1
 
+
   private var textureY: Int = 0
   private var currentFrame: Int = 0
-  private val runSs: Spritesheet = new Spritesheet("data/images/hero_run.png", SPRITE_WIDTH, SPRITE_HEIGHT)
+  private var currentFrame2: Int = 0
+  private val runSs: Spritesheet = new Spritesheet("data/images/hero_run.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
+  private val swordAttackSs: Spritesheet = new Spritesheet("data/images/hero_sword_attack.png", ATTACK_SPRITE_WIDTH, ATTACK_SPRITE_HEIGHT * 3) // Pourquoi * 3 alors que c'est du 192x192 ?????
 
   private var speed: Double = 1
   private var move: Boolean = false
+  private var attackFrameRemain: Int = -1;
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
   var isInvincible: Boolean = false
@@ -47,21 +53,31 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   def animate(elapsedTime: Double): Unit = {
     val frameTime = FRAME_TIME / speed
 
-    if(isMoving){
+    if(attackFrameRemain >= 0) {
       dt += elapsedTime
+      if (dt > frameTime) {
+        dt -= frameTime
+        currentFrame2 = (ATTACK_FRAME_NUMBER - 1) - attackFrameRemain
+        attackFrameRemain -= 1
+      }
     }
-    else{
-      currentFrame = 0
-      dt = 0
-    }
+    else {
+      if (isMoving) {
+        dt += elapsedTime
+      }
+      else {
+        currentFrame = 0
+        dt = 0
+      }
 
-    if(dt > frameTime){
-      dt -= frameTime
+      if (dt > frameTime) {
+        dt -= frameTime
 
-      currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
+        currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
 
-      if(currentFrame == 0){
-        move = false
+        if (currentFrame == 0) {
+          move = false
+        }
       }
     }
   }
@@ -97,6 +113,12 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
 
+  def attack(pointer: Vector2d): Unit = {
+    if(attackFrameRemain < 0) {
+      attackFrameRemain = ATTACK_FRAME_NUMBER - 1; //Start at 0
+    }
+  }
+
   def isMoving: Boolean = {
     return move
   }
@@ -106,6 +128,11 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   override def draw(g: GdxGraphics): Unit = {
-    g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
+    if (attackFrameRemain >= 0) {
+      g.draw(swordAttackSs.sprites(textureY)(currentFrame2), position.x - width, position.y - width, width * 3 , width * 3) // Au bol (* 3 compréhensible car au lieu d'avoir une image 16x16 on a du 48x48)
+    }
+    else {
+      g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
+    }
   }
 }
