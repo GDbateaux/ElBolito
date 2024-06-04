@@ -27,8 +27,8 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
 
   private var textureY: Int = 0
-  private var currentFrame: Int = 0
-  private var currentFrame2: Int = 0
+  private var currentRunFrame: Int = 0
+  private var currentAttackFrame: Int = 0
   private val runSs: Spritesheet = new Spritesheet("data/images/hero_run.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
   private val swordAttackSs: Spritesheet = new Spritesheet("data/images/hero_sword_attack.png", ATTACK_SPRITE_WIDTH, ATTACK_SPRITE_HEIGHT * 3) // Pourquoi * 3 alors que c'est du 192x192 ?????
 
@@ -57,7 +57,13 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
       dt += elapsedTime
       if (dt > frameTime) {
         dt -= frameTime
-        currentFrame2 = (ATTACK_FRAME_NUMBER - 1) - attackFrameRemain
+        currentAttackFrame = (ATTACK_FRAME_NUMBER - 1) - attackFrameRemain
+
+        if(currentAttackFrame == 1 || currentAttackFrame == 2) {
+          //Ajouter la hitbox de dégats pendant 2 frame
+
+        }
+
         attackFrameRemain -= 1
       }
     }
@@ -66,16 +72,16 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         dt += elapsedTime
       }
       else {
-        currentFrame = 0
+        currentRunFrame = 0
         dt = 0
       }
 
       if (dt > frameTime) {
         dt -= frameTime
 
-        currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
+        currentRunFrame = (currentRunFrame + 1) % NUM_FRAME_RUN
 
-        if (currentFrame == 0) {
+        if (currentRunFrame == 0) {
           move = false
         }
       }
@@ -83,38 +89,51 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def turn(d: Direction): Unit = {
-    d match{
-      case Direction.SOUTH => textureY = 0
-      case Direction.WEST => textureY = 1
-      case Direction.EAST => textureY = 2
-      case Direction.NORTH => textureY = 3
-      case _ =>
+    if(attackFrameRemain < 0) {
+      d match {
+        case Direction.SOUTH => textureY = 0
+        case Direction.WEST => textureY = 1
+        case Direction.EAST => textureY = 2
+        case Direction.NORTH => textureY = 3
+        case _ =>
+      }
     }
   }
 
   def go(directions: ArrayBuffer[Direction]): Unit = {
-    move = true
-    var length: Float = 1
+    if(attackFrameRemain < 0) {
+      move = true
+      var length: Float = 1
 
-    if(directions.length == 2){
-      length = math.cos(math.Pi/4).toFloat
-    }
-
-    for(d: Direction <- directions){
-      d match {
-        case Direction.SOUTH => position.y -= length * GROW_FACTOR * speed.toFloat
-        case Direction.WEST => position.x -= length * GROW_FACTOR * speed.toFloat
-        case Direction.EAST => position.x += length * GROW_FACTOR * speed.toFloat
-        case Direction.NORTH => position.y += length * GROW_FACTOR * speed.toFloat
-        case _ =>
+      if (directions.length == 2) {
+        length = math.cos(math.Pi / 4).toFloat
       }
-    }
 
-    hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
+      for (d: Direction <- directions) {
+        d match {
+          case Direction.SOUTH => position.y -= length * GROW_FACTOR * speed.toFloat
+          case Direction.WEST => position.x -= length * GROW_FACTOR * speed.toFloat
+          case Direction.EAST => position.x += length * GROW_FACTOR * speed.toFloat
+          case Direction.NORTH => position.y += length * GROW_FACTOR * speed.toFloat
+          case _ =>
+        }
+      }
+
+      hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
+    }
   }
 
   def attack(pointer: Vector2d): Unit = {
     if(attackFrameRemain < 0) {
+      val verticalDif = position.y - pointer.y
+      val horizontalDif = position.x - pointer.x
+
+      if (math.abs(verticalDif) > math.abs(horizontalDif)) {
+        if (verticalDif > 0) turn(Direction.SOUTH) else turn(Direction.NORTH)
+      } else {
+        if (horizontalDif > 0) turn(Direction.WEST) else turn(Direction.EAST)
+      }
+
       attackFrameRemain = ATTACK_FRAME_NUMBER - 1; //Start at 0
     }
   }
@@ -129,10 +148,10 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   override def draw(g: GdxGraphics): Unit = {
     if (attackFrameRemain >= 0) {
-      g.draw(swordAttackSs.sprites(textureY)(currentFrame2), position.x - width, position.y - width, width * 3 , width * 3) // Au bol (* 3 compréhensible car au lieu d'avoir une image 16x16 on a du 48x48)
+      g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3) // Au bol (* 3 compréhensible car au lieu d'avoir une image 16x16 on a du 48x48)
     }
     else {
-      g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
+      g.draw(runSs.sprites(textureY)(currentRunFrame), position.x, position.y, width, width)
     }
   }
 }
