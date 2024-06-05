@@ -40,6 +40,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val KEY_RIGHT = Input.Keys.D
   private val KEY_DOWN = Input.Keys.S
   private val KEY_LEFT = Input.Keys.A
+  private val KEY_SHIFT = Input.Keys.SHIFT_LEFT;
   private val BUTTON_LEFT = Input.Buttons.LEFT
   private val BUTTON_RIGHT = Input.Buttons.RIGHT
 
@@ -56,6 +57,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     keyStatus(KEY_RIGHT) = false
     keyStatus(KEY_DOWN) = false
     keyStatus(KEY_LEFT) = false
+    keyStatus(KEY_SHIFT) = false
     buttonStatus(BUTTON_LEFT) = false
     buttonStatus(BUTTON_RIGHT) = false
   }
@@ -68,7 +70,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   override def onGraphicRender(g: GdxGraphics): Unit = {
     // Clears the screen
     g.clear()
-    
+
     f.draw(g)
     /*for (d <- f.currentRoom.roomObstacles){
       d.hitbox.draw(g)
@@ -148,8 +150,12 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     }
 
     goDir = goDir.diff(dirNoGo)
+
     h.go(goDir)
 
+    if(keyStatus(KEY_SHIFT)) {
+      h.roll();
+    }
 
     if(!keyStatus(KEY_UP) && !keyStatus(KEY_DOWN) &&
       !keyStatus(KEY_LEFT) && !keyStatus(KEY_RIGHT)){

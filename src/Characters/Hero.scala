@@ -15,8 +15,14 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val ATTACK_SPRITE_WIDTH: Int = 48;
   private val ATTACK_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH;
   private val ATTACK_FRAME_NUMBER: Int = 4;
+
+  private val ROLL_SPRITE_WIDTH: Int = 16;
+  private val ROLL_SPRITE_HEIGHT: Int = ROLL_SPRITE_WIDTH;
+  private val ROLL_FRAME_NUMBER: Int = 9;
+  private val ROLL_COOLDOWN: Double = 6.0;
   private val HITBOX_WIDTH: Float = 6 * width / HERO_SPRITE_WIDTH
-  private val HITBOX_HEIGHT: Float = width/3
+  private val HITBOX_HEIGHT: Float = width / 3
+
   private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d((width-HITBOX_WIDTH)/2 + HITBOX_WIDTH/2, HITBOX_HEIGHT/2)
 
   var INVINCIBILITY_TIME: Double = 1
@@ -29,12 +35,19 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private var textureY: Int = 0
   private var currentRunFrame: Int = 0
   private var currentAttackFrame: Int = 0
+  private var currentRollFrame: Int = 0;
+  private var currentTime: Double = 0.0;
   private val runSs: Spritesheet = new Spritesheet("data/images/hero_run.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
   private val swordAttackSs: Spritesheet = new Spritesheet("data/images/hero_sword_attack.png", ATTACK_SPRITE_WIDTH, ATTACK_SPRITE_HEIGHT * 3) // Pourquoi * 3 alors que c'est du 192x192 ?????
+  private val rollSs: Spritesheet = new Spritesheet("data/images/hero_roll.png", ROLL_SPRITE_WIDTH, ROLL_SPRITE_HEIGHT);
+  private var curentDirections: ArrayBuffer[Direction] = new ArrayBuffer[Direction]().addOne(Direction.SOUTH)
 
   private var speed: Double = 1
+  private val rollSpeed: Double = 3
+  private var lastRollTime: Double = 0.0;
   private var move: Boolean = false
   private var attackFrameRemain: Int = -1;
+  private var rollFrameRemain: Int = -1;
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
   var isInvincible: Boolean = false
@@ -51,7 +64,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def animate(elapsedTime: Double): Unit = {
-    val frameTime = FRAME_TIME / speed
+    var frameTime = FRAME_TIME / speed
 
     if(attackFrameRemain >= 0) {
       dt += elapsedTime
@@ -65,6 +78,59 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         }
 
         attackFrameRemain -= 1
+      }
+    }
+    else if(rollFrameRemain >= 0) {
+      var frameTime = FRAME_TIME / rollSpeed
+
+      dt += elapsedTime
+
+      if (dt > frameTime) {
+        dt -= frameTime
+
+        if(rollFrameRemain == 0 || rollFrameRemain == 1 || rollFrameRemain == ROLL_FRAME_NUMBER) {
+          currentRollFrame = (5 - 1) - rollFrameRemain
+        }
+        else if(rollFrameRemain == ROLL_FRAME_NUMBER - 1) {
+          //First frame
+          isInvincible = true;
+          currentRollFrame = 0;
+          lastRollTime = System.currentTimeMillis() / 1000.0;
+        }
+        else {
+          if(rollFrameRemain % 2 == 0) {
+            currentRollFrame = 2
+          } else {
+            currentRollFrame = 3
+          }
+        }
+
+        //currentRollFrame = (ROLL_FRAME_NUMBER - 1) - rollFrameRemain
+
+        var length: Float = 1
+
+        if (curentDirections.length == 2) {
+          length = math.cos(math.Pi / 4).toFloat
+        }
+
+        for (d: Direction <- curentDirections) {
+          d match {
+            case Direction.SOUTH => position.y -= length * GROW_FACTOR * rollSpeed.toFloat
+            case Direction.WEST => position.x -= length * GROW_FACTOR * rollSpeed.toFloat
+            case Direction.EAST => position.x += length * GROW_FACTOR * rollSpeed.toFloat
+            case Direction.NORTH => position.y += length * GROW_FACTOR * rollSpeed.toFloat
+            case _ =>
+          }
+        }
+
+        hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
+
+        if(rollFrameRemain == 0) {
+          //Last frame
+          isInvincible = false;
+        }
+
+        rollFrameRemain -= 1
       }
     }
     else {
@@ -89,7 +155,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def turn(d: Direction): Unit = {
-    if(attackFrameRemain < 0) {
+    if(attackFrameRemain < 0  && rollFrameRemain < 0) {
       d match {
         case Direction.SOUTH => textureY = 0
         case Direction.WEST => textureY = 1
@@ -101,8 +167,13 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def go(directions: ArrayBuffer[Direction]): Unit = {
-    if(attackFrameRemain < 0) {
+    if(attackFrameRemain < 0 && rollFrameRemain < 0) {
+      if(directions.nonEmpty) {
+        curentDirections = directions.clone();
+      }
+
       move = true
+
       var length: Float = 1
 
       if (directions.length == 2) {
@@ -124,7 +195,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def attack(pointer: Vector2d): Unit = {
-    if(attackFrameRemain < 0) {
+    if(attackFrameRemain < 0 && rollFrameRemain < 0) {
       val verticalDif = position.y - pointer.y
       val horizontalDif = position.x - pointer.x
 
@@ -135,6 +206,15 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
       }
 
       attackFrameRemain = ATTACK_FRAME_NUMBER - 1; //Start at 0
+    }
+  }
+
+  def roll(): Unit = {
+    var currentTime: Double = System.currentTimeMillis() / 1000.0;
+
+    if(attackFrameRemain < 0 && rollFrameRemain < 0 && currentTime > lastRollTime + ROLL_COOLDOWN) {
+
+      rollFrameRemain = ROLL_FRAME_NUMBER - 1; //Start at 0
     }
   }
 
@@ -149,6 +229,9 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   override def draw(g: GdxGraphics): Unit = {
     if (attackFrameRemain >= 0) {
       g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3) // Au bol (* 3 compréhensible car au lieu d'avoir une image 16x16 on a du 48x48)
+    }
+    else if(rollFrameRemain >= 0) {
+      g.draw(rollSs.sprites(textureY)(currentRollFrame), position.x, position.y, width, width)
     }
     else {
       g.draw(runSs.sprites(textureY)(currentRunFrame), position.x, position.y, width, width)
