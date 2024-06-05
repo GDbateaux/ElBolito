@@ -158,6 +158,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       h.roll();
     }
 
+
     if(!keyStatus(KEY_UP) && !keyStatus(KEY_DOWN) &&
       !keyStatus(KEY_LEFT) && !keyStatus(KEY_RIGHT)){
       h.setMove(false)
