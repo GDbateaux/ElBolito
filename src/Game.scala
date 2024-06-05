@@ -11,9 +11,9 @@ import scala.collection.mutable.ArrayBuffer
 
 
 /**
- * Hello World demo in Scala
+ * ElBolito game in Scala
  *
- * @author Pierre-André Mudry (mui)
+ * @author Simon Masserey & Yolan Savioz
  * @version 1.0
  */
 object Game {

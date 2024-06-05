@@ -47,6 +47,10 @@ trait Room extends DrawableObject {
 
   }
 
+  def setFirstDraw(f: Boolean): Unit = {
+    firstDraw = f
+  }
+
   private def init(): Unit = {
     val SCREEN_WIDTH = Screen.WIDTH.toDouble
     val SCREEN_HEIGHT = Screen.HEIGHT.toDouble
@@ -142,6 +146,10 @@ trait Room extends DrawableObject {
     val doorLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_left_closed.png"))
     val doorBot = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_bot_closed.png"))
     val doorRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_right_closed.png"))
+
+    if(firstDraw){
+      monsters = new ArrayBuffer[Monster]()
+    }
 
     for (y: Int <- 0 until nbrSquareY) {
       for (x: Int <- 0 until nbrSquareX) {

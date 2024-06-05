@@ -48,6 +48,7 @@ class Floor(private val numRoom: Int) extends DrawableObject{
       if (floor(nextRoomPos.y)(nextRoomPos.x) != null) {
         currentRoomPos = nextRoomPos
         currentRoom = floor(currentRoomPos.y)(currentRoomPos.x)
+        floor(currentRoomPos.y)(currentRoomPos.x).setFirstDraw(true)
       }
     }
   }
