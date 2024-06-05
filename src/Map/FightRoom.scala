@@ -122,6 +122,7 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
           }
         }
       }
+      generateMonsters(monstersPositionRemain)
     }
 
   override def monsterAttack(c: Vector2d): Unit = {

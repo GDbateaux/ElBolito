@@ -1,15 +1,13 @@
 package Map
 
-import Characters.{Hero, Hitbox, Monster}
+import Characters.{Hitbox, Monster}
 import Utils.{Direction, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.math.Vector2
 
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 //Type de room: 0: Chill, 1: Battle, 2: Boss, 3: BigFoot (pas sûr pour le 3)
@@ -23,7 +21,7 @@ trait Room extends DrawableObject {
 
   protected var room: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   protected var doorsPositions: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
-  protected var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
+  var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
 
   private val nbrSquareX: Int = ROOM_WIDTH + 4 // 2 = les murs droites et gauches (+ over)
   private val nbrSquareY: Int = ROOM_HEIGHT + 4 // 2 = les murs en haut et en bas (+ over)
@@ -247,11 +245,9 @@ trait Room extends DrawableObject {
             g.draw(obstacle, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
           else if (room(y - 2)(x - 2) == ROOM_MONSTER) {
-            val m: Monster = new Monster(new Vector2d(posX, posY), squareWidth)
             if(firstDraw){
-              monsters.append(m)
+              monsters.append(new Monster(new Vector2d(posX, posY), squareWidth))
             }
-            m.draw(g)
           }
           else if (room(y - 2)(x - 2) == ROOM_CHARACTER) {
 
@@ -259,6 +255,7 @@ trait Room extends DrawableObject {
         }
       }
     }
+
     firstDraw = false
     wallTop.dispose()
     wallLeft.dispose()
