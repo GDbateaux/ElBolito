@@ -25,10 +25,9 @@ object Game {
 class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windowWidth, windowHeigth) {
   private val ANIMATION_LENGTH_DAMAGE: Float = 1
   private val NUM_ROOM: Int = 10
-  private val DRAW_HITBOX: Boolean = true
+  private val DRAW_HITBOX: Boolean = false
 
   private var h: Hero = _
-  private var m: Monster = _
   private var f: Floor = _
   private val keyStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
   private val buttonStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
@@ -49,9 +48,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
     f = new Floor(NUM_ROOM)
     h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
-    m = new Monster(new Vector2d(200, 200), f.currentRoom.squareWidth)
     h.setSpeed(1)
-    m.setSpeed(0.5)
 
     keyStatus(KEY_UP) = false
     keyStatus(KEY_RIGHT) = false
@@ -79,26 +76,18 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     manageHero()
     h.draw(g)
 
-    manageMonster()
-    m.draw(g)
+    for(m: Monster <- f.currentRoom.monsters){
+      m.manageMonster(h)
+      m.draw(g)
+      m.setSpeed(0.6)
+    }
 
     if(DRAW_HITBOX){
       h.hitbox.draw(g)
       h.attackHitbox.draw(g)
-      m.hitbox.draw(g)
     }
 
     g.drawFPS()
-  }
-
-  private def manageMonster(): Unit = {
-    m.animate(Gdx.graphics.getDeltaTime)
-
-    if(m.hitbox.interect(h.hitbox)){
-      h.setInvisibility(true)
-    }
-
-    m.go(h.hitbox.center)
   }
 
   private def manageHero(): Unit = {
@@ -155,7 +144,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     h.go(goDir)
 
     if(keyStatus(KEY_SHIFT)) {
-      h.roll();
+      h.roll()
     }
 
 

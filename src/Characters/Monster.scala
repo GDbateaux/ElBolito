@@ -4,6 +4,7 @@ import Utils.Vector2d
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Interpolation
 
 class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
@@ -14,11 +15,11 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d((width - HITBOX_WIDTH) / 2 + HITBOX_WIDTH / 2,
     (width - HITBOX_HEIGHT) / 2 + HITBOX_HEIGHT / 2)
 
-  private val GROW_FACTOR = width / SPRITE_WIDTH
+  private val GROW_FACTOR = width / (SPRITE_WIDTH / 2)
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
-  val DIFFICULTY: Int = 1;
+  val DIFFICULTY: Int = 1
 
   //private var textureY: Int = 0
   private var currentFrame: Int = 0
@@ -42,6 +43,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
       dt -= frameTime
       currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
     }
+    hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
 
   /*def goBack(CoordinateCenterHeroBase: Vector2d, CoordinateCenterBase: Vector2d, percentage: Float): Unit = {
@@ -63,6 +65,16 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     position.y += (math.sin(angle) * speed * GROW_FACTOR).toFloat
 
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
+  }
+
+  def manageMonster(h: Hero): Unit = {
+    animate(Gdx.graphics.getDeltaTime)
+
+    if(hitbox.interect(h.hitbox)){
+      h.setInvisibility(true)
+    }
+
+    go(h.hitbox.center)
   }
 
   override def draw(g: GdxGraphics): Unit = {

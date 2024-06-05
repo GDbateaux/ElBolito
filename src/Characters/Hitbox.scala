@@ -17,6 +17,7 @@ class Hitbox(private var centerPos: Vector2d, width: Double, height: Double) ext
 
   def updateCenter(center: Vector2d): Unit = {
     centerPos = center
+    updateCoordinates()
   }
 
   private def updateCoordinates(): Unit = {

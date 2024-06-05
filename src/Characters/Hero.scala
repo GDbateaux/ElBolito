@@ -13,14 +13,14 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val HERO_SPRITE_WIDTH: Int = 16
   private val HERO_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH
 
-  private val ATTACK_SPRITE_WIDTH: Int = 48;
-  private val ATTACK_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH;
-  private val ATTACK_FRAME_NUMBER: Int = 4;
+  private val ATTACK_SPRITE_WIDTH: Int = 48
+  private val ATTACK_SPRITE_HEIGHT: Int = ATTACK_SPRITE_WIDTH
+  private val ATTACK_FRAME_NUMBER: Int = 4
 
-  private val ROLL_SPRITE_WIDTH: Int = 16;
-  private val ROLL_SPRITE_HEIGHT: Int = ROLL_SPRITE_WIDTH;
-  private val ROLL_FRAME_NUMBER: Int = 9;
-  private val ROLL_COOLDOWN: Double = 6.0;
+  private val ROLL_SPRITE_WIDTH: Int = 16
+  private val ROLL_SPRITE_HEIGHT: Int = ROLL_SPRITE_WIDTH
+  private val ROLL_FRAME_NUMBER: Int = 9
+  private val ROLL_COOLDOWN: Double = 6.0
 
   private val HITBOX_WIDTH: Float = 6 * width / HERO_SPRITE_WIDTH
   private val HITBOX_HEIGHT: Float = width / 3
@@ -37,20 +37,21 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private var textureY: Int = 0
   private var currentRunFrame: Int = 0
   private var currentAttackFrame: Int = 0
-  private var currentRollFrame: Int = 0;
-  private var currentTime: Double = 0.0;
+  private var currentRollFrame: Int = 0
+  private var currentTime: Double = 0.0
   private val runSs: Spritesheet = new Spritesheet("data/images/hero_run.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
-  private val swordAttackSs: Spritesheet = new Spritesheet("data/images/hero_sword_attack.png", ATTACK_SPRITE_WIDTH, ATTACK_SPRITE_HEIGHT * 3) // Pourquoi * 3 alors que c'est du 192x192 ?????
-  private val rollSs: Spritesheet = new Spritesheet("data/images/hero_roll.png", ROLL_SPRITE_WIDTH, ROLL_SPRITE_HEIGHT);
+  private val swordAttackSs: Spritesheet = new Spritesheet("data/images/hero_sword_attack.png", ATTACK_SPRITE_WIDTH,
+    ATTACK_SPRITE_HEIGHT) // Pourquoi * 3 alors que c'est du 192x192 ?????
+  private val rollSs: Spritesheet = new Spritesheet("data/images/hero_roll.png", ROLL_SPRITE_WIDTH, ROLL_SPRITE_HEIGHT)
   private var curentDirections: ArrayBuffer[Direction] = new ArrayBuffer[Direction]().addOne(Direction.SOUTH)
 
   private var speed: Double = 1
   private val rollSpeed: Double = 3
-  private var lastRollTime: Double = 0.0;
+  private var lastRollTime: Double = 0.0
   private var move: Boolean = false
 
-  private var attackFrameRemain: Int = -1;
-  private var rollFrameRemain: Int = -1;
+  private var attackFrameRemain: Int = -1
+  private var rollFrameRemain: Int = -1
 
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
@@ -119,9 +120,9 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         }
         else if(rollFrameRemain == ROLL_FRAME_NUMBER - 1) {
           //First frame
-          isInvincible = true;
-          currentRollFrame = 0;
-          lastRollTime = System.currentTimeMillis() / 1000.0;
+          isInvincible = true
+          currentRollFrame = 0
+          lastRollTime = System.currentTimeMillis() / 1000.0
         }
         else {
           if(rollFrameRemain % 2 == 0) {
@@ -153,7 +154,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
         if(rollFrameRemain == 0) {
           //Last frame
-          isInvincible = false;
+          isInvincible = false
         }
 
         rollFrameRemain -= 1
