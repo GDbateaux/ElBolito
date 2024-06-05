@@ -247,7 +247,11 @@ trait Room extends DrawableObject {
              g.draw(obstacle, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
           else if (room(y - 2)(x - 2) == ROOM_MONSTER) {
-
+             val m: Monster = new Monster(new Vector2d(posX, posY), squareWidth)
+             if(firstDraw){
+               monsters.append(m)
+             }
+             m.draw(g)
           }
           else if (room(y - 2)(x - 2) == ROOM_CHARACTER) {
 

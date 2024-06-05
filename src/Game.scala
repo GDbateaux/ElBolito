@@ -32,7 +32,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private var f: Floor = _
   private val keyStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
   private val buttonStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
-  private val pointerPos: Vector2d = new Vector2d(0, 0);
+  private val pointerPos: Vector2d = new Vector2d(0, 0)
   private var currentTime: Float = 0
   private var invincibilityTime: Float = 0
 
@@ -120,11 +120,11 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       goDir.append(Direction.WEST)
     }
     if(buttonStatus(BUTTON_RIGHT)) {
-      buttonStatus(BUTTON_RIGHT) = false;
+      buttonStatus(BUTTON_RIGHT) = false
     }
     if (buttonStatus(BUTTON_LEFT)) {
       h.attack(pointerPos);
-      buttonStatus(BUTTON_LEFT) = false;
+      buttonStatus(BUTTON_LEFT) = false
     }
 
     if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom)) {
