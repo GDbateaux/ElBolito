@@ -10,12 +10,14 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
   private val NUMBER_OBSTACLE_MAX_PERCENTAGE = 20
   private val NUMBER_OBSTACLE_MIN_PERCENTAGE = 15
   private val OBSTACLE_SIZE_MAX = 5
+  private val DIFFICULTY_MAX = 1
   var characterDir: Direction = Direction.NORTH
   doorsPositions = doorsDir
   createRoom()
 
   override def createRoom(): Unit = {
       //generateMonsters()
+
       if (characterDir == Direction.NORTH) {
         room(0)((ROOM_WIDTH - 1) / 2) = ROOM_CHARACTER
       }
@@ -37,10 +39,11 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
       val nbrObstaclePercentage = Random.nextInt(NUMBER_OBSTACLE_MAX_PERCENTAGE - NUMBER_OBSTACLE_MIN_PERCENTAGE + 1) + NUMBER_OBSTACLE_MIN_PERCENTAGE
       var obstaclesRemain = ROOM_WIDTH * ROOM_HEIGHT / 100 * nbrObstaclePercentage
 
-      var positionRemain: ArrayBuffer[Position] = new ArrayBuffer[Position]()
+      var obstaclesPositionRemain: ArrayBuffer[Position] = new ArrayBuffer[Position]()
+      var monstersPositionRemain: ArrayBuffer[Position] = new ArrayBuffer[Position]();
       for (y <- 0 until ROOM_HEIGHT) {
         for (x <- 0 until ROOM_WIDTH) {
-          positionRemain.addOne(Position(x, y))
+          obstaclesPositionRemain.addOne(Position(x, y))
         }
       }
 
@@ -60,11 +63,13 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
         }
 
         //Remove doors and neighbors positions
-        positionRemain.subtractOne(doorPos)
-        for (posToRemove <- getNeighbor(positionRemain, doorPos)) {
-          positionRemain.subtractOne(posToRemove)
+        obstaclesPositionRemain.subtractOne(doorPos)
+        for (posToRemove <- getNeighbor(obstaclesPositionRemain, doorPos)) {
+          obstaclesPositionRemain.subtractOne(posToRemove)
         }
       }
+
+      monstersPositionRemain = obstaclesPositionRemain.clone();
 
       //Aléatoire et symétrique
       while (obstaclesRemain > 0) {
@@ -76,27 +81,30 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
 
         var obstaclesPos: ArrayBuffer[Position] = new ArrayBuffer[Position]()
 
-        if (positionRemain.isEmpty) {
+        if (obstaclesPositionRemain.isEmpty) {
           obstaclesRemain = 0
         }
         else {
           // First Wall
-          var newPositionId = Random.nextInt(positionRemain.length)
-          var pos = positionRemain(newPositionId)
+          var newPositionId = Random.nextInt(obstaclesPositionRemain.length)
+          var pos = obstaclesPositionRemain(newPositionId)
           obstaclesPos.addOne(pos)
-          positionRemain.subtractOne(pos)
+          obstaclesPositionRemain.subtractOne(pos)
           room(pos.y)(pos.x) = ROOM_OBSTACLE
           obstacleSize = obstacleSize - 1
 
           //Other walls
           while (obstacleSize > 0) {
             newPositionId = Random.nextInt(obstaclesPos.length)
-            var posPossible: ArrayBuffer[Position] = getNeighbor(positionRemain, obstaclesPos(newPositionId))
-            if (posPossible.nonEmpty) {
+            var posPossible: ArrayBuffer[Position] = getNeighbor(obstaclesPositionRemain, obstaclesPos(newPositionId))
+            if (posPossible.nonEmpty) {3
               newPositionId = Random.nextInt(posPossible.length)
               pos = posPossible(newPositionId)
               obstaclesPos.addOne(pos)
-              positionRemain.subtractOne(pos)
+
+              obstaclesPositionRemain.subtractOne(pos)
+              monstersPositionRemain.subtractOne(pos)
+
               room(pos.y)(pos.x) = ROOM_OBSTACLE
               obstacleSize = obstacleSize - 1
             }
@@ -108,8 +116,8 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
 
           //Remove wall neighbor
           for (obstacle <- obstaclesPos) {
-            for (posToRemove <- getNeighbor(positionRemain, obstacle)) {
-              positionRemain.subtractOne(posToRemove)
+            for (posToRemove <- getNeighbor(obstaclesPositionRemain, obstacle)) {
+              obstaclesPositionRemain.subtractOne(posToRemove)
             }
           }
         }
@@ -153,8 +161,25 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
       return res
   }
 
-  def generateMonsters(): Unit = {
-    // TODO
+  private def generateMonsters(posPossible: ArrayBuffer[Position]): Unit = {
+    var diffultyRemain = diffulty;
+    while(diffultyRemain > 0) {
+      if(posPossible.nonEmpty) {
+        var newPositionId: Int = Random.nextInt(posPossible.length)
+        var pos: Position = posPossible(newPositionId)
+        posPossible.subtractOne(pos);
+        room(pos.y)(pos.x) = ROOM_MONSTER;
+
+        var newDifficulty: Int = Random.nextInt(DIFFICULTY_MAX) + 1
+        if (DIFFICULTY_MAX > diffultyRemain) {
+          newDifficulty = Random.nextInt(diffultyRemain) + 1
+        }
+
+        diffultyRemain = diffultyRemain - newDifficulty;
+      } else {
+        diffultyRemain = 0
+      }
+    }
   }
 
 }

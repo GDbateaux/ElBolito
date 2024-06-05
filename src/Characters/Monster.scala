@@ -18,6 +18,8 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
+  val DIFFICULTY: Int = 1;
+
   //private var textureY: Int = 0
   private var currentFrame: Int = 0
   private val runSs: Spritesheet = new Spritesheet("data/images/slime2.png", SPRITE_WIDTH, SPRITE_HEIGHT)

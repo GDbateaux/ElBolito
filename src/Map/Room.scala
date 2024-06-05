@@ -240,18 +240,18 @@ trait Room extends DrawableObject {
         }
         else if(y >= 2 && y < nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
           g.draw(floor, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
-           if (room(y - 2)(x - 2) == ROOM_OBSTACLE) {
-             if(firstDraw){
-               roomObstacles.append(new Obstacle(new Vector2d(posX, posY), squareWidth))
-             }
-             g.draw(obstacle, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
+          if (room(y - 2)(x - 2) == ROOM_OBSTACLE) {
+            if(firstDraw){
+              roomObstacles.append(new Obstacle(new Vector2d(posX, posY), squareWidth))
+            }
+            g.draw(obstacle, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
           else if (room(y - 2)(x - 2) == ROOM_MONSTER) {
-             val m: Monster = new Monster(new Vector2d(posX, posY), squareWidth)
-             if(firstDraw){
-               monsters.append(m)
-             }
-             m.draw(g)
+            val m: Monster = new Monster(new Vector2d(posX, posY), squareWidth)
+            if(firstDraw){
+              monsters.append(m)
+            }
+            m.draw(g)
           }
           else if (room(y - 2)(x - 2) == ROOM_CHARACTER) {
 
