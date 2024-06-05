@@ -82,6 +82,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
     if(DRAW_HITBOX){
       h.hitbox.draw(g)
+      h.attackHitbox.draw(g)
       m.hitbox.draw(g)
     }
 
@@ -123,26 +124,26 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       buttonStatus(BUTTON_RIGHT) = false
     }
     if (buttonStatus(BUTTON_LEFT)) {
-      h.attack(pointerPos);
+      h.attack(pointerPos)
       buttonStatus(BUTTON_LEFT) = false
     }
 
     if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom)) {
       if(dirSwitchRoom == Direction.SOUTH) {
-        h.position.x = f.currentRoom.ROOM_NORTH.x;
-        h.position.y = f.currentRoom.ROOM_NORTH.y;
+        h.position.x = f.currentRoom.ROOM_NORTH.x
+        h.position.y = f.currentRoom.ROOM_NORTH.y
       }
       else if (dirSwitchRoom == Direction.NORTH) {
-        h.position.x = f.currentRoom.ROOM_SOUTH.x;
-        h.position.y = f.currentRoom.ROOM_SOUTH.y;
+        h.position.x = f.currentRoom.ROOM_SOUTH.x
+        h.position.y = f.currentRoom.ROOM_SOUTH.y
       }
       else if (dirSwitchRoom == Direction.EAST) {
-        h.position.x = f.currentRoom.ROOM_WEST.x;
-        h.position.y = f.currentRoom.ROOM_WEST.y;
+        h.position.x = f.currentRoom.ROOM_WEST.x
+        h.position.y = f.currentRoom.ROOM_WEST.y
       }
       else if (dirSwitchRoom == Direction.WEST) {
-        h.position.x = f.currentRoom.ROOM_EAST.x;
-        h.position.y = f.currentRoom.ROOM_EAST.y;
+        h.position.x = f.currentRoom.ROOM_EAST.x
+        h.position.y = f.currentRoom.ROOM_EAST.y
       }
       f.changeRoom(dirSwitchRoom)
     }
@@ -180,8 +181,8 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
   override def onClick(x: Int, y: Int, button: Int): Unit = {
     super.onClick(x, y, button)
-    pointerPos.x = x;
-    pointerPos.y = y;
+    pointerPos.x = x
+    pointerPos.y = y
     buttonStatus(button) = true
   }
 }
