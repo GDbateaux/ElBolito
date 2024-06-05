@@ -70,11 +70,11 @@ trait Room extends DrawableObject {
       spaceWidth = (SCREEN_WIDTH - width) / 2
     }
 
-    ROOM_CENTER = new Vector2d(squareWidth * nbrSquareX / 2.0.toFloat + spaceWidth.toFloat - squareWidth / 2.0.toFloat, squareWidth * nbrSquareY / 2.0.toFloat - spaceHeight.toFloat - squareWidth / 2.0.toFloat);
-    ROOM_WEST = new Vector2d(squareWidth * 2 + spaceWidth.toFloat, squareWidth * nbrSquareY / 2.0.toFloat - spaceHeight.toFloat - squareWidth / 2.0.toFloat);
-    ROOM_EAST = new Vector2d(squareWidth * (nbrSquareX - 2) + spaceWidth.toFloat - squareWidth, squareWidth * nbrSquareY / 2.0.toFloat - spaceHeight.toFloat - squareWidth / 2.0.toFloat);
-    ROOM_NORTH = new Vector2d(squareWidth * nbrSquareX / 2.0.toFloat + spaceWidth.toFloat - squareWidth / 2.0.toFloat, squareWidth * (nbrSquareY - 2) - spaceHeight.toFloat - squareWidth);
-    ROOM_SOUTH = new Vector2d(squareWidth * nbrSquareX / 2.0.toFloat + spaceWidth.toFloat - squareWidth / 2.0.toFloat, squareWidth * 2 - spaceHeight.toFloat);
+    ROOM_CENTER = new Vector2d(squareWidth * nbrSquareX / 2.0.toFloat + spaceWidth.toFloat - squareWidth / 2.0.toFloat, squareWidth * nbrSquareY / 2.0.toFloat + spaceHeight.toFloat - squareWidth / 2.0.toFloat)
+    ROOM_WEST = new Vector2d(squareWidth * 2 + spaceWidth.toFloat, squareWidth * nbrSquareY / 2.0.toFloat + spaceHeight.toFloat - squareWidth / 2.0.toFloat)
+    ROOM_EAST = new Vector2d(squareWidth * (nbrSquareX - 2) + spaceWidth.toFloat - squareWidth, squareWidth * nbrSquareY / 2.0.toFloat + spaceHeight.toFloat - squareWidth / 2.0.toFloat)
+    ROOM_NORTH = new Vector2d(squareWidth * nbrSquareX / 2.0.toFloat + spaceWidth.toFloat - squareWidth / 2.0.toFloat, squareWidth * (nbrSquareY - 2) + spaceHeight.toFloat - squareWidth)
+    ROOM_SOUTH = new Vector2d(squareWidth * nbrSquareX / 2.0.toFloat + spaceWidth.toFloat - squareWidth / 2.0.toFloat, squareWidth * 2 + spaceHeight.toFloat)
 
     /*for (y: Int <- 0 until nbrSquareY) {
       for (x: Int <- 0 until nbrSquareX) {

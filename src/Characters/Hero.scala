@@ -12,6 +12,7 @@ import scala.util.Random
 class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val HERO_SPRITE_WIDTH: Int = 16
   private val HERO_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH
+
   private val ATTACK_SPRITE_WIDTH: Int = 48;
   private val ATTACK_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH;
   private val ATTACK_FRAME_NUMBER: Int = 4;
@@ -20,6 +21,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val ROLL_SPRITE_HEIGHT: Int = ROLL_SPRITE_WIDTH;
   private val ROLL_FRAME_NUMBER: Int = 9;
   private val ROLL_COOLDOWN: Double = 6.0;
+
   private val HITBOX_WIDTH: Float = 6 * width / HERO_SPRITE_WIDTH
   private val HITBOX_HEIGHT: Float = width / 3
 
@@ -46,10 +48,14 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val rollSpeed: Double = 3
   private var lastRollTime: Double = 0.0;
   private var move: Boolean = false
+
   private var attackFrameRemain: Int = -1;
   private var rollFrameRemain: Int = -1;
+
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
+  var isAttaking: Boolean = false
+  var attackHitbox: Hitbox = new Hitbox(new Vector2d(0,0),0,0)
   var isInvincible: Boolean = false
 
 
@@ -74,9 +80,29 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
         if(currentAttackFrame == 1 || currentAttackFrame == 2) {
           //Ajouter la hitbox de dégats pendant 2 frame
+          isAttaking = true
+          if(textureY == 0){
+            attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.sub(new Vector2d(0, width).sub(
+              new Vector2d(0, HITBOX_HEIGHT)))), width*2, width)
+          }
+          else if(textureY == 1){
+            attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.sub(new Vector2d(width, 0).sub(
+              new Vector2d(HITBOX_WIDTH, 0)))), width, width*2)
+          }
+          else if(textureY == 2){
+            attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.add(new Vector2d(width, 0).sub(
+              new Vector2d(HITBOX_WIDTH, 0)))),width,width*2)
+          }
+          else if (textureY == 3) {
+            attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.add(new Vector2d(0, width).sub(
+              new Vector2d(0, HITBOX_HEIGHT)))), width*2, width)
+          }
 
         }
-
+        else{
+          isAttaking = false
+          attackHitbox = new Hitbox(new Vector2d(0,0),0,0)
+        }
         attackFrameRemain -= 1
       }
     }
@@ -205,7 +231,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         if (horizontalDif > 0) turn(Direction.WEST) else turn(Direction.EAST)
       }
 
-      attackFrameRemain = ATTACK_FRAME_NUMBER - 1; //Start at 0
+      attackFrameRemain = ATTACK_FRAME_NUMBER - 1 //Start at 0
     }
   }
 

@@ -29,7 +29,7 @@ class Hitbox(private var centerPos: Vector2d, width: Double, height: Double) ext
   override def draw(gdxGraphics: GdxGraphics): Unit = {
     updateCoordinates()
     gdxGraphics.setColor(Color.RED)
-    gdxGraphics.drawRectangle(centerPos.x, centerPos.y,
+    gdxGraphics.drawFilledRectangle(centerPos.x, centerPos.y,
       width.toFloat, height.toFloat, 0)
   }
 
