@@ -46,7 +46,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   override def onInit(): Unit = {
     setTitle("El Bolito")
 
-    f = new Floor(NUM_ROOM)
+    f = new Floor(NUM_ROOM, 0)
     h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
     h.setSpeed(1)
 
