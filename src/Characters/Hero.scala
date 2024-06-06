@@ -1,10 +1,11 @@
 package Characters
 
-import Utils.{Vector2d, Direction, Position}
+import Utils.{Direction, Position, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -22,6 +23,9 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val ROLL_FRAME_NUMBER: Int = 9
   private val ROLL_COOLDOWN: Double = 6.0
 
+  private val HEART_SPRITE_WIDTH: Int = 17
+  private val HEART_SPRITE_HEIGHT: Int = HEART_SPRITE_WIDTH
+
   private val HITBOX_WIDTH: Float = 6 * width / HERO_SPRITE_WIDTH
   private val HITBOX_HEIGHT: Float = width / 3
 
@@ -32,7 +36,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val GROW_FACTOR = width / HERO_SPRITE_WIDTH
   private val NUM_FRAME_RUN: Int = 6
   private val FRAME_TIME: Double = 0.1
-
+  private val MAX_HEALTH: Int = 6
 
   private var textureY: Int = 0
   private var currentRunFrame: Int = 0
@@ -44,6 +48,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     ATTACK_SPRITE_HEIGHT) // Pourquoi * 3 alors que c'est du 192x192 ?????
   private val rollSs: Spritesheet = new Spritesheet("data/images/hero_roll.png", ROLL_SPRITE_WIDTH, ROLL_SPRITE_HEIGHT)
   private var curentDirections: ArrayBuffer[Direction] = new ArrayBuffer[Direction]().addOne(Direction.SOUTH)
+  private val heartSs: Spritesheet = new Spritesheet("data/images/heart.png", HEART_SPRITE_WIDTH, HEART_SPRITE_HEIGHT)
 
   private var speed: Double = 1
   private val rollSpeed: Double = 4
@@ -58,7 +63,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var isAttaking: Boolean = false
   var attackHitbox: Hitbox = new Hitbox(new Vector2d(0,0),0,0)
   var isInvincible: Boolean = false
-  var hp = 3;
+  var hp = MAX_HEALTH
 
 
   private var dt: Double = 0
@@ -197,7 +202,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   def go(directions: ArrayBuffer[Direction]): Unit = {
     if(attackFrameRemain < 0 && rollFrameRemain < 0) {
       if(directions.nonEmpty) {
-        curentDirections = directions.clone();
+        curentDirections = directions.clone()
       }
 
       move = true
@@ -254,7 +259,28 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     move = m
   }
 
+  def drawHearts(g: GdxGraphics): Unit = {
+    val space: Float = Screen.HEIGHT / 100
+    val heartWidth: Float = width/2
+    val posY: Float = Screen.HEIGHT - heartWidth - space
+    var currentRegion: TextureRegion = heartSs.sprites(0)(0)
+
+    for(i: Int <- 1 to MAX_HEALTH/2){
+      if(hp-i*2 >= 0){
+        currentRegion = heartSs.sprites(0)(0)
+      }
+      else if(hp-i*2 == -1){
+        currentRegion = heartSs.sprites(0)(1)
+      }
+      else{
+        currentRegion = heartSs.sprites(0)(2)
+      }
+      g.draw(currentRegion, (i-1)*heartWidth+space, posY, heartWidth, heartWidth)
+    }
+  }
+
   override def draw(g: GdxGraphics): Unit = {
+    drawHearts(g)
     if (attackFrameRemain >= 0) {
       g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3) // Au bol (* 3 compréhensible car au lieu d'avoir une image 16x16 on a du 48x48)
     }
