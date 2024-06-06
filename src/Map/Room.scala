@@ -3,6 +3,7 @@ package Map
 import Characters.{Hitbox, Monster}
 import Utils.{Direction, Screen, Vector2d}
 import Utils.Direction.Direction
+import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.Gdx
@@ -28,6 +29,20 @@ trait Room extends DrawableObject {
   private var spaceWidth: Double = 0
   private var spaceHeight: Double = 0
   private var firstDraw: Boolean = true
+  private val HERO_SPRITE_WIDTH: Int = 32;
+  private val HERO_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH;
+
+  private val DOOR_FRAME_NUMBER: Int = 15
+  protected var curentDoorFrame: Int = DOOR_FRAME_NUMBER - 1;
+
+  private val doorTopSs: Spritesheet = new Spritesheet("data/images/doorTop.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
+  private val doorRightSs: Spritesheet = new Spritesheet("data/images/doorRight.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
+  private val doorBotSs: Spritesheet = new Spritesheet("data/images/doorBot.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
+  private val doorLeftSs: Spritesheet = new Spritesheet("data/images/doorLeft.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
+
+  private val FRAME_TIME: Double = 0.7
+  private var speed: Double = 1
+  private var dt: Double = 0
 
   var ROOM_EAST: Vector2d = _
   var ROOM_WEST: Vector2d = _
@@ -115,6 +130,18 @@ trait Room extends DrawableObject {
     return res
   }
 
+  def doorAnimate(elapsedTime: Double): Unit = {
+    var frameTime = FRAME_TIME / speed
+    dt += elapsedTime
+    if (isClean && dt > frameTime) {
+      dt -= frameTime
+
+      if(curentDoorFrame < DOOR_FRAME_NUMBER - 1) {
+        curentDoorFrame += 1
+      }
+    }
+  }
+
   override def draw(g: GdxGraphics): Unit = {
     //Mettre les différents murs
     //Ajouter les portes (trou pour les portes sur les coté et en bas). Porte du haut avec animation (déterminer si elle doit être ouverte ou fermée)
@@ -143,10 +170,6 @@ trait Room extends DrawableObject {
     val wallOverBot_cornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_bot_inner_right.png"))
     val floor = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\floor\\floor_2.png"))
     val obstacle = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\props_itens\\barrel.png"))
-    val doorTop = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_top_closed.png"))
-    val doorLeft = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_left_closed.png"))
-    val doorBot = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_bot_closed.png"))
-    val doorRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\door_right_closed.png"))
 
     if(firstDraw){
       monsters = new ArrayBuffer[Monster]()
@@ -167,7 +190,7 @@ trait Room extends DrawableObject {
               roomDoors.append(Door(new Hitbox(new Vector2d(posX + squareWidth/2, posY + squareWidth/2),
                 squareWidth, squareWidth), Direction.NORTH))
             }
-            g.draw(doorTop, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
+            g.draw(doorTopSs.sprites(0)(curentDoorFrame), posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == 1 && y >= 2 && y < nbrSquareY - 2) {
@@ -180,7 +203,7 @@ trait Room extends DrawableObject {
               roomDoors.append(Door(new Hitbox(new Vector2d(posX + squareWidth / 2, posY + squareWidth / 2),
                 squareWidth, squareWidth), Direction.WEST))
             }
-            g.draw(doorLeft, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
+            g.draw(doorLeftSs.sprites(curentDoorFrame)(0), posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (y == nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
@@ -193,7 +216,7 @@ trait Room extends DrawableObject {
               roomDoors.append(Door(new Hitbox(new Vector2d(posX + squareWidth / 2, posY + squareWidth / 2),
                 squareWidth, squareWidth), Direction.SOUTH))
             }
-            g.draw(doorBot, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
+            g.draw(doorBotSs.sprites(0)(curentDoorFrame), posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == nbrSquareX - 2 && y >= 2 && y < nbrSquareY - 2) {
@@ -206,7 +229,7 @@ trait Room extends DrawableObject {
               roomDoors.append(Door(new Hitbox(new Vector2d(posX + squareWidth / 2, posY + squareWidth / 2),
                 squareWidth, squareWidth), Direction.EAST))
             }
-            g.draw(doorRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
+            g.draw(doorRightSs.sprites(curentDoorFrame)(0), posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
         }
         else if (x == 0 && y != 0 && y < nbrSquareY - 1) {
@@ -288,13 +311,5 @@ trait Room extends DrawableObject {
     wallOverBot_cornerRight.dispose()
     floor.dispose()
     obstacle.dispose()
-    doorTop.dispose()
-    doorLeft.dispose()
-    doorBot.dispose()
-    doorRight.dispose()
-  }
-
-  def openDoor(): Unit = {
-
   }
 }

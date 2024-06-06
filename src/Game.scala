@@ -69,6 +69,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     g.clear()
 
     f.draw(g)
+    f.currentRoom.doorAnimate(Gdx.graphics.getDeltaTime)
     /*for (d <- f.currentRoom.roomObstacles){
       d.hitbox.draw(g)
     }*/

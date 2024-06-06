@@ -13,6 +13,7 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
   private val DIFFICULTY_MAX = 1
   var characterDir: Direction = Direction.NORTH
   doorsPositions = doorsDir
+  curentDoorFrame = 0;
   createRoom()
 
   override def createRoom(): Unit = {
