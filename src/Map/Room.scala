@@ -40,7 +40,7 @@ trait Room extends DrawableObject {
   private val doorBotSs: Spritesheet = new Spritesheet("data/images/doorBot.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
   private val doorLeftSs: Spritesheet = new Spritesheet("data/images/doorLeft.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
 
-  private val FRAME_TIME: Double = 0.7
+  private val FRAME_TIME: Double = 0.1
   private var speed: Double = 1
   private var dt: Double = 0
 
@@ -131,13 +131,15 @@ trait Room extends DrawableObject {
   }
 
   def doorAnimate(elapsedTime: Double): Unit = {
-    var frameTime = FRAME_TIME / speed
-    dt += elapsedTime
-    if (isClean && dt > frameTime) {
-      dt -= frameTime
+    if(isClean) {
+      var frameTime = FRAME_TIME / speed
+      dt += elapsedTime
+      if (dt > frameTime) {
+        dt -= frameTime
 
-      if(curentDoorFrame < DOOR_FRAME_NUMBER - 1) {
-        curentDoorFrame += 1
+        if(curentDoorFrame < DOOR_FRAME_NUMBER - 1) {
+          curentDoorFrame += 1
+        }
       }
     }
   }

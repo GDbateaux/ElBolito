@@ -126,7 +126,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       buttonStatus(BUTTON_LEFT) = false
     }
 
-    if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom)) {
+    if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom) && f.currentRoom.isClean) {
       if(dirSwitchRoom == Direction.SOUTH) {
         h.position.x = f.currentRoom.ROOM_NORTH.x
         h.position.y = f.currentRoom.ROOM_NORTH.y
