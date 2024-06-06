@@ -63,10 +63,12 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var isAttaking: Boolean = false
   var attackHitbox: Hitbox = new Hitbox(new Vector2d(0,0),0,0)
   var isInvincible: Boolean = false
+  var invincibleTransparence: Boolean = false;
   var hp = MAX_HEALTH
 
 
   private var dt: Double = 0
+  private var dtInvincible: Double = 0;
 
   def setSpeed(s: Double): Unit = {
     speed = s
@@ -167,12 +169,23 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
       }
     }
     else {
+      dtInvincible += elapsedTime
       if (isMoving) {
         dt += elapsedTime
       }
       else {
         currentRunFrame = 0
         dt = 0
+      }
+
+      if (dtInvincible > frameTime) {
+        dtInvincible -= frameTime
+        if(isInvincible) {
+          invincibleTransparence = !invincibleTransparence;
+        }
+        else {
+          invincibleTransparence = false;
+        }
       }
 
       if (dt > frameTime) {
@@ -287,7 +300,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     else if(rollFrameRemain >= 0) {
       g.draw(rollSs.sprites(textureY)(currentRollFrame), position.x, position.y, width, width)
     }
-    else {
+    else if(!invincibleTransparence){
       g.draw(runSs.sprites(textureY)(currentRunFrame), position.x, position.y, width, width)
     }
   }
