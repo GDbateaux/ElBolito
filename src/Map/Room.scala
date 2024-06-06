@@ -38,6 +38,7 @@ trait Room extends DrawableObject {
   val roomDoors: ArrayBuffer[Door] = new ArrayBuffer[Door]()
   val roomObstacles: ArrayBuffer[Obstacle] = new ArrayBuffer[Obstacle]()
   var squareWidth: Float = 0
+  var isClean: Boolean = false
   //var squareCoordinate: Array[Array[Coordinate]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   init()
 
@@ -253,7 +254,7 @@ trait Room extends DrawableObject {
             g.draw(obstacle, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           }
           else if (room(y - 2)(x - 2) == ROOM_MONSTER) {
-            if(firstDraw){
+            if(firstDraw && !isClean){
               monsters.append(new Monster(new Vector2d(posX, posY), squareWidth))
             }
           }
@@ -262,6 +263,10 @@ trait Room extends DrawableObject {
           }
         }
       }
+    }
+
+    if(monsters.isEmpty){
+      isClean = true
     }
 
     firstDraw = false
