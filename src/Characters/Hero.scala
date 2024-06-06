@@ -46,7 +46,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private var curentDirections: ArrayBuffer[Direction] = new ArrayBuffer[Direction]().addOne(Direction.SOUTH)
 
   private var speed: Double = 1
-  private val rollSpeed: Double = 3
+  private val rollSpeed: Double = 4
   private var lastRollTime: Double = 0.0
   private var move: Boolean = false
 
@@ -58,6 +58,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var isAttaking: Boolean = false
   var attackHitbox: Hitbox = new Hitbox(new Vector2d(0,0),0,0)
   var isInvincible: Boolean = false
+  var hp = 3;
 
 
   private var dt: Double = 0

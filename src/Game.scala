@@ -76,10 +76,16 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     manageHero()
     h.draw(g)
 
-    for(m: Monster <- f.currentRoom.monsters){
-      m.manageMonster(h)
-      m.draw(g)
-      m.setSpeed(0.6)
+    var idx:Int = 0
+    while (idx < f.currentRoom.monsters.length) {
+      f.currentRoom.monsters(idx).manageMonster(h)
+      f.currentRoom.monsters(idx).draw(g)
+      f.currentRoom.monsters(idx).setSpeed(0.6)
+      if (f.currentRoom.monsters(idx).hp <= 0) {
+        f.currentRoom.monsters.subtractOne(f.currentRoom.monsters(idx))
+        //f.currentRoom.monsters = new ArrayBuffer[Monster]();
+      }
+      idx += 1
     }
 
     if(DRAW_HITBOX){
@@ -160,6 +166,10 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
     if(h.isInvincible){
       invincibilityTime += Gdx.graphics.getDeltaTime
+    }
+
+    if(h.hp <= 0) {
+      h.setSpeed(0)
     }
 
     h.animate(Gdx.graphics.getDeltaTime)

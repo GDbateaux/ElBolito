@@ -19,6 +19,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
+  var hp: Int = 1
   val DIFFICULTY: Int = 1
 
   //private var textureY: Int = 0
@@ -70,8 +71,13 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   def manageMonster(h: Hero): Unit = {
     animate(Gdx.graphics.getDeltaTime)
 
-    if(hitbox.interect(h.hitbox)){
+    if(hitbox.interect(h.hitbox) && !h.isInvincible) {
+      h.hp -= 1;
       h.setInvisibility(true)
+    }
+
+    if(hitbox.interect(h.attackHitbox)) {
+      hp -= 1;
     }
 
     go(h.hitbox.center)
