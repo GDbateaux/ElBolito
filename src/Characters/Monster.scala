@@ -71,12 +71,12 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   def manageMonster(h: Hero): Unit = {
     animate(Gdx.graphics.getDeltaTime)
 
-    if(hitbox.interect(h.hitbox) && !h.isInvincible) {
+    if(hitbox.intersect(h.hitbox) && !h.isInvincible) {
       h.hp -= 1;
       h.setInvisibility(true)
     }
 
-    if(hitbox.interect(h.attackHitbox)) {
+    if(hitbox.intersect(h.attackHitbox)) {
       hp -= 1;
     }
 

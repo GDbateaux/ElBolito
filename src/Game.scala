@@ -1,4 +1,4 @@
-import Characters.{Hero, Monster}
+import Characters.{Hero, Monster, Projectile, ProjectileHandler}
 import Map.Floor
 import Utils.Direction.Direction
 import Utils.{Direction, Screen, Vector2d}
@@ -48,8 +48,6 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
     f = new Floor(NUM_ROOM, 0)
     h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
-    h.setSpeed(1)
-
     keyStatus(KEY_UP) = false
     keyStatus(KEY_RIGHT) = false
     keyStatus(KEY_DOWN) = false
@@ -76,6 +74,8 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
     manageHero()
     h.draw(g)
+
+    ProjectileHandler.handle(g, f.currentRoom, h)
 
     var idx:Int = 0
     while (idx < f.currentRoom.monsters.length) {

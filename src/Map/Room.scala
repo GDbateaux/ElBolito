@@ -109,7 +109,7 @@ trait Room extends DrawableObject {
     var lastObstaclePos: Vector2d = new Vector2d(10,10)
 
     for(obstacle <- roomObstacles) {
-      if (heroHitbox.interect(obstacle.hitbox)){
+      if (heroHitbox.intersect(obstacle.hitbox)){
         res.addOne(heroHitbox.neighborDirection(obstacle.hitbox))
         if(lastObstaclePos.x != obstacle.position.x && lastObstaclePos.y == obstacle.position.y){
           res = res.diff(ArrayBuffer(Direction.WEST, Direction.EAST))
@@ -123,7 +123,7 @@ trait Room extends DrawableObject {
   def doorContact(heroHitbox: Hitbox): Direction = {
     var res: Direction = Direction.NULL
     for(door: Door <- roomDoors) {
-      if (heroHitbox.interect(door.hitbox)){
+      if (heroHitbox.intersect(door.hitbox)){
         return door.dir
       }
     }

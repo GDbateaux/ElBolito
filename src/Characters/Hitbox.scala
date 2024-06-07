@@ -34,7 +34,7 @@ class Hitbox(private var centerPos: Vector2d, width: Double, height: Double) ext
       width.toFloat, height.toFloat, 0)
   }
 
-  def interect(h: Hitbox): Boolean = {
+  def intersect(h: Hitbox): Boolean = {
     val overlapX = h.pos1.x < pos2.x && h.pos2.x > pos1.x
     val overlapY = h.pos1.y < pos2.y && h.pos2.y > pos1.y
 

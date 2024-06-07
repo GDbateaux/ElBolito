@@ -65,8 +65,9 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var isInvincible: Boolean = false
   var invincibleTransparence: Boolean = false;
   var hp = MAX_HEALTH
+  var projectileFactor: Float = 8
 
-
+  private val projectileDistance: Float = width * projectileFactor
   private var dt: Double = 0
   private var dtInvincible: Double = 0;
 
@@ -241,6 +242,8 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def attack(pointer: Vector2d): Unit = {
+    val p: Projectile = new Projectile(position, pointer.sub(position), projectileDistance, width/6, 1, true)
+    ProjectileHandler.projectiles.append(p)
     if(attackFrameRemain < 0 && rollFrameRemain < 0) {
       val verticalDif = position.y - pointer.y
       val horizontalDif = position.x - pointer.x
