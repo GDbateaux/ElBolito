@@ -78,6 +78,36 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
 
+  /*def go(hero: Hero, obstacles: ArrayBuffer[Obstacle]): Unit = {
+  val path = findPath(hero, obstacles)
+  if (path.nonEmpty) {
+    val nextPosition = path.head
+    position.x = nextPosition.x
+    position.y = nextPosition.y
+  }
+}*/
+
+
+  def findPath(hero: Hero, obstacles: ArrayBuffer[Obstacle]): List[Vector2d] = {
+    // Créez une grille représentant votre espace de jeu. Chaque cellule de la grille correspond à une position possible pour le monstre.
+    val grid = Array.ofDimInt
+
+    // Initialisez la grille. Mettez 0 pour les cellules libres et 1 pour les cellules contenant des obstacles.
+    for (x <- 0 until gameWidth; y <- 0 until gameHeight) {
+      grid(x)(y) = if (obstacles.exists(obstacle => obstacle.hitbox.contains(new Vector2d(x, y)))) 1 else 0
+    }
+
+    // Créez une instance de l'algorithme A* avec votre grille.
+    val aStar = new AStar(grid)
+
+    // Utilisez l'algorithme A* pour trouver le chemin le plus court du monstre au héros.
+    val path = aStar.findPath(monster.position, hero.position)
+
+    // Convertissez le chemin (qui est une liste de cellules) en une liste de positions.
+    path.map(cell => new Vector2d(cell.x, cell.y))
+  }
+
+
   def manageMonster(h: Hero): Unit = {
     animate(Gdx.graphics.getDeltaTime)
 
