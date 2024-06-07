@@ -290,6 +290,14 @@ trait Room extends DrawableObject {
       }
     }
 
+    for(o <- roomObstacles){
+      for (m: Monster <- monsters) {
+        if (m.hitbox.intersect(o.hitbox)) {
+          m.dirCantGo.addOne(m.hitbox.neighborDirection(o.hitbox))
+        }
+      }
+    }
+
     if(monsters.isEmpty){
       isClean = true
     }

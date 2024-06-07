@@ -1,11 +1,14 @@
 package Characters
 
-import Utils.Vector2d
+import Utils.Direction.Direction
+import Utils.{Direction, Vector2d}
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Interpolation
+
+import scala.collection.mutable.ArrayBuffer
 
 class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val SPRITE_WIDTH: Int = 32
@@ -19,6 +22,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
+  var dirCantGo: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
   var hp: Int = 1
   val DIFFICULTY: Int = 1
 
@@ -62,9 +66,15 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     val relativeVector: Vector2d = CoordinateCenter.sub(hitbox.center)
     val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
 
-    position.x += (math.cos(angle) * speed * GROW_FACTOR).toFloat
-    position.y += (math.sin(angle) * speed * GROW_FACTOR).toFloat
-
+    if(!(math.cos(angle) > 0 && dirCantGo.contains(Direction.EAST) ||
+      math.cos(angle) < 0 && dirCantGo.contains(Direction.WEST))){
+      position.x += (math.cos(angle) * speed * GROW_FACTOR).toFloat
+    }
+    if (!(math.sin(angle) > 0 && dirCantGo.contains(Direction.NORTH) ||
+      math.cos(angle) < 0 && dirCantGo.contains(Direction.SOUTH))) {
+      position.y += (math.sin(angle) * speed * GROW_FACTOR).toFloat
+    }
+    dirCantGo.clear()
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
 
