@@ -82,12 +82,12 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     animate(Gdx.graphics.getDeltaTime)
 
     if(hitbox.intersect(h.hitbox) && !h.isInvincible) {
-      h.hp -= 1;
+      h.hp -= 1
       h.setInvisibility(true)
     }
 
     if(hitbox.intersect(h.attackHitbox)) {
-      hp -= 1;
+      hp -= 1
     }
 
     go(h.hitbox.center)
