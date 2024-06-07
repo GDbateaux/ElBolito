@@ -20,7 +20,8 @@ trait Room extends DrawableObject {
   protected val ROOM_MONSTER: Int = 2
   protected val ROOM_OBSTACLE: Int = 3
 
-  protected var room: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
+  var room: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
+  var roomVectors: Array[Array[Vector2d]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH);
   protected var doorsPositions: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
   var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
 
@@ -271,6 +272,9 @@ trait Room extends DrawableObject {
           g.draw(wallBotCornerRight, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
         }
         else if(y >= 2 && y < nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
+          if(firstDraw) {
+            roomVectors(y - 2)(x - 2) = new Vector2d(posX, posY);
+          }
           g.draw(floor, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (room(y - 2)(x - 2) == ROOM_OBSTACLE) {
             if(firstDraw){

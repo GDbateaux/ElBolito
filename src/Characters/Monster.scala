@@ -1,7 +1,8 @@
 package Characters
 
+import Map.Obstacle
 import Utils.Direction.Direction
-import Utils.{Direction, Vector2d}
+import Utils.{AStar, Direction, Position, Vector2d}
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
@@ -62,7 +63,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     position.y = Interpolation.linear.apply(CoordinateCenterBase.y, finalPos.y, percentage)
   }*/
 
-  def go(CoordinateCenter: Vector2d): Unit = {
+  /*def go(CoordinateCenter: Vector2d): Unit = {
     val relativeVector: Vector2d = CoordinateCenter.sub(hitbox.center)
     val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
 
@@ -76,6 +77,16 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     }
     dirCantGo.clear()
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
+  }*/
+
+  def go(CoordinateCenter: Vector2d): Unit = {
+    val relativeVector: Vector2d = CoordinateCenter.sub(hitbox.center)
+    val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
+
+    position.x += (math.cos(angle) * speed * GROW_FACTOR).toFloat
+    position.y += (math.sin(angle) * speed * GROW_FACTOR).toFloat
+
+    hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
 
   /*def go(hero: Hero, obstacles: ArrayBuffer[Obstacle]): Unit = {
@@ -87,28 +98,72 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 }*/
 
+  def posToVector2d(position: Position, gridVectors: Array[Array[Vector2d]]): Vector2d = {
+    return gridVectors(position.y)(position.x)
+  }
 
-  def findPath(hero: Hero, obstacles: ArrayBuffer[Obstacle]): List[Vector2d] = {
+  def vector2dToPos(vector2d: Vector2d, gridVectors: Array[Array[Vector2d]]): Position = {
+    var goodX: Int = 0;
+    var goodY: Int = 0;
+    var lessDiff: Double = math.abs(gridVectors(goodY)(goodX).x - vector2d.x) + math.abs(gridVectors(goodY)(goodX).y - vector2d.y);
+    for (y: Int <- gridVectors.indices) {
+      for (x: Int <- gridVectors(0).indices) {
+        val actualDiff = math.abs(gridVectors(y)(x).x - vector2d.x) + math.abs(gridVectors(y)(x).y - vector2d.y);
+        if(actualDiff < lessDiff) {
+          lessDiff = actualDiff
+          goodX = x;
+          goodY = y
+        }
+      }
+    }
+    return Position(goodX, goodY)
+  }
+
+  def findPath(hero: Hero, grid: Array[Array[Int]], gridVectors: Array[Array[Vector2d]]): ArrayBuffer[Vector2d] = {
+    val res: ArrayBuffer[Vector2d] = new ArrayBuffer[Vector2d]();
+    val ROOM_HEIGHT: Int = 11
+    val ROOM_WIDTH: Int = 19
+    val ROOM_CHARACTER: Int = 1
+    val ROOM_MONSTER: Int = 2
+    val ROOM_OBSTACLE: Int = 3
+
     // Créez une grille représentant votre espace de jeu. Chaque cellule de la grille correspond à une position possible pour le monstre.
-    val grid = Array.ofDimInt
+    //val grid: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH);
 
     // Initialisez la grille. Mettez 0 pour les cellules libres et 1 pour les cellules contenant des obstacles.
-    for (x <- 0 until gameWidth; y <- 0 until gameHeight) {
-      grid(x)(y) = if (obstacles.exists(obstacle => obstacle.hitbox.contains(new Vector2d(x, y)))) 1 else 0
+    for(y <- 0 until ROOM_HEIGHT) {
+      for(x <- 0 until ROOM_WIDTH) {
+        if(grid(y)(x) == ROOM_CHARACTER) {
+          grid(y)(x) == 0;
+        }
+        else if(grid(y)(x) == ROOM_MONSTER) {
+          grid(y)(x) == 0;
+        }
+        else if(grid(y)(x) == ROOM_OBSTACLE){
+          grid(y)(x) == 1;
+        }
+      }
     }
 
     // Créez une instance de l'algorithme A* avec votre grille.
-    val aStar = new AStar(grid)
+    val aStar: AStar = new AStar(grid)
+
+    val heroPosition: Position = vector2dToPos(hero.position, gridVectors);
+    val monsterPosition: Position = vector2dToPos(position, gridVectors);
 
     // Utilisez l'algorithme A* pour trouver le chemin le plus court du monstre au héros.
-    val path = aStar.findPath(monster.position, hero.position)
-
-    // Convertissez le chemin (qui est une liste de cellules) en une liste de positions.
-    path.map(cell => new Vector2d(cell.x, cell.y))
+    val path: ArrayBuffer[Position] = aStar.findPath(monsterPosition, heroPosition);
+    println("START");
+    for(p <- path) {
+      println(p.x + " " + p.y);
+      res.addOne(posToVector2d(p, gridVectors));
+    }
+    println("END");
+    return res
   }
 
 
-  def manageMonster(h: Hero): Unit = {
+  def manageMonster(h: Hero, path: ArrayBuffer[Vector2d]): Unit = {
     animate(Gdx.graphics.getDeltaTime)
 
     if(hitbox.intersect(h.hitbox) && !h.isInvincible) {
@@ -120,7 +175,9 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
       hp -= 1
     }
 
-    go(h.hitbox.center)
+    if(path.nonEmpty) {
+      go(path(0))
+    }
   }
 
   override def draw(g: GdxGraphics): Unit = {
