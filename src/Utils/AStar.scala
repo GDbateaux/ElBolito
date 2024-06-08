@@ -60,7 +60,11 @@ class AStar(grid: Array[Array[Int]]) {
   def isValid(position: Position): Boolean = {
     val x = position.x.toInt
     val y = position.y.toInt
-    x >= 0 && y >= 0 && x < grid.length && y < grid(0).length && grid(x)(y) == 0
+    println("Astar" + x + " " + y)
+    if(x >= 0 && y >= 0 && x < grid(0).length && y < grid.length) {
+      println(grid(y)(x))
+    }
+    x >= 0 && y >= 0 && x < grid(0).length && y < grid.length && grid(y)(x) != 3
   }
 
   def heuristic(start: Position, end: Position): Int = {

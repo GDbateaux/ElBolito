@@ -7,6 +7,7 @@ import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 
 import scala.collection.mutable.ArrayBuffer
@@ -32,6 +33,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val runSs: Spritesheet = new Spritesheet("data/images/slime2.png", SPRITE_WIDTH, SPRITE_HEIGHT)
 
   private var speed: Double = 1
+  private var posToGo: Vector2d = new Vector2d(0, 0)
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
 
@@ -89,15 +91,6 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
 
-  /*def go(hero: Hero, obstacles: ArrayBuffer[Obstacle]): Unit = {
-  val path = findPath(hero, obstacles)
-  if (path.nonEmpty) {
-    val nextPosition = path.head
-    position.x = nextPosition.x
-    position.y = nextPosition.y
-  }
-}*/
-
   def posToVector2d(position: Position, gridVectors: Array[Array[Vector2d]]): Vector2d = {
     return gridVectors(position.y)(position.x)
   }
@@ -131,18 +124,12 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     //val grid: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH);
 
     // Initialisez la grille. Mettez 0 pour les cellules libres et 1 pour les cellules contenant des obstacles.
-    for(y <- 0 until ROOM_HEIGHT) {
-      for(x <- 0 until ROOM_WIDTH) {
-        if(grid(y)(x) == ROOM_CHARACTER) {
-          grid(y)(x) == 0;
-        }
-        else if(grid(y)(x) == ROOM_MONSTER) {
-          grid(y)(x) == 0;
-        }
-        else if(grid(y)(x) == ROOM_OBSTACLE){
-          grid(y)(x) == 1;
-        }
+
+    for (y: Int <- grid.indices) {
+      for (x: Int <- grid(0).indices) {
+        print(grid(y)(x) + " ")
       }
+      println()
     }
 
     // Créez une instance de l'algorithme A* avec votre grille.
@@ -163,7 +150,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
 
-  def manageMonster(h: Hero, path: ArrayBuffer[Vector2d]): Unit = {
+  def manageMonster(h: Hero, grid: Array[Array[Int]], gridVectors: Array[Array[Vector2d]], squareWidth: Float): Unit = {
     animate(Gdx.graphics.getDeltaTime)
 
     if(hitbox.intersect(h.hitbox) && !h.isInvincible) {
@@ -175,12 +162,30 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
       hp -= 1
     }
 
-    if(path.nonEmpty) {
-      go(path(0))
+    if(position == posToGo || posToGo.x == 0 && posToGo.y == 0) {
+      val path = findPath(h, grid, gridVectors);
+      if (path.nonEmpty) {
+
+        posToGo.x = path(1).x + squareWidth / 2;
+        posToGo.y = path(1).y + squareWidth / 2;
+        go(posToGo);
+      }
+      for(p <- path) {
+        println(p.x + " " + p.y)
+      }
+      println(squareWidth)
+      println("POSITION: " + position.x + " " + position.y)
+      println("POSTOGO: " + posToGo.x + " " + posToGo.y)
+    }
+    else {
+      println("POSITION: " + position.x + " " + position.y)
+      go(posToGo);
     }
   }
 
   override def draw(g: GdxGraphics): Unit = {
     g.draw(runSs.sprites(0)(currentFrame), position.x, position.y, width, width)
+    g.setColor(Color.RED)
+    g.drawFilledRectangle(posToGo.x, posToGo.y, 20, 20, 0)
   }
 }

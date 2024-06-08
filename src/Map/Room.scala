@@ -7,7 +7,7 @@ import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.{Color, Texture}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -273,6 +273,8 @@ trait Room extends DrawableObject {
         }
         else if(y >= 2 && y < nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
           if(firstDraw) {
+            /*val centerX: Float = posX + squareWidth / 2
+            val centerY: Float = posY + squareWidth / 2*/
             roomVectors(y - 2)(x - 2) = new Vector2d(posX, posY);
           }
           g.draw(floor, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
