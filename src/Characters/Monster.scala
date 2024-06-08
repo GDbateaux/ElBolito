@@ -90,17 +90,6 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
           goodX = x
           goodY = y
         }
-
-        for(_: Int <- 0 to 1){
-          if(grid(goodY)(goodX) == 3 && goodX != 0 && goodY != 0){
-            if(math.abs(gridVectors(y)(x).x - vector2d.x) > math.abs(gridVectors(y)(x).y - vector2d.y)){
-              goodX -= 1
-            }
-            else{
-              goodY -= 1
-            }
-          }
-        }
       }
     }
     return Position(goodX, goodY)
@@ -112,8 +101,10 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     val aStar: AStar = new AStar(grid)
 
     val heroPosition: Position = vector2dToPos(hero.hitbox.center, gridVectors, grid)
-    val monsterPosition: Position = vector2dToPos(position, gridVectors, grid)
+    val monsterPosition: Position = vector2dToPos(hitbox.center, gridVectors, grid)
 
+    println("aaa  " + monsterPosition.x)
+    println(monsterPosition.y)
     // Utilisez l'algorithme A* pour trouver le chemin le plus court du monstre au héros.
     val path: ArrayBuffer[Position] = aStar.findPath(monsterPosition, heroPosition)
 
@@ -136,13 +127,13 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
       hp -= 1
     }
 
-    if(posToGo.x  == hitbox.center.x && posToGo.y == hitbox.center.y || posToGo.x == 0 && posToGo.y == 0) {
+    if(math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1 || posToGo.x == 0 && posToGo.y == 0) {
       val path = findPath(h, grid, gridVectors)
 
       //Path(0) is the actual monster position
       if (path.length >= 2) {
-        posToGo.x = path(1).x + squareWidth / 2
-        posToGo.y = path(1).y + squareWidth / 2
+        posToGo.x = path(1).x
+        posToGo.y = path(1).y
         go(posToGo)
       }
       else {

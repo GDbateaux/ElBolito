@@ -273,9 +273,9 @@ trait Room extends DrawableObject {
         }
         else if(y >= 2 && y < nbrSquareY - 2 && x >= 2 && x < nbrSquareX - 2) {
           if(firstDraw) {
-            /*val centerX: Float = posX + squareWidth / 2
-            val centerY: Float = posY + squareWidth / 2*/
-            roomVectors(y - 2)(x - 2) = new Vector2d(posX, posY)
+            val centerX: Float = posX + squareWidth / 2
+            val centerY: Float = posY + squareWidth / 2
+            roomVectors(y - 2)(x - 2) = new Vector2d(centerX, centerY)
           }
           g.draw(floor, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (room(y - 2)(x - 2) == ROOM_OBSTACLE) {
