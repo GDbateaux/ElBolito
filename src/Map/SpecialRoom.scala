@@ -1,5 +1,6 @@
 package Map
 
+import Characters.Hero
 import Utils.Direction
 import Utils.Direction.Direction
 
@@ -9,6 +10,10 @@ class SpecialRoom(val doorsDir: ArrayBuffer[Direction]) extends Room {
   val characterDir: Direction = Direction.NORTH
   doorsPositions = doorsDir
   override def createRoom(): Unit = {
+
+  }
+
+  override def manageRoom(h: Hero): Unit = {
 
   }
 }

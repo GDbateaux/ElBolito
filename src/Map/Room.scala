@@ -1,6 +1,6 @@
 package Map
 
-import Characters.{Hitbox, Monster}
+import Characters.{Hero, Hitbox, Monster}
 import Utils.{Direction, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
@@ -54,7 +54,7 @@ trait Room extends DrawableObject {
   val roomDoors: ArrayBuffer[Door] = new ArrayBuffer[Door]()
   val roomObstacles: ArrayBuffer[Obstacle] = new ArrayBuffer[Obstacle]()
   var squareWidth: Float = 0
-  var isClean: Boolean = false
+  var isClean: Boolean = true
   //var squareCoordinate: Array[Array[Coordinate]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   init()
 
@@ -144,6 +144,8 @@ trait Room extends DrawableObject {
       }
     }
   }
+
+  def manageRoom(h: Hero)
 
   override def draw(g: GdxGraphics): Unit = {
     //Mettre les différents murs
@@ -294,10 +296,6 @@ trait Room extends DrawableObject {
           }
         }
       }
-    }
-
-    if(monsters.isEmpty){
-      isClean = true
     }
 
     firstDraw = false
