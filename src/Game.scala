@@ -67,28 +67,13 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     g.clear()
 
     f.draw(g)
+    f.currentRoom.manageRoom(h)
     f.currentRoom.doorAnimate(Gdx.graphics.getDeltaTime)
-    /*for (d <- f.currentRoom.roomObstacles){
-      d.hitbox.draw(g)
-    }*/
 
     manageHero()
     h.draw(g)
 
     ProjectileHandler.handle(g, f.currentRoom, h)
-
-    var idx:Int = 0
-    while (idx < f.currentRoom.monsters.length) {
-      f.currentRoom.monsters(idx).manageMonster(h, f.currentRoom.room, f.currentRoom.roomVectors, f.currentRoom.squareWidth)
-      //f.currentRoom.monsters(idx).manageMonster(h, path)
-      f.currentRoom.monsters(idx).setSpeed(0.6)
-      f.currentRoom.monsters(idx).draw(g)
-      if (f.currentRoom.monsters(idx).hp <= 0) {
-        f.currentRoom.monsters.subtractOne(f.currentRoom.monsters(idx))
-        //f.currentRoom.monsters = new ArrayBuffer[Monster]()
-      }
-      idx += 1
-    }
 
     if(DRAW_HITBOX){
       h.hitbox.draw(g)

@@ -1,6 +1,6 @@
 package Map
 
-import Characters.Boss
+import Characters.{Boss, Hero}
 import Utils.{Direction, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.lib.GdxGraphics
@@ -16,6 +16,9 @@ class BossRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends 
 
   override def createRoom(): Unit = {
 
+  }
+  override def manageRoom(h: Hero){
+    boss.manageBoss(h)
   }
 
   override def draw(g: GdxGraphics): Unit = {
