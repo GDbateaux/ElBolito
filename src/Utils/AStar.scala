@@ -7,8 +7,8 @@ case class Cell(position: Position, var g: Int, h: Int, var parent: Cell = null)
 }
 
 class AStar(grid: Array[Array[Int]]) {
-  val openList: ArrayBuffer[Cell] = new ArrayBuffer[Cell]();
-  val closedList: ArrayBuffer[Cell] = new ArrayBuffer[Cell]();
+  val openList: ArrayBuffer[Cell] = new ArrayBuffer[Cell]()
+  val closedList: ArrayBuffer[Cell] = new ArrayBuffer[Cell]()
 
   def findPath(start: Position, end: Position): ArrayBuffer[Position] = {
     openList += Cell(start, 0, heuristic(start, end))
@@ -37,7 +37,7 @@ class AStar(grid: Array[Array[Int]]) {
       }
     }
 
-    return new ArrayBuffer[Position]();
+    return new ArrayBuffer[Position]()
   }
 
   def getNeighbors(cell: Cell, end: Position): ArrayBuffer[Cell] = {
@@ -69,7 +69,7 @@ class AStar(grid: Array[Array[Int]]) {
   }
 
   def reconstructPath(cell: Cell, end: Position): ArrayBuffer[Position] = {
-    var path: ArrayBuffer[Position] = new ArrayBuffer[Position]();
+    var path: ArrayBuffer[Position] = new ArrayBuffer[Position]()
     var current = cell
 
     while (current != null) {

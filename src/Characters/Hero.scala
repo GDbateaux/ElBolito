@@ -65,16 +65,16 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var isAttaking: Boolean = false
   var attackHitbox: Hitbox = new Hitbox(new Vector2d(0,0),0,0)
   var isInvincible: Boolean = false
-  var invincibleTransparence: Boolean = false;
+  var invincibleTransparence: Boolean = false
   var hp = MAX_HEALTH
   var projectileFactor: Float = 8
-  var weaponType: Int = 0;
-  val WEAPON_TYPE_SWORD: Int = 0;
-  val WEAPON_TYPE_BOW: Int = 1;
+  var weaponType: Int = 0
+  val WEAPON_TYPE_SWORD: Int = 0
+  val WEAPON_TYPE_BOW: Int = 1
 
   private val projectileDistance: Float = width * projectileFactor
   private var dt: Double = 0
-  private var dtInvincible: Double = 0;
+  private var dtInvincible: Double = 0
 
   def setSpeed(s: Double): Unit = {
     speed = s
@@ -187,10 +187,10 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
       if (dtInvincible > frameTime) {
         dtInvincible -= frameTime
         if(isInvincible) {
-          invincibleTransparence = !invincibleTransparence;
+          invincibleTransparence = !invincibleTransparence
         }
         else {
-          invincibleTransparence = false;
+          invincibleTransparence = false
         }
       }
 
@@ -266,11 +266,11 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def roll(): Unit = {
-    var currentTime: Double = System.currentTimeMillis() / 1000.0;
+    var currentTime: Double = System.currentTimeMillis() / 1000.0
 
     if(attackFrameRemain < 0 && rollFrameRemain < 0 && currentTime > lastRollTime + ROLL_COOLDOWN) {
 
-      rollFrameRemain = ROLL_FRAME_NUMBER - 1; //Start at 0
+      rollFrameRemain = ROLL_FRAME_NUMBER - 1 //Start at 0
     }
   }
 

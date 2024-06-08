@@ -13,7 +13,7 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
   private val DIFFICULTY_MAX = 1
   var characterDir: Direction = Direction.NORTH
   doorsPositions = doorsDir
-  curentDoorFrame = 0;
+  curentDoorFrame = 0
   createRoom()
 
   override def createRoom(): Unit = {
@@ -41,7 +41,7 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
       var obstaclesRemain = ROOM_WIDTH * ROOM_HEIGHT / 100 * nbrObstaclePercentage
 
       var obstaclesPositionRemain: ArrayBuffer[Position] = new ArrayBuffer[Position]()
-      var monstersPositionRemain: ArrayBuffer[Position] = new ArrayBuffer[Position]();
+      var monstersPositionRemain: ArrayBuffer[Position] = new ArrayBuffer[Position]()
       for (y <- 0 until ROOM_HEIGHT) {
         for (x <- 0 until ROOM_WIDTH) {
           obstaclesPositionRemain.addOne(Position(x, y))
@@ -70,7 +70,7 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
         }
       }
 
-      monstersPositionRemain = obstaclesPositionRemain.clone();
+      monstersPositionRemain = obstaclesPositionRemain.clone()
 
       //Aléatoire et symétrique
       while (obstaclesRemain > 0) {
@@ -164,20 +164,20 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
   }
 
   private def generateMonsters(posPossible: ArrayBuffer[Position]): Unit = {
-    var diffultyRemain = diffulty;
+    var diffultyRemain = diffulty
     while(diffultyRemain > 0) {
       if(posPossible.nonEmpty) {
         var newPositionId: Int = Random.nextInt(posPossible.length)
         var pos: Position = posPossible(newPositionId)
-        posPossible.subtractOne(pos);
-        room(pos.y)(pos.x) = ROOM_MONSTER;
+        posPossible.subtractOne(pos)
+        room(pos.y)(pos.x) = ROOM_MONSTER
 
         var newDifficulty: Int = Random.nextInt(DIFFICULTY_MAX) + 1
         if (DIFFICULTY_MAX > diffultyRemain) {
           newDifficulty = Random.nextInt(diffultyRemain) + 1
         }
 
-        diffultyRemain = diffultyRemain - newDifficulty;
+        diffultyRemain = diffultyRemain - newDifficulty
       } else {
         diffultyRemain = 0
       }
