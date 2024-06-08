@@ -147,7 +147,5 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   override def draw(g: GdxGraphics): Unit = {
     g.draw(runSs.sprites(0)(currentFrame), position.x, position.y, width, width)
-    g.setColor(Color.RED)
-    g.drawFilledRectangle(posToGo.x, posToGo.y, 20, 20, 0)
   }
 }

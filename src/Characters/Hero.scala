@@ -16,8 +16,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   private val ATTACK_SPRITE_WIDTH: Int = 48
   private val ATTACK_SPRITE_HEIGHT: Int = ATTACK_SPRITE_WIDTH
-  private val ATTACK_FRAME_NUMBER: Int = 4
-
+  private val ATTACK_SWORD_FRAME_NUMBER: Int = 4
   private val ATTACK_BOW_FRAME_NUMBER: Int = 6
 
   private val ROLL_SPRITE_WIDTH: Int = 16
@@ -47,10 +46,11 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private var currentTime: Double = 0.0
   private val runSs: Spritesheet = new Spritesheet("data/images/hero_run.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
   private val swordAttackSs: Spritesheet = new Spritesheet("data/images/hero_sword_attack.png", ATTACK_SPRITE_WIDTH,
-    ATTACK_SPRITE_HEIGHT) // Pourquoi * 3 alors que c'est du 192x192 ?????
+    ATTACK_SPRITE_HEIGHT)
   private val rollSs: Spritesheet = new Spritesheet("data/images/hero_roll.png", ROLL_SPRITE_WIDTH, ROLL_SPRITE_HEIGHT)
   private var curentDirections: ArrayBuffer[Direction] = new ArrayBuffer[Direction]().addOne(Direction.SOUTH)
   private val heartSs: Spritesheet = new Spritesheet("data/images/heart.png", HEART_SPRITE_WIDTH, HEART_SPRITE_HEIGHT)
+  private val bowSs: Spritesheet = new Spritesheet("data/images/hero_bow_attack.png", ATTACK_SPRITE_WIDTH, ATTACK_SPRITE_HEIGHT)
 
   private var speed: Double = 1
   private val rollSpeed: Double = 4
@@ -59,6 +59,8 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   private var attackFrameRemain: Int = -1
   private var rollFrameRemain: Int = -1
+  private var weaponType: Int = 0;
+  private val pointerLastPos: Vector2d = new Vector2d(0, 0);
 
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
@@ -68,7 +70,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var invincibleTransparence: Boolean = false;
   var hp = MAX_HEALTH
   var projectileFactor: Float = 8
-  var weaponType: Int = 0;
+
   val WEAPON_TYPE_SWORD: Int = 0;
   val WEAPON_TYPE_BOW: Int = 1;
 
@@ -84,6 +86,14 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     isInvincible = i
   }
 
+  def setWeaponType(t: Int): Unit = {
+    if(attackFrameRemain < 0) {
+      if(t == WEAPON_TYPE_BOW || t == WEAPON_TYPE_SWORD) {
+        weaponType = t;
+      }
+    }
+  }
+
   def animate(elapsedTime: Double): Unit = {
     var frameTime = FRAME_TIME / speed
 
@@ -91,33 +101,44 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
       dt += elapsedTime
       if (dt > frameTime) {
         dt -= frameTime
-        currentAttackFrame = (ATTACK_FRAME_NUMBER - 1) - attackFrameRemain
 
-        if(currentAttackFrame == 1 || currentAttackFrame == 2) {
-          //Ajouter la hitbox de dégats pendant 2 frame
-          isAttaking = true
-          if(textureY == 0){
-            attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.sub(new Vector2d(0, width).sub(
-              new Vector2d(0, HITBOX_HEIGHT)))), width*2, width)
-          }
-          else if(textureY == 1){
-            attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.sub(new Vector2d(width, 0).sub(
-              new Vector2d(HITBOX_WIDTH, 0)))), width, width*2)
-          }
-          else if(textureY == 2){
-            attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.add(new Vector2d(width, 0).sub(
-              new Vector2d(HITBOX_WIDTH, 0)))),width,width*2)
-          }
-          else if (textureY == 3) {
-            attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.add(new Vector2d(0, width).sub(
-              new Vector2d(0, HITBOX_HEIGHT)))), width*2, width)
-          }
+        if(weaponType == WEAPON_TYPE_SWORD) {
+          currentAttackFrame = (ATTACK_SWORD_FRAME_NUMBER - 1) - attackFrameRemain
 
+          if(currentAttackFrame == 1 || currentAttackFrame == 2) {
+            //Ajouter la hitbox de dégats pendant 2 frame
+            isAttaking = true
+            if(textureY == 0){
+              attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.sub(new Vector2d(0, width).sub(
+                new Vector2d(0, HITBOX_HEIGHT)))), width*2, width)
+            }
+            else if(textureY == 1){
+              attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.sub(new Vector2d(width, 0).sub(
+                new Vector2d(HITBOX_WIDTH, 0)))), width, width*2)
+            }
+            else if(textureY == 2){
+              attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.add(new Vector2d(width, 0).sub(
+                new Vector2d(HITBOX_WIDTH, 0)))),width,width*2)
+            }
+            else if (textureY == 3) {
+              attackHitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX.add(new Vector2d(0, width).sub(
+                new Vector2d(0, HITBOX_HEIGHT)))), width*2, width)
+            }
+
+          }
+          else{
+            isAttaking = false
+            attackHitbox = new Hitbox(new Vector2d(0,0),0,0)
+          }
         }
-        else{
-          isAttaking = false
-          attackHitbox = new Hitbox(new Vector2d(0,0),0,0)
+        else if(weaponType == WEAPON_TYPE_BOW) {
+          currentAttackFrame = (ATTACK_BOW_FRAME_NUMBER - 1) - attackFrameRemain
+          if(currentAttackFrame == 4) {
+            val p: Projectile = new Projectile(hitbox.center, pointerLastPos.sub(position), projectileDistance, width / 6, 1, true)
+            ProjectileHandler.projectiles.append(p)
+          }
         }
+
         attackFrameRemain -= 1
       }
     }
@@ -247,11 +268,10 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def attack(pointer: Vector2d): Unit = {
-    if(weaponType == WEAPON_TYPE_BOW) {
-      val p: Projectile = new Projectile(position, pointer.sub(position), projectileDistance, width / 6, 1, true)
-      ProjectileHandler.projectiles.append(p)
-    }
     if(attackFrameRemain < 0 && rollFrameRemain < 0) {
+      pointerLastPos.x = pointer.x;
+      pointerLastPos.y = pointer.y;
+
       val verticalDif = position.y - pointer.y
       val horizontalDif = position.x - pointer.x
 
@@ -261,7 +281,12 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         if (horizontalDif > 0) turn(Direction.WEST) else turn(Direction.EAST)
       }
 
-      attackFrameRemain = ATTACK_FRAME_NUMBER - 1 //Start at 0
+      if(weaponType == WEAPON_TYPE_BOW) {
+        attackFrameRemain = ATTACK_BOW_FRAME_NUMBER - 1 //Start at 0
+      }
+      else if(weaponType == WEAPON_TYPE_SWORD) {
+        attackFrameRemain = ATTACK_SWORD_FRAME_NUMBER - 1 //Start at 0
+      }
     }
   }
 
@@ -309,9 +334,8 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3)
       }
       else if(weaponType == WEAPON_TYPE_BOW) {
-        g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3)
+        g.draw(bowSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3)
       }
-
     }
     else if(rollFrameRemain >= 0) {
       g.draw(rollSs.sprites(textureY)(currentRollFrame), position.x, position.y, width, width)
