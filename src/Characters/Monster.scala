@@ -24,7 +24,6 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
-  var dirCantGo: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
   var hp: Int = 1
   val DIFFICULTY: Int = 1
 
