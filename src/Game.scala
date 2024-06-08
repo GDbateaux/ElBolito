@@ -42,7 +42,6 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val KEY_SHIFT = Input.Keys.SHIFT_LEFT;
   private val BUTTON_LEFT = Input.Buttons.LEFT
   private val BUTTON_RIGHT = Input.Buttons.RIGHT
-  private var onlyOne: Boolean = true;
 
   override def onInit(): Unit = {
     setTitle("El Bolito")
@@ -80,10 +79,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
     var idx:Int = 0
     while (idx < f.currentRoom.monsters.length) {
-      if(onlyOne) {
-        f.currentRoom.monsters(idx).manageMonster(h, f.currentRoom.room, f.currentRoom.roomVectors, f.currentRoom.squareWidth)
-        onlyOne = false
-      }
+      f.currentRoom.monsters(idx).manageMonster(h, f.currentRoom.room, f.currentRoom.roomVectors, f.currentRoom.squareWidth)
       //f.currentRoom.monsters(idx).manageMonster(h, path)
       f.currentRoom.monsters(idx).setSpeed(0.6)
       f.currentRoom.monsters(idx).draw(g)

@@ -15,9 +15,15 @@ class Vector2d(var x: Float, var y: Float){
     return new Vector2d(x * l, y * l)
   }
 
-  def normalize(): Vector2d = {
-    val length: Double = math.sqrt(math.pow(x, 2) + math.pow(y, 2))
+  def length(): Double = {
+    return math.sqrt(math.pow(x, 2) + math.pow(y, 2))
+  }
 
-    return new Vector2d((x/length).toFloat, (y/length).toFloat)
+  def normalize(): Vector2d = {
+    val length: Double = this.length()
+    if(length != 0){
+      return new Vector2d((x/length).toFloat, (y/length).toFloat)
+    }
+    return new Vector2d(0,0)
   }
 }

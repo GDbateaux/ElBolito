@@ -60,10 +60,7 @@ class AStar(grid: Array[Array[Int]]) {
   def isValid(position: Position): Boolean = {
     val x = position.x.toInt
     val y = position.y.toInt
-    println("Astar" + x + " " + y)
-    if(x >= 0 && y >= 0 && x < grid(0).length && y < grid.length) {
-      println(grid(y)(x))
-    }
+
     x >= 0 && y >= 0 && x < grid(0).length && y < grid.length && grid(y)(x) != 3
   }
 

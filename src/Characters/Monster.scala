@@ -54,48 +54,32 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
 
-  /*def goBack(CoordinateCenterHeroBase: Vector2d, CoordinateCenterBase: Vector2d, percentage: Float): Unit = {
-    val relativeVector: Vector2d = Vector2d(-(CoordinateCenterHeroBase.x - hitbox.center.x),
-      -(CoordinateCenterHeroBase.y - hitbox.center.y))
-    val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
-    val finalPos: Vector2d = new Vector2d((math.cos(angle) * GROW_FACTOR * 10).toFloat,
-      (math.sin(angle) * GROW_FACTOR * 10).toFloat)
-
-    position.x = Interpolation.linear.apply(CoordinateCenterBase.x, finalPos.x, percentage)
-    position.y = Interpolation.linear.apply(CoordinateCenterBase.y, finalPos.y, percentage)
-  }*/
-
-  /*def go(CoordinateCenter: Vector2d): Unit = {
-    val relativeVector: Vector2d = CoordinateCenter.sub(hitbox.center)
-    val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
-
-    if(!(math.cos(angle) > 0 && dirCantGo.contains(Direction.EAST) ||
-      math.cos(angle) < 0 && dirCantGo.contains(Direction.WEST))){
-      position.x += (math.cos(angle) * speed * GROW_FACTOR).toFloat
-    }
-    if (!(math.sin(angle) > 0 && dirCantGo.contains(Direction.NORTH) ||
-      math.cos(angle) < 0 && dirCantGo.contains(Direction.SOUTH))) {
-      position.y += (math.sin(angle) * speed * GROW_FACTOR).toFloat
-    }
-    dirCantGo.clear()
-    hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
-  }*/
-
   def go(CoordinateCenter: Vector2d): Unit = {
     val relativeVector: Vector2d = CoordinateCenter.sub(hitbox.center)
-    val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
+    val normalizedVector = relativeVector.normalize()
+    val vectorToGo: Vector2d = new Vector2d(
+      (normalizedVector.x * speed * GROW_FACTOR).toFloat,
+      (normalizedVector.y * speed * GROW_FACTOR).toFloat
+    )
 
-    position.x += (math.cos(angle) * speed * GROW_FACTOR).toFloat
-    position.y += (math.sin(angle) * speed * GROW_FACTOR).toFloat
+    if(relativeVector .length() != 0){
+      if (relativeVector.length() <= vectorToGo.length()) {
+        position.x += relativeVector.x
+        position.y += relativeVector.y
+      } else {
+        position.x += vectorToGo.x
+        position.y += vectorToGo.y
+      }
+    }
 
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
 
-  def posToVector2d(position: Position, gridVectors: Array[Array[Vector2d]]): Vector2d = {
+  private def posToVector2d(position: Position, gridVectors: Array[Array[Vector2d]]): Vector2d = {
     return gridVectors(position.y)(position.x)
   }
 
-  def vector2dToPos(vector2d: Vector2d, gridVectors: Array[Array[Vector2d]]): Position = {
+  private def vector2dToPos(vector2d: Vector2d, gridVectors: Array[Array[Vector2d]]): Position = {
     var goodX: Int = 0;
     var goodY: Int = 0;
     var lessDiff: Double = math.abs(gridVectors(goodY)(goodX).x - vector2d.x) + math.abs(gridVectors(goodY)(goodX).y - vector2d.y);
@@ -112,27 +96,9 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     return Position(goodX, goodY)
   }
 
-  def findPath(hero: Hero, grid: Array[Array[Int]], gridVectors: Array[Array[Vector2d]]): ArrayBuffer[Vector2d] = {
+  private def findPath(hero: Hero, grid: Array[Array[Int]], gridVectors: Array[Array[Vector2d]]): ArrayBuffer[Vector2d] = {
     val res: ArrayBuffer[Vector2d] = new ArrayBuffer[Vector2d]();
-    val ROOM_HEIGHT: Int = 11
-    val ROOM_WIDTH: Int = 19
-    val ROOM_CHARACTER: Int = 1
-    val ROOM_MONSTER: Int = 2
-    val ROOM_OBSTACLE: Int = 3
 
-    // Créez une grille représentant votre espace de jeu. Chaque cellule de la grille correspond à une position possible pour le monstre.
-    //val grid: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH);
-
-    // Initialisez la grille. Mettez 0 pour les cellules libres et 1 pour les cellules contenant des obstacles.
-
-    for (y: Int <- grid.indices) {
-      for (x: Int <- grid(0).indices) {
-        print(grid(y)(x) + " ")
-      }
-      println()
-    }
-
-    // Créez une instance de l'algorithme A* avec votre grille.
     val aStar: AStar = new AStar(grid)
 
     val heroPosition: Position = vector2dToPos(hero.position, gridVectors);
@@ -140,15 +106,13 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
 
     // Utilisez l'algorithme A* pour trouver le chemin le plus court du monstre au héros.
     val path: ArrayBuffer[Position] = aStar.findPath(monsterPosition, heroPosition);
-    println("START");
+
     for(p <- path) {
-      println(p.x + " " + p.y);
       res.addOne(posToVector2d(p, gridVectors));
     }
-    println("END");
+
     return res
   }
-
 
   def manageMonster(h: Hero, grid: Array[Array[Int]], gridVectors: Array[Array[Vector2d]], squareWidth: Float): Unit = {
     animate(Gdx.graphics.getDeltaTime)
@@ -162,23 +126,21 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
       hp -= 1
     }
 
-    if(position == posToGo || posToGo.x == 0 && posToGo.y == 0) {
+    if(posToGo.x  == hitbox.center.x && posToGo.y == hitbox.center.y || posToGo.x == 0 && posToGo.y == 0) {
       val path = findPath(h, grid, gridVectors);
-      if (path.nonEmpty) {
 
+      //Path(0) is the actual monster position
+      if (path.length >= 2) {
         posToGo.x = path(1).x + squareWidth / 2;
         posToGo.y = path(1).y + squareWidth / 2;
         go(posToGo);
       }
-      for(p <- path) {
-        println(p.x + " " + p.y)
+      else {
+        posToGo = h.hitbox.center;
+        go(posToGo);
       }
-      println(squareWidth)
-      println("POSITION: " + position.x + " " + position.y)
-      println("POSTOGO: " + posToGo.x + " " + posToGo.y)
     }
     else {
-      println("POSITION: " + position.x + " " + position.y)
       go(posToGo);
     }
   }
