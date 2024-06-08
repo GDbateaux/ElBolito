@@ -18,6 +18,8 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val ATTACK_SPRITE_HEIGHT: Int = ATTACK_SPRITE_WIDTH
   private val ATTACK_FRAME_NUMBER: Int = 4
 
+  private val ATTACK_BOW_FRAME_NUMBER: Int = 6
+
   private val ROLL_SPRITE_WIDTH: Int = 16
   private val ROLL_SPRITE_HEIGHT: Int = ROLL_SPRITE_WIDTH
   private val ROLL_FRAME_NUMBER: Int = 9
@@ -66,6 +68,9 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var invincibleTransparence: Boolean = false;
   var hp = MAX_HEALTH
   var projectileFactor: Float = 8
+  var weaponType: Int = 0;
+  val WEAPON_TYPE_SWORD: Int = 0;
+  val WEAPON_TYPE_BOW: Int = 1;
 
   private val projectileDistance: Float = width * projectileFactor
   private var dt: Double = 0
@@ -242,8 +247,10 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def attack(pointer: Vector2d): Unit = {
-    val p: Projectile = new Projectile(position, pointer.sub(position), projectileDistance, width/6, 1, true)
-    ProjectileHandler.projectiles.append(p)
+    if(weaponType == WEAPON_TYPE_BOW) {
+      val p: Projectile = new Projectile(position, pointer.sub(position), projectileDistance, width / 6, 1, true)
+      ProjectileHandler.projectiles.append(p)
+    }
     if(attackFrameRemain < 0 && rollFrameRemain < 0) {
       val verticalDif = position.y - pointer.y
       val horizontalDif = position.x - pointer.x
@@ -298,7 +305,13 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   override def draw(g: GdxGraphics): Unit = {
     drawHearts(g)
     if (attackFrameRemain >= 0) {
-      g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3) // Au bol (* 3 compréhensible car au lieu d'avoir une image 16x16 on a du 48x48)
+      if(weaponType == WEAPON_TYPE_SWORD) {
+        g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3)
+      }
+      else if(weaponType == WEAPON_TYPE_BOW) {
+        g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3)
+      }
+
     }
     else if(rollFrameRemain >= 0) {
       g.draw(rollSs.sprites(textureY)(currentRollFrame), position.x, position.y, width, width)
