@@ -106,6 +106,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     val dirNoGo: ArrayBuffer[Direction] = f.currentRoom.wallContact(h.hitbox)
     val dirSwitchRoom: Direction = f.currentRoom.doorContact(h.hitbox)
 
+    h.setWeaponType(h.WEAPON_TYPE_BOW);
+    h.setWeaponType(h.WEAPON_TYPE_SWORD);
+
     if (keyStatus(KEY_UP)) {
       h.turn(Direction.NORTH)
       goDir.append(Direction.NORTH)
