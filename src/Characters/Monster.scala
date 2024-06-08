@@ -103,8 +103,6 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     val heroPosition: Position = vector2dToPos(hero.hitbox.center, gridVectors, grid)
     val monsterPosition: Position = vector2dToPos(hitbox.center, gridVectors, grid)
 
-    println("aaa  " + monsterPosition.x)
-    println(monsterPosition.y)
     // Utilisez l'algorithme A* pour trouver le chemin le plus court du monstre au héros.
     val path: ArrayBuffer[Position] = aStar.findPath(monsterPosition, heroPosition)
 
