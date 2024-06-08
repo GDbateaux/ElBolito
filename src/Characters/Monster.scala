@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Interpolation
 
 import scala.collection.mutable.ArrayBuffer
 
-class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
+class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with Enemy {
   private val SPRITE_WIDTH: Int = 32
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
   private val HITBOX_WIDTH: Float = width / 2

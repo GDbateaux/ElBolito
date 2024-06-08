@@ -8,7 +8,7 @@ import com.badlogic.gdx.Gdx
 
 import scala.collection.mutable.ArrayBuffer
 
-class Boss(initialPos: Vector2d, width: Float) {
+class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   private val SPRITE_WIDTH: Int = 64
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
   private val HITBOX_WIDTH: Float = width / 2
@@ -19,7 +19,8 @@ class Boss(initialPos: Vector2d, width: Float) {
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
-  var hp: Int = 10
+  val MAX_HP: Int = 50
+  var hp: Int = MAX_HP
 
   private var textureY: Int = 0
   private var currentFrame: Int = 0
@@ -68,11 +69,10 @@ class Boss(initialPos: Vector2d, width: Float) {
       hp -= 1
     }
 
-    go(h.hitbox.center)
+    //go(h.hitbox.center)
   }
 
   def draw(g: GdxGraphics): Unit = {
     g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
-    hitbox.draw(g)
   }
 }
