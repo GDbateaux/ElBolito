@@ -39,7 +39,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val KEY_RIGHT = Input.Keys.D
   private val KEY_DOWN = Input.Keys.S
   private val KEY_LEFT = Input.Keys.A
-  private val KEY_SHIFT = Input.Keys.SHIFT_LEFT;
+  private val KEY_SHIFT = Input.Keys.SHIFT_LEFT
   private val BUTTON_LEFT = Input.Buttons.LEFT
   private val BUTTON_RIGHT = Input.Buttons.RIGHT
 
@@ -85,7 +85,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       f.currentRoom.monsters(idx).draw(g)
       if (f.currentRoom.monsters(idx).hp <= 0) {
         f.currentRoom.monsters.subtractOne(f.currentRoom.monsters(idx))
-        //f.currentRoom.monsters = new ArrayBuffer[Monster]();
+        //f.currentRoom.monsters = new ArrayBuffer[Monster]()
       }
       idx += 1
     }
@@ -93,6 +93,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     if(DRAW_HITBOX){
       h.hitbox.draw(g)
       h.attackHitbox.draw(g)
+      for(m <- f.currentRoom.monsters){
+        m.hitbox.draw(g)
+      }
     }
 
     g.drawFPS()

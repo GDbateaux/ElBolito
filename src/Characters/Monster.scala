@@ -17,14 +17,12 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
   private val HITBOX_WIDTH: Float = width / 2
   private val HITBOX_HEIGHT: Float = 12 * width / SPRITE_WIDTH
-  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d((width - HITBOX_WIDTH) / 2 + HITBOX_WIDTH / 2,
-    (width - HITBOX_HEIGHT) / 2 + HITBOX_HEIGHT / 2)
+  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d(width / 2, width/ 2)
 
   private val GROW_FACTOR = width / (SPRITE_WIDTH / 2)
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
-  var dirCantGo: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
   var hp: Int = 1
   val DIFFICULTY: Int = 1
 
@@ -79,17 +77,29 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     return gridVectors(position.y)(position.x)
   }
 
-  private def vector2dToPos(vector2d: Vector2d, gridVectors: Array[Array[Vector2d]]): Position = {
-    var goodX: Int = 0;
-    var goodY: Int = 0;
-    var lessDiff: Double = math.abs(gridVectors(goodY)(goodX).x - vector2d.x) + math.abs(gridVectors(goodY)(goodX).y - vector2d.y);
+  private def vector2dToPos(vector2d: Vector2d, gridVectors: Array[Array[Vector2d]], grid: Array[Array[Int]]): Position = {
+    var goodX: Int = 0
+    var goodY: Int = 0
+    var lessDiff: Double = math.abs(gridVectors(goodY)(goodX).x - vector2d.x) + math.abs(gridVectors(goodY)(goodX).y - vector2d.y)
+
     for (y: Int <- gridVectors.indices) {
       for (x: Int <- gridVectors(0).indices) {
-        val actualDiff = math.abs(gridVectors(y)(x).x - vector2d.x) + math.abs(gridVectors(y)(x).y - vector2d.y);
+        val actualDiff = math.abs(gridVectors(y)(x).x - vector2d.x) + math.abs(gridVectors(y)(x).y - vector2d.y)
         if(actualDiff < lessDiff) {
           lessDiff = actualDiff
-          goodX = x;
+          goodX = x
           goodY = y
+        }
+
+        for(_: Int <- 0 to 1){
+          if(grid(goodY)(goodX) == 3 && goodX != 0 && goodY != 0){
+            if(math.abs(gridVectors(y)(x).x - vector2d.x) > math.abs(gridVectors(y)(x).y - vector2d.y)){
+              goodX -= 1
+            }
+            else{
+              goodY -= 1
+            }
+          }
         }
       }
     }
@@ -97,18 +107,18 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   private def findPath(hero: Hero, grid: Array[Array[Int]], gridVectors: Array[Array[Vector2d]]): ArrayBuffer[Vector2d] = {
-    val res: ArrayBuffer[Vector2d] = new ArrayBuffer[Vector2d]();
+    val res: ArrayBuffer[Vector2d] = new ArrayBuffer[Vector2d]()
 
     val aStar: AStar = new AStar(grid)
 
-    val heroPosition: Position = vector2dToPos(hero.position, gridVectors);
-    val monsterPosition: Position = vector2dToPos(position, gridVectors);
+    val heroPosition: Position = vector2dToPos(hero.hitbox.center, gridVectors, grid)
+    val monsterPosition: Position = vector2dToPos(position, gridVectors, grid)
 
     // Utilisez l'algorithme A* pour trouver le chemin le plus court du monstre au héros.
-    val path: ArrayBuffer[Position] = aStar.findPath(monsterPosition, heroPosition);
+    val path: ArrayBuffer[Position] = aStar.findPath(monsterPosition, heroPosition)
 
     for(p <- path) {
-      res.addOne(posToVector2d(p, gridVectors));
+      res.addOne(posToVector2d(p, gridVectors))
     }
 
     return res
@@ -127,21 +137,21 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     }
 
     if(posToGo.x  == hitbox.center.x && posToGo.y == hitbox.center.y || posToGo.x == 0 && posToGo.y == 0) {
-      val path = findPath(h, grid, gridVectors);
+      val path = findPath(h, grid, gridVectors)
 
       //Path(0) is the actual monster position
       if (path.length >= 2) {
-        posToGo.x = path(1).x + squareWidth / 2;
-        posToGo.y = path(1).y + squareWidth / 2;
-        go(posToGo);
+        posToGo.x = path(1).x + squareWidth / 2
+        posToGo.y = path(1).y + squareWidth / 2
+        go(posToGo)
       }
       else {
-        posToGo = h.hitbox.center;
-        go(posToGo);
+        posToGo = h.hitbox.center
+        go(posToGo)
       }
     }
     else {
-      go(posToGo);
+      go(posToGo)
     }
   }
 

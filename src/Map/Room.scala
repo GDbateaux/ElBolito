@@ -21,7 +21,7 @@ trait Room extends DrawableObject {
   protected val ROOM_OBSTACLE: Int = 3
 
   var room: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
-  var roomVectors: Array[Array[Vector2d]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH);
+  var roomVectors: Array[Array[Vector2d]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   protected var doorsPositions: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
   var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
 
@@ -30,11 +30,11 @@ trait Room extends DrawableObject {
   private var spaceWidth: Double = 0
   private var spaceHeight: Double = 0
   private var firstDraw: Boolean = true
-  private val HERO_SPRITE_WIDTH: Int = 32;
-  private val HERO_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH;
+  private val HERO_SPRITE_WIDTH: Int = 32
+  private val HERO_SPRITE_HEIGHT: Int = HERO_SPRITE_WIDTH
 
   private val DOOR_FRAME_NUMBER: Int = 15
-  protected var curentDoorFrame: Int = DOOR_FRAME_NUMBER - 1;
+  protected var curentDoorFrame: Int = DOOR_FRAME_NUMBER - 1
 
   private val doorTopSs: Spritesheet = new Spritesheet("data/images/doorTop.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
   private val doorRightSs: Spritesheet = new Spritesheet("data/images/doorRight.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
@@ -275,7 +275,7 @@ trait Room extends DrawableObject {
           if(firstDraw) {
             /*val centerX: Float = posX + squareWidth / 2
             val centerY: Float = posY + squareWidth / 2*/
-            roomVectors(y - 2)(x - 2) = new Vector2d(posX, posY);
+            roomVectors(y - 2)(x - 2) = new Vector2d(posX, posY)
           }
           g.draw(floor, posX, posY, squareWidth.toFloat, squareWidth.toFloat)
           if (room(y - 2)(x - 2) == ROOM_OBSTACLE) {
@@ -292,14 +292,6 @@ trait Room extends DrawableObject {
           else if (room(y - 2)(x - 2) == ROOM_CHARACTER) {
 
           }
-        }
-      }
-    }
-
-    for(o <- roomObstacles){
-      for (m: Monster <- monsters) {
-        if (m.hitbox.intersect(o.hitbox)) {
-          m.dirCantGo.addOne(m.hitbox.neighborDirection(o.hitbox))
         }
       }
     }
