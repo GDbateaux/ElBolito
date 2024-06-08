@@ -9,15 +9,16 @@ import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-class Floor(private val numRoom: Int) extends DrawableObject{
+class Floor(private val numRoom: Int, private val floorNumber: Int) extends DrawableObject{
   private var arraySide: Int = 0
   private val PRODUCT_SIDE_ROOME: Double = 0.8
   private val tmpSide: Int = (numRoom * PRODUCT_SIDE_ROOME).toInt
   private var floorInt: Array[Array[Int]] = _
   private var floor: Array[Array[Room]] = _
   private var currentRoomPos: Position = Position(0,0)
+  private var distanceRoom: Array[Array[Int]] = _
+  private var nearestRoomDifficulty: Int = floorNumber * 5
   var currentRoom: Room = _
-  var RoomDifficulty: Int = 1
 
   if(tmpSide % 2 == 0){
     arraySide = tmpSide + 1
@@ -48,6 +49,7 @@ class Floor(private val numRoom: Int) extends DrawableObject{
       if (floor(nextRoomPos.y)(nextRoomPos.x) != null) {
         currentRoomPos = nextRoomPos
         currentRoom = floor(currentRoomPos.y)(currentRoomPos.x)
+        floor(currentRoomPos.y)(currentRoomPos.x).setFirstDraw(true)
       }
     }
   }
@@ -55,6 +57,7 @@ class Floor(private val numRoom: Int) extends DrawableObject{
   private def generateFloor(): Unit = {
     floorInt = generateBlueprint()
     addRoomType(floorInt)
+    generateDistanceRoom(floorInt)
     floor = generateFloorArray(floorInt)
     currentRoom = floor(currentRoomPos.y)(currentRoomPos.x)
   }
@@ -70,12 +73,19 @@ class Floor(private val numRoom: Int) extends DrawableObject{
     println()
     println()
 
-    for (y: Int <- floor.indices) {
+    for (y: Int <- distanceRoom.indices) {
+      for (x: Int <- distanceRoom(0).indices) {
+        print(distanceRoom(y)(x))
+      }
+      println()
+    }
+
+    /*for (y: Int <- floor.indices) {
       for (x: Int <- floor(0).indices) {
         print(floor(y)(x))
       }
       println()
-    }
+    }*/
   }
 
   private def generateFloorArray(f: Array[Array[Int]]): Array[Array[Room]] = {
@@ -85,7 +95,7 @@ class Floor(private val numRoom: Int) extends DrawableObject{
       for (x: Int <- f(0).indices) {
         val neighborRooms: ArrayBuffer[Direction] = getNeighborDirections(f, Position(x,y))
         if(f(y)(x) == 1){
-          res(y)(x) = new FightRoom(RoomDifficulty, neighborRooms)
+          res(y)(x) = new FightRoom(nearestRoomDifficulty + distanceRoom(y)(x), neighborRooms)
         }
         else if(f(y)(x) == 2){
           currentRoomPos = Position(x,y)
@@ -95,7 +105,7 @@ class Floor(private val numRoom: Int) extends DrawableObject{
           res(y)(x) = new SpecialRoom(neighborRooms)
         }
         else if(f(y)(x) == 4){
-          res(y)(x) = new BossRoom(RoomDifficulty, neighborRooms)
+          res(y)(x) = new BossRoom(nearestRoomDifficulty + distanceRoom(y)(x), neighborRooms)
         }
       }
     }
@@ -174,6 +184,37 @@ class Floor(private val numRoom: Int) extends DrawableObject{
       }
     }
     floor(pos.y)(pos.x) = 4
+  }
+
+  private def generateDistanceRoom(floor: Array[Array[Int]]): Unit = {
+    distanceRoom = Array.ofDim(arraySide, arraySide)
+    distanceRoom(arraySide/2)(arraySide/2) = 1
+    generate(Position(arraySide/2, arraySide/2), 1)
+
+    def generate(pos: Position, num: Int): Unit = {
+      val dir: ArrayBuffer[Direction] = getNeighborDirections(floor, pos)
+
+      if (dir.contains(Direction.NORTH) && (distanceRoom(pos.y - 1)(pos.x) > num + 1 || distanceRoom(pos.y - 1)(pos.x) == 0)) {
+        val newPos = pos.copy(y = pos.y - 1)
+        distanceRoom(newPos.y)(newPos.x) = num
+        generate(newPos, num + 1)
+      }
+      if (dir.contains(Direction.SOUTH) && (distanceRoom(pos.y + 1)(pos.x) > num + 1 || distanceRoom(pos.y + 1)(pos.x) == 0)) {
+        val newPos = pos.copy(y = pos.y + 1)
+        distanceRoom(newPos.y)(newPos.x) = num
+        generate(newPos, num + 1)
+      }
+      if (dir.contains(Direction.EAST) && (distanceRoom(pos.y)(pos.x + 1) > num + 1 || distanceRoom(pos.y)(pos.x + 1) == 0)) {
+        val newPos = pos.copy(x = pos.x + 1)
+        distanceRoom(newPos.y)(newPos.x) = num
+        generate(newPos, num + 1)
+      }
+      if (dir.contains(Direction.WEST) && (distanceRoom(pos.y)(pos.x - 1) > num + 1 || distanceRoom(pos.y)(pos.x - 1) == 0)) {
+        val newPos = pos.copy(x = pos.x - 1)
+        distanceRoom(newPos.y)(newPos.x) = num
+        generate(newPos, num + 1)
+      }
+    }
   }
 
   private def getFarthestPos(floor: Array[Array[Int]]): ArrayBuffer[Position] = {
@@ -288,5 +329,6 @@ class Floor(private val numRoom: Int) extends DrawableObject{
 }
 
 object FloorTest extends App {
-  val f: Floor = new Floor(15)
+  val f: Floor = new Floor(15, 0)
+
 }

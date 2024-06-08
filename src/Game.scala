@@ -1,4 +1,4 @@
-import Characters.{Hero, Monster}
+import Characters.{Hero, Monster, Projectile, ProjectileHandler}
 import Map.Floor
 import Utils.Direction.Direction
 import Utils.{Direction, Screen, Vector2d}
@@ -11,9 +11,9 @@ import scala.collection.mutable.ArrayBuffer
 
 
 /**
- * Hello World demo in Scala
+ * ElBolito game in Scala
  *
- * @author Pierre-André Mudry (mui)
+ * @author Simon Masserey & Yolan Savioz
  * @version 1.0
  */
 object Game {
@@ -25,12 +25,13 @@ object Game {
 class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windowWidth, windowHeigth) {
   private val ANIMATION_LENGTH_DAMAGE: Float = 1
   private val NUM_ROOM: Int = 10
-  private val DRAW_HITBOX: Boolean = true
+  private val DRAW_HITBOX: Boolean = false
 
   private var h: Hero = _
-  private var m: Monster = _
   private var f: Floor = _
   private val keyStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
+  private val buttonStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
+  private val pointerPos: Vector2d = new Vector2d(0, 0)
   private var currentTime: Float = 0
   private var invincibilityTime: Float = 0
 
@@ -38,20 +39,22 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val KEY_RIGHT = Input.Keys.D
   private val KEY_DOWN = Input.Keys.S
   private val KEY_LEFT = Input.Keys.A
+  private val KEY_SHIFT = Input.Keys.SHIFT_LEFT
+  private val BUTTON_LEFT = Input.Buttons.LEFT
+  private val BUTTON_RIGHT = Input.Buttons.RIGHT
 
   override def onInit(): Unit = {
     setTitle("El Bolito")
 
-    f = new Floor(NUM_ROOM)
+    f = new Floor(NUM_ROOM, 0)
     h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
-    m = new Monster(new Vector2d(200, 200), f.currentRoom.squareWidth)
-    h.setSpeed(1)
-    m.setSpeed(0.5)
-
     keyStatus(KEY_UP) = false
     keyStatus(KEY_RIGHT) = false
     keyStatus(KEY_DOWN) = false
     keyStatus(KEY_LEFT) = false
+    keyStatus(KEY_SHIFT) = false
+    buttonStatus(BUTTON_LEFT) = false
+    buttonStatus(BUTTON_RIGHT) = false
   }
 
   /**
@@ -62,8 +65,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   override def onGraphicRender(g: GdxGraphics): Unit = {
     // Clears the screen
     g.clear()
-    
+
     f.draw(g)
+    f.currentRoom.doorAnimate(Gdx.graphics.getDeltaTime)
     /*for (d <- f.currentRoom.roomObstacles){
       d.hitbox.draw(g)
     }*/
@@ -71,31 +75,39 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     manageHero()
     h.draw(g)
 
-    manageMonster()
-    m.draw(g)
+    ProjectileHandler.handle(g, f.currentRoom, h)
+
+    var idx:Int = 0
+    while (idx < f.currentRoom.monsters.length) {
+      f.currentRoom.monsters(idx).manageMonster(h, f.currentRoom.room, f.currentRoom.roomVectors, f.currentRoom.squareWidth)
+      //f.currentRoom.monsters(idx).manageMonster(h, path)
+      f.currentRoom.monsters(idx).setSpeed(0.6)
+      f.currentRoom.monsters(idx).draw(g)
+      if (f.currentRoom.monsters(idx).hp <= 0) {
+        f.currentRoom.monsters.subtractOne(f.currentRoom.monsters(idx))
+        //f.currentRoom.monsters = new ArrayBuffer[Monster]()
+      }
+      idx += 1
+    }
 
     if(DRAW_HITBOX){
       h.hitbox.draw(g)
-      m.hitbox.draw(g)
+      h.attackHitbox.draw(g)
+      for(m <- f.currentRoom.monsters){
+        m.hitbox.draw(g)
+      }
     }
 
     g.drawFPS()
-  }
-
-  private def manageMonster(): Unit = {
-    m.animate(Gdx.graphics.getDeltaTime)
-
-    if(m.hitbox.interect(h.hitbox)){
-      h.setInvisibility(true)
-    }
-
-    m.go(h.hitbox.center)
   }
 
   private def manageHero(): Unit = {
     var goDir: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
     val dirNoGo: ArrayBuffer[Direction] = f.currentRoom.wallContact(h.hitbox)
     val dirSwitchRoom: Direction = f.currentRoom.doorContact(h.hitbox)
+
+    h.setWeaponType(h.WEAPON_TYPE_BOW);
+    h.setWeaponType(h.WEAPON_TYPE_SWORD);
 
     if (keyStatus(KEY_UP)) {
       h.turn(Direction.NORTH)
@@ -113,29 +125,42 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       h.turn(Direction.WEST)
       goDir.append(Direction.WEST)
     }
+    if(buttonStatus(BUTTON_RIGHT)) {
+      buttonStatus(BUTTON_RIGHT) = false
+    }
+    if (buttonStatus(BUTTON_LEFT)) {
+      h.attack(pointerPos)
+      buttonStatus(BUTTON_LEFT) = false
+    }
 
-    if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom)) {
+    if (dirSwitchRoom != Direction.NULL && goDir.contains(dirSwitchRoom) && f.currentRoom.isClean) {
       if(dirSwitchRoom == Direction.SOUTH) {
-        h.position.x = f.currentRoom.ROOM_NORTH.x;
-        h.position.y = f.currentRoom.ROOM_NORTH.y;
+        h.position.x = f.currentRoom.ROOM_NORTH.x
+        h.position.y = f.currentRoom.ROOM_NORTH.y
       }
       else if (dirSwitchRoom == Direction.NORTH) {
-        h.position.x = f.currentRoom.ROOM_SOUTH.x;
-        h.position.y = f.currentRoom.ROOM_SOUTH.y;
+        h.position.x = f.currentRoom.ROOM_SOUTH.x
+        h.position.y = f.currentRoom.ROOM_SOUTH.y
       }
       else if (dirSwitchRoom == Direction.EAST) {
-        h.position.x = f.currentRoom.ROOM_WEST.x;
-        h.position.y = f.currentRoom.ROOM_WEST.y;
+        h.position.x = f.currentRoom.ROOM_WEST.x
+        h.position.y = f.currentRoom.ROOM_WEST.y
       }
       else if (dirSwitchRoom == Direction.WEST) {
-        h.position.x = f.currentRoom.ROOM_EAST.x;
-        h.position.y = f.currentRoom.ROOM_EAST.y;
+        h.position.x = f.currentRoom.ROOM_EAST.x
+        h.position.y = f.currentRoom.ROOM_EAST.y
       }
       f.changeRoom(dirSwitchRoom)
     }
+
     goDir = goDir.diff(dirNoGo)
 
     h.go(goDir)
+
+    if(keyStatus(KEY_SHIFT)) {
+      h.roll()
+    }
+
 
     if(!keyStatus(KEY_UP) && !keyStatus(KEY_DOWN) &&
       !keyStatus(KEY_LEFT) && !keyStatus(KEY_RIGHT)){
@@ -151,6 +176,10 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       invincibilityTime += Gdx.graphics.getDeltaTime
     }
 
+    if(h.hp <= 0) {
+      h.setSpeed(0)
+    }
+
     h.animate(Gdx.graphics.getDeltaTime)
   }
 
@@ -162,5 +191,12 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   override def onKeyDown(keyCode: Int): Unit = {
     super.onKeyDown(keyCode)
     keyStatus(keyCode) = true
+  }
+
+  override def onClick(x: Int, y: Int, button: Int): Unit = {
+    super.onClick(x, y, button)
+    pointerPos.x = x
+    pointerPos.y = y
+    buttonStatus(button) = true
   }
 }
