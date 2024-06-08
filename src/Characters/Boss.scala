@@ -12,15 +12,13 @@ class Boss(initialPos: Vector2d, width: Float) {
   private val SPRITE_WIDTH: Int = 64
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
   private val HITBOX_WIDTH: Float = width / 2
-  private val HITBOX_HEIGHT: Float = 12 * width / SPRITE_WIDTH
-  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d((width - HITBOX_WIDTH) / 2 + HITBOX_WIDTH / 2,
-    (width - HITBOX_HEIGHT) / 2 + HITBOX_HEIGHT / 2)
+  private val HITBOX_HEIGHT: Float = 26 * width / SPRITE_WIDTH
+  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d(width/2, width/5)
 
   private val GROW_FACTOR = width / (SPRITE_WIDTH / 2)
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
-  var dirCantGo: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
   var hp: Int = 10
 
   private var textureY: Int = 0
@@ -75,5 +73,6 @@ class Boss(initialPos: Vector2d, width: Float) {
 
   def draw(g: GdxGraphics): Unit = {
     g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
+    hitbox.draw(g)
   }
 }

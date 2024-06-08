@@ -93,6 +93,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     if(DRAW_HITBOX){
       h.hitbox.draw(g)
       h.attackHitbox.draw(g)
+      for(m <- f.currentRoom.monsters){
+        m.hitbox.draw(g)
+      }
     }
 
     g.drawFPS()

@@ -17,8 +17,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
   private val HITBOX_WIDTH: Float = width / 2
   private val HITBOX_HEIGHT: Float = 12 * width / SPRITE_WIDTH
-  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d((width - HITBOX_WIDTH) / 2 + HITBOX_WIDTH / 2,
-    (width - HITBOX_HEIGHT) / 2 + HITBOX_HEIGHT / 2)
+  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d(width / 2, width/ 2)
 
   private val GROW_FACTOR = width / (SPRITE_WIDTH / 2)
   private val NUM_FRAME_RUN: Int = 4

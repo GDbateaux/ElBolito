@@ -31,7 +31,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val HITBOX_WIDTH: Float = 6 * width / HERO_SPRITE_WIDTH
   private val HITBOX_HEIGHT: Float = width / 3
 
-  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d((width-HITBOX_WIDTH)/2 + HITBOX_WIDTH/2, HITBOX_HEIGHT/2)
+  private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d(width/2, HITBOX_HEIGHT/2)
 
   var INVINCIBILITY_TIME: Double = 1
 
