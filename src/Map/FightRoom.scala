@@ -1,6 +1,6 @@
 package Map
 
-import Characters.{Hero, Monster}
+import Characters.{Enemy, Hero, Monster}
 import Utils.{Direction, Position, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.lib.GdxGraphics
@@ -191,8 +191,8 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
   override def manageRoom(h: Hero): Unit = {
     var idx:Int = 0
     while (idx < monsters.length) {
-      monsters(idx).manageMonster(h, room, roomVectors, squareWidth)
-      monsters(idx).setSpeed(0.6)
+      monsters(idx).asInstanceOf[Monster].manageMonster(h, room, roomVectors, squareWidth)
+      monsters(idx).asInstanceOf[Monster].setSpeed(0.6)
       if (monsters(idx).hp <= 0) {
         monsters.subtractOne(monsters(idx))
       }
@@ -206,7 +206,7 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
 
   override def draw(g: GdxGraphics): Unit = {
     super.draw(g)
-    for(m: Monster <- monsters){
+    for(m: Enemy <- monsters){
       m.draw(g)
     }
   }

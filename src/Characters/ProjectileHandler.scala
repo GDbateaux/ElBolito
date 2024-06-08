@@ -25,7 +25,7 @@ object ProjectileHandler {
           }
         }
         if(p.isFromHero){
-          for (m: Monster <- currentRoom.monsters) {
+          for (m: Enemy <- currentRoom.monsters) {
             if (m.hitbox.intersect(p.hitbox)) {
               m.hp -= p.damage
               p.isFinish = true

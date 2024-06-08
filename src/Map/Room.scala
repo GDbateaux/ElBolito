@@ -1,6 +1,6 @@
 package Map
 
-import Characters.{Hero, Hitbox, Monster}
+import Characters.{Enemy, Hero, Hitbox, Monster}
 import Utils.{Direction, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
@@ -23,7 +23,7 @@ trait Room extends DrawableObject {
   var room: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   var roomVectors: Array[Array[Vector2d]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   protected var doorsPositions: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
-  var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
+  var monsters: ArrayBuffer[Enemy] = new ArrayBuffer[Enemy]()
 
   private val nbrSquareX: Int = ROOM_WIDTH + 4 // 2 = les murs droites et gauches (+ over)
   private val nbrSquareY: Int = ROOM_HEIGHT + 4 // 2 = les murs en haut et en bas (+ over)
@@ -177,7 +177,7 @@ trait Room extends DrawableObject {
     val obstacle = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\props_itens\\barrel.png"))
 
     if(firstDraw){
-      monsters = new ArrayBuffer[Monster]()
+      monsters = new ArrayBuffer[Enemy]()
     }
 
     for (y: Int <- 0 until nbrSquareY) {
