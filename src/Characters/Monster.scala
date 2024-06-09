@@ -25,7 +25,6 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
 
   var hp: Int = 3
   val DIFFICULTY: Int = 1
-  private var isInvincible: Boolean = false
 
   //private var textureY: Int = 0
   private var currentFrame: Int = 0
@@ -47,6 +46,14 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
     dt += elapsedTime
 
     if (dt > frameTime) {
+      if(invincibleFrameRemain > 0) {
+        invincibleTransparence = !invincibleTransparence
+        invincibleFrameRemain -= 1;
+      }
+      else {
+        invincibleTransparence = false
+      }
+
       dt -= frameTime
       currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
     }
@@ -122,14 +129,9 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
       h.setInvisibility(true)
     }
 
-    if(isInvincible && h.attackHitbox.center.y == 0 && h.attackHitbox.center.x == 0) {
-      isInvincible = false;
-      speed = 1
-    }
-
-    if(!isInvincible && hitbox.intersect(h.attackHitbox)) {
+    if(invincibleFrameRemain <= 0 && hitbox.intersect(h.attackHitbox)) {
       hp -= 1
-      isInvincible = true;
+      invincibleFrameRemain = INVINCIBLE_FRAME;
     }
 
     if(math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1 || posToGo.x == 0 && posToGo.y == 0) {
@@ -139,19 +141,24 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
       if (path.length >= 2) {
         posToGo.x = path(1).x
         posToGo.y = path(1).y
-        go(posToGo)
       }
       else {
         posToGo = h.hitbox.center
-        go(posToGo)
       }
     }
-    else {
+
+    if(invincibleFrameRemain <= 0) {
       go(posToGo)
     }
+    else {
+      go(hitbox.center)
+    }
+
   }
 
   override def draw(g: GdxGraphics): Unit = {
-    g.draw(runSs.sprites(0)(currentFrame), position.x, position.y, width, width)
+    if(!invincibleTransparence) {
+      g.draw(runSs.sprites(0)(currentFrame), position.x, position.y, width, width)
+    }
   }
 }
