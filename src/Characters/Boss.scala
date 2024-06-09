@@ -27,19 +27,19 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   private val runSs: Spritesheet = new Spritesheet("data/images/yeti_run.png", SPRITE_WIDTH, SPRITE_HEIGHT)
   private val chargeSs: Spritesheet = new Spritesheet("data/images/yeti_charge.png", SPRITE_WIDTH, SPRITE_HEIGHT)
 
-  private val runSpeed: Double = 0.6;
-  private val CHARGE_CASTING_CD = 3;
-  private var castingCharge = -1;
+  private val runSpeed: Double = 0.6
+  private val CHARGE_CASTING_CD = 3
+  private var castingCharge = -1
   private val chargeSpeed: Double = 3
   private var speed: Double = runSpeed
-  private val SPECTIAL_COOLDOWN: Int = 6;
-  private var lastSpecialTime: Double = System.currentTimeMillis() / 1000.0;
+  private val SPECTIAL_COOLDOWN: Int = 6
+  private var lastSpecialTime: Double = System.currentTimeMillis() / 1000.0
   private var posToGo: Vector2d = new Vector2d(0, 0)
-  private var isCharging: Boolean = false;
+  private var isCharging: Boolean = false
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
 
-  private var firstTimeManage: Boolean = true;
+  private var firstTimeManage: Boolean = true
 
   private var dt: Double = 0
 
@@ -69,8 +69,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       if(castingCharge > 0)
       {
         currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
-        castingCharge -= 1;
-        println(castingCharge)
+        castingCharge -= 1
       }
       else {
         currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
@@ -110,11 +109,11 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   def manageBoss(h: Hero): Unit = {
     animate(Gdx.graphics.getDeltaTime)
 
-    val currentTime = System.currentTimeMillis() / 1000.0;
+    val currentTime = System.currentTimeMillis() / 1000.0
 
     if(firstTimeManage) {
-      lastSpecialTime = currentTime;
-      firstTimeManage = false;
+      lastSpecialTime = currentTime
+      firstTimeManage = false
     }
 
     if (hitbox.intersect(h.hitbox) && !h.isInvincible) {
@@ -128,31 +127,31 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
     }
 
     if(currentTime > lastSpecialTime + SPECTIAL_COOLDOWN) {
-      posToGo.x = hitbox.center.x;
-      posToGo.y = hitbox.center.y;
-      castingCharge = CHARGE_CASTING_CD;
-      isCharging = true;
-      lastSpecialTime = currentTime;
+      posToGo.x = hitbox.center.x
+      posToGo.y = hitbox.center.y
+      castingCharge = CHARGE_CASTING_CD
+      isCharging = true
+      lastSpecialTime = currentTime
     }
     else if(castingCharge == 0) {
-      speed = chargeSpeed;
-      posToGo.x = h.hitbox.center.x;
-      posToGo.y = h.hitbox.center.y;
-      castingCharge -= 1;
+      speed = chargeSpeed
+      posToGo.x = h.hitbox.center.x
+      posToGo.y = h.hitbox.center.y
+      castingCharge -= 1
     }
 
     if(!isCharging) {
       if(invincibleFrameRemain <= 0 ) {
-        speed = runSpeed;
-        posToGo.x = h.hitbox.center.x;
-        posToGo.y = h.hitbox.center.y;
+        speed = runSpeed
+        posToGo.x = h.hitbox.center.x
+        posToGo.y = h.hitbox.center.y
       }
       else {
-        posToGo.x = hitbox.center.x;
-        posToGo.y = hitbox.center.y;
+        posToGo.x = hitbox.center.x
+        posToGo.y = hitbox.center.y
       }
     } else if(castingCharge <= 0 && math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1) {
-      isCharging = false;
+      isCharging = false
     }
 
     go(posToGo)

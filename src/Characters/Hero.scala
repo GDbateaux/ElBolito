@@ -267,8 +267,8 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   def attack(pointer: Vector2d): Unit = {
     if(attackFrameRemain < 0 && rollFrameRemain < 0) {
-      pointerLastPos.x = pointer.x;
-      pointerLastPos.y = pointer.y;
+      pointerLastPos.x = pointer.x
+      pointerLastPos.y = pointer.y
 
       val verticalDif = position.y - pointer.y
       val horizontalDif = position.x - pointer.x

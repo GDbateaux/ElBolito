@@ -63,7 +63,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val BUTTON_RIGHT = Input.Buttons.RIGHT
   private val SPACE = Input.Keys.SPACE
 
-  private var onlyOne: Boolean = true;
+  private var onlyOne: Boolean = true
 
   override def onInit(): Unit = {
     setTitle("El Bolito")
@@ -121,7 +121,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       manageSong()
 
       if(f.currentRoom.isInstanceOf[BossRoom] && onlyOne) {
-        onlyOne = false;
+        onlyOne = false
         songs(currentSong).dispose()
         bossSong.play()
       }
