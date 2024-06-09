@@ -60,7 +60,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
       (normalizedVector.y * speed * GROW_FACTOR).toFloat
     )
 
-    if(relativeVector .length() != 0){
+    if(relativeVector.length() != 0){
       if (relativeVector.length() <= vectorToGo.length()) {
         position.x += relativeVector.x
         position.y += relativeVector.y
