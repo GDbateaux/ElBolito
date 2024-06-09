@@ -10,6 +10,7 @@ import com.badlogic.gdx.{Gdx, Input}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 
 /**
@@ -48,7 +49,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private var song0: SoundSample = _
   private var song1: SoundSample = _
   private var song2: SoundSample = _
-  private var currentSong: Int = 0
+  private var currentSong: Int = Random.nextInt(3)
   private val songTime: ArrayBuffer[Float] = new ArrayBuffer[Float]()
   private val songs: ArrayBuffer[SoundSample] = new ArrayBuffer[SoundSample]()
 
@@ -110,7 +111,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       if(firstLoopGame){
         firstLoopGame = false
         menuSong.dispose()
-        song0.play()
+        songs(currentSong).play()
       }
       manageSong()
 
