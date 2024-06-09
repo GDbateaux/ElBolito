@@ -23,8 +23,9 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
-  var hp: Int = 1
+  var hp: Int = 3
   val DIFFICULTY: Int = 1
+  private var isInvincible: Boolean = false
 
   //private var textureY: Int = 0
   private var currentFrame: Int = 0
@@ -121,8 +122,14 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
       h.setInvisibility(true)
     }
 
-    if(hitbox.intersect(h.attackHitbox)) {
+    if(isInvincible && h.attackHitbox.center.y == 0 && h.attackHitbox.center.x == 0) {
+      isInvincible = false;
+      speed = 1
+    }
+
+    if(!isInvincible && hitbox.intersect(h.attackHitbox)) {
       hp -= 1
+      isInvincible = true;
     }
 
     if(math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1 || posToGo.x == 0 && posToGo.y == 0) {
