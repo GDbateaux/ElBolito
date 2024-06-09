@@ -306,7 +306,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def drawHearts(g: GdxGraphics): Unit = {
-    val space: Float = Screen.HEIGHT / 100
+    val space: Float = Screen.HEIGHT / 50
     val heartWidth: Float = width/2
     val posY: Float = Screen.HEIGHT - heartWidth - space
     var currentRegion: TextureRegion = heartSs.sprites(0)(0)
