@@ -28,6 +28,7 @@ object ProjectileHandler {
           for (m: Enemy <- currentRoom.monsters) {
             if (m.hitbox.intersect(p.hitbox)) {
               m.hp -= p.damage
+              m.invincibleFrameRemain = m.INVINCIBLE_FRAME
               p.isFinish = true
             }
           }

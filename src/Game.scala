@@ -92,7 +92,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     val dirSwitchRoom: Direction = f.currentRoom.doorContact(h.hitbox)
 
     h.setWeaponType(h.WEAPON_TYPE_BOW);
-    h.setWeaponType(h.WEAPON_TYPE_SWORD);
+    //h.setWeaponType(h.WEAPON_TYPE_SWORD);
 
     if (keyStatus(KEY_UP)) {
       h.turn(Direction.NORTH)

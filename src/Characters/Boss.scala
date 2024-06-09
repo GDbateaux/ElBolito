@@ -79,6 +79,8 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   }
 
   def draw(g: GdxGraphics): Unit = {
-    g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
+    if(!invincibleTransparence) {
+      g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
+    }
   }
 }
