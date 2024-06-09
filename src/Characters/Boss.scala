@@ -46,6 +46,14 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
     dt += elapsedTime
 
     if (dt > frameTime) {
+      if(invincibleFrameRemain > 0) {
+        invincibleTransparence = !invincibleTransparence
+        invincibleFrameRemain -= 1;
+      }
+      else {
+        invincibleTransparence = false
+      }
+
       dt -= frameTime
       currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
     }
@@ -88,16 +96,17 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       h.setInvisibility(true)
     }
 
-    if (isInvincible && h.attackHitbox.center.y == 0 && h.attackHitbox.center.x == 0) {
-      isInvincible = false;
-    }
-
-    if (!isInvincible && hitbox.intersect(h.attackHitbox)) {
+    if(invincibleFrameRemain <= 0 && hitbox.intersect(h.attackHitbox)) {
       hp -= 1
-      isInvincible = true;
+      invincibleFrameRemain = INVINCIBLE_FRAME;
     }
 
-    go(h.hitbox.center)
+    if(invincibleFrameRemain <= 0) {
+      go(h.hitbox.center)
+    }
+    else {
+      go(hitbox.center)
+    }
   }
 
   def draw(g: GdxGraphics): Unit = {
