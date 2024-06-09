@@ -167,8 +167,6 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
           }
         }
 
-        //currentRollFrame = (ROLL_FRAME_NUMBER - 1) - rollFrameRemain
-
         var length: Float = 1
 
         if (curentDirections.length == 2) {
@@ -291,7 +289,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def roll(): Unit = {
-    var currentTime: Double = System.currentTimeMillis() / 1000.0
+    val currentTime: Double = System.currentTimeMillis() / 1000.0
 
     if(attackFrameRemain < 0 && rollFrameRemain < 0 && currentTime > lastRollTime + ROLL_COOLDOWN) {
 

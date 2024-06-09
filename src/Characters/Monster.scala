@@ -23,7 +23,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
-  var hp: Int = 3
+  var hp: Int = 1
   val DIFFICULTY: Int = 1
 
   //private var textureY: Int = 0
