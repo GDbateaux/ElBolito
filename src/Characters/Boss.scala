@@ -15,7 +15,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   private val HITBOX_HEIGHT: Float = 26 * width / SPRITE_WIDTH
   private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d(width/2, width/5)
 
-  private val GROW_FACTOR = width / (SPRITE_WIDTH / 2)
+  private val GROW_FACTOR = (width / (SPRITE_WIDTH / 2))/2
   private val NUM_FRAME_RUN: Int = 4
   private val FRAME_TIME: Double = 0.1
 
@@ -32,6 +32,10 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
 
   private var dt: Double = 0
+
+  def isDead: Boolean = {
+    return hp <= 0
+  }
 
   def setSpeed(s: Double): Unit = {
     speed = s
@@ -50,10 +54,28 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
 
   def go(CoordinateCenter: Vector2d): Unit = {
     val relativeVector: Vector2d = CoordinateCenter.sub(hitbox.center)
-    val angle: Double = Math.atan2(relativeVector.y, relativeVector.x)
+    val normalizedVector = relativeVector.normalize()
+    val vectorToGo: Vector2d = new Vector2d(
+      (normalizedVector.x * speed * GROW_FACTOR).toFloat,
+      (normalizedVector.y * speed * GROW_FACTOR).toFloat
+    )
 
-    position.x += (math.cos(angle) * speed * GROW_FACTOR).toFloat
-    position.y += (math.sin(angle) * speed * GROW_FACTOR).toFloat
+    if(relativeVector.length() != 0){
+      if (relativeVector.length() <= vectorToGo.length()) {
+        position.x += relativeVector.x
+        position.y += relativeVector.y
+      } else {
+        position.x += vectorToGo.x
+        position.y += vectorToGo.y
+      }
+    }
+
+    if(relativeVector.x <= 0){
+      textureY = 1
+    }
+    else{
+      textureY = 0
+    }
 
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
@@ -75,7 +97,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       isInvincible = true;
     }
 
-    //go(h.hitbox.center)
+    go(h.hitbox.center)
   }
 
   def draw(g: GdxGraphics): Unit = {
