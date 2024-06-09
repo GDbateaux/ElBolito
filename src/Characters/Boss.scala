@@ -26,6 +26,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   private var currentFrame: Int = 0
   private val runSs: Spritesheet = new Spritesheet("data/images/yeti_run.png", SPRITE_WIDTH, SPRITE_HEIGHT)
 
+  private var isInvincible: Boolean = false
   private var speed: Double = 1
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
@@ -65,8 +66,13 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       h.setInvisibility(true)
     }
 
-    if (hitbox.intersect(h.attackHitbox)) {
+    if (isInvincible && h.attackHitbox.center.y == 0 && h.attackHitbox.center.x == 0) {
+      isInvincible = false;
+    }
+
+    if (!isInvincible && hitbox.intersect(h.attackHitbox)) {
       hp -= 1
+      isInvincible = true;
     }
 
     //go(h.hitbox.center)
