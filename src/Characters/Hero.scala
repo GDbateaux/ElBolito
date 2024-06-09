@@ -59,8 +59,8 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   private var attackFrameRemain: Int = -1
   private var rollFrameRemain: Int = -1
-  private var weaponType: Int = 0;
-  private val pointerLastPos: Vector2d = new Vector2d(0, 0);
+  private var weaponType: Int = 0
+  private val pointerLastPos: Vector2d = new Vector2d(0, 0)
 
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
@@ -89,7 +89,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   def setWeaponType(t: Int): Unit = {
     if(attackFrameRemain < 0) {
       if(t == WEAPON_TYPE_BOW || t == WEAPON_TYPE_SWORD) {
-        weaponType = t;
+        weaponType = t
       }
     }
   }
@@ -134,7 +134,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         else if(weaponType == WEAPON_TYPE_BOW) {
           currentAttackFrame = (ATTACK_BOW_FRAME_NUMBER - 1) - attackFrameRemain
           if(currentAttackFrame == 4) {
-            val p: Projectile = new Projectile(hitbox.center, pointerLastPos.sub(position), projectileDistance, width / 6, 1, true)
+            val p: Projectile = new Projectile(hitbox.center, pointerLastPos.sub(hitbox.center), projectileDistance, width / 2, 1, true)
             ProjectileHandler.projectiles.append(p)
           }
         }

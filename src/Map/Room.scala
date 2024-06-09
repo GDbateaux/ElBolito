@@ -176,10 +176,6 @@ trait Room extends DrawableObject {
     val floor = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\floor\\floor_2.png"))
     val obstacle = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\props_itens\\barrel.png"))
 
-    if(firstDraw){
-      monsters = new ArrayBuffer[Enemy]()
-    }
-
     for (y: Int <- 0 until nbrSquareY) {
       for (x: Int <- 0 until nbrSquareX) {
         var posX: Float = (x.toDouble * squareWidth).toFloat + spaceWidth.toFloat
