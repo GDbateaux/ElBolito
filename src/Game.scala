@@ -1,5 +1,5 @@
 import Characters.{Hero, Monster, Projectile, ProjectileHandler}
-import Map.Floor
+import Map.{BossRoom, Floor}
 import Utils.Direction.{Direction, EAST, NULL}
 import Utils.{Direction, Screen, Vector2d}
 import ch.hevs.gdx2d.components.audio.SoundSample
@@ -49,6 +49,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private var song0: SoundSample = _
   private var song1: SoundSample = _
   private var song2: SoundSample = _
+  private var bossSong: SoundSample = _
   private var currentSong: Int = Random.nextInt(3)
   private val songTime: ArrayBuffer[Float] = new ArrayBuffer[Float]()
   private val songs: ArrayBuffer[SoundSample] = new ArrayBuffer[SoundSample]()
@@ -62,6 +63,8 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val BUTTON_RIGHT = Input.Buttons.RIGHT
   private val SPACE = Input.Keys.SPACE
 
+  private var onlyOne: Boolean = true;
+
   override def onInit(): Unit = {
     setTitle("El Bolito")
 
@@ -72,6 +75,8 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     song0 = new SoundSample("data/sounds/song0.mp3")
     song1 = new SoundSample("data/sounds/song1.mp3")
     song2 = new SoundSample("data/sounds/song2.mp3")
+
+    bossSong = new SoundSample("data/sounds/boss.mp3")
 
     songTime.append(SONG0_TIME)
     songTime.append(SONG1_TIME)
@@ -114,6 +119,12 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
         songs(currentSong).play()
       }
       manageSong()
+
+      if(f.currentRoom.isInstanceOf[BossRoom] && onlyOne) {
+        onlyOne = false;
+        songs(currentSong).dispose()
+        bossSong.play()
+      }
 
       f.draw(g)
       f.currentRoom.manageRoom(h)
