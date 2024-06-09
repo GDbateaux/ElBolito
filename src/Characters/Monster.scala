@@ -48,7 +48,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
     if (dt > frameTime) {
       if(invincibleFrameRemain > 0) {
         invincibleTransparence = !invincibleTransparence
-        invincibleFrameRemain -= 1;
+        invincibleFrameRemain -= 1
       }
       else {
         invincibleTransparence = false
@@ -131,7 +131,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with En
 
     if(invincibleFrameRemain <= 0 && hitbox.intersect(h.attackHitbox)) {
       hp -= 1
-      invincibleFrameRemain = INVINCIBLE_FRAME;
+      invincibleFrameRemain = INVINCIBLE_FRAME
     }
 
     if(math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1 || posToGo.x == 0 && posToGo.y == 0) {

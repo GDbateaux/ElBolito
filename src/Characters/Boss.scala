@@ -48,7 +48,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
     if (dt > frameTime) {
       if(invincibleFrameRemain > 0) {
         invincibleTransparence = !invincibleTransparence
-        invincibleFrameRemain -= 1;
+        invincibleFrameRemain -= 1
       }
       else {
         invincibleTransparence = false
@@ -98,7 +98,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
 
     if(invincibleFrameRemain <= 0 && hitbox.intersect(h.attackHitbox)) {
       hp -= 1
-      invincibleFrameRemain = INVINCIBLE_FRAME;
+      invincibleFrameRemain = INVINCIBLE_FRAME
     }
 
     if(invincibleFrameRemain <= 0) {
