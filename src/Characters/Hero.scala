@@ -22,7 +22,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val ROLL_SPRITE_WIDTH: Int = 16
   private val ROLL_SPRITE_HEIGHT: Int = ROLL_SPRITE_WIDTH
   private val ROLL_FRAME_NUMBER: Int = 9
-  private val ROLL_COOLDOWN: Double = 6.0
+  private val ROLL_COOLDOWN: Double = 5.0
 
   private val HEART_SPRITE_WIDTH: Int = 17
   private val HEART_SPRITE_HEIGHT: Int = HEART_SPRITE_WIDTH

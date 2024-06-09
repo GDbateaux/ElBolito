@@ -25,11 +25,21 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   private var textureY: Int = 0
   private var currentFrame: Int = 0
   private val runSs: Spritesheet = new Spritesheet("data/images/yeti_run.png", SPRITE_WIDTH, SPRITE_HEIGHT)
+  private val chargeSs: Spritesheet = new Spritesheet("data/images/yeti_charge.png", SPRITE_WIDTH, SPRITE_HEIGHT)
 
-  private var isInvincible: Boolean = false
-  private var speed: Double = 1
+  private val runSpeed: Double = 0.6;
+  private val CHARGE_CASTING_CD = 3;
+  private var castingCharge = -1;
+  private val chargeSpeed: Double = 3
+  private var speed: Double = runSpeed
+  private val SPECTIAL_COOLDOWN: Int = 6;
+  private var lastSpecialTime: Double = System.currentTimeMillis() / 1000.0;
+  private var posToGo: Vector2d = new Vector2d(0, 0)
+  private var isCharging: Boolean = false;
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
+
+  private var firstTimeManage: Boolean = true;
 
   private var dt: Double = 0
 
@@ -55,7 +65,16 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       }
 
       dt -= frameTime
-      currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
+
+      if(castingCharge > 0)
+      {
+        currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
+        castingCharge -= 1;
+        println(castingCharge)
+      }
+      else {
+        currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
+      }
     }
     hitbox.updateCenter(position.add(RELATIVE_CENTER_HITBOX))
   }
@@ -91,6 +110,13 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   def manageBoss(h: Hero): Unit = {
     animate(Gdx.graphics.getDeltaTime)
 
+    val currentTime = System.currentTimeMillis() / 1000.0;
+
+    if(firstTimeManage) {
+      lastSpecialTime = currentTime;
+      firstTimeManage = false;
+    }
+
     if (hitbox.intersect(h.hitbox) && !h.isInvincible) {
       h.hp -= 1
       h.setInvisibility(true)
@@ -101,17 +127,46 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       invincibleFrameRemain = INVINCIBLE_FRAME
     }
 
-    if(invincibleFrameRemain <= 0) {
-      go(h.hitbox.center)
+    if(currentTime > lastSpecialTime + SPECTIAL_COOLDOWN) {
+      posToGo.x = hitbox.center.x;
+      posToGo.y = hitbox.center.y;
+      castingCharge = CHARGE_CASTING_CD;
+      isCharging = true;
+      lastSpecialTime = currentTime;
     }
-    else {
-      go(hitbox.center)
+    else if(castingCharge == 0) {
+      speed = chargeSpeed;
+      posToGo.x = h.hitbox.center.x;
+      posToGo.y = h.hitbox.center.y;
+      castingCharge -= 1;
     }
+
+    if(!isCharging) {
+      if(invincibleFrameRemain <= 0 ) {
+        speed = runSpeed;
+        posToGo.x = h.hitbox.center.x;
+        posToGo.y = h.hitbox.center.y;
+      }
+      else {
+        posToGo.x = hitbox.center.x;
+        posToGo.y = hitbox.center.y;
+      }
+    } else if(castingCharge <= 0 && math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1) {
+      isCharging = false;
+    }
+
+    go(posToGo)
   }
 
   def draw(g: GdxGraphics): Unit = {
     if(!invincibleTransparence) {
-      g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
+      if(!isCharging) {
+        g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
+      }
+      else {
+        g.draw(chargeSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
+      }
+
     }
   }
 }
