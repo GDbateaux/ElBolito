@@ -1,5 +1,6 @@
 package Characters
 
+import Characters.Projectiles.{Arrow, Projectile, ProjectileHandler}
 import Utils.Direction.Direction
 import Utils.{Direction, Vector2d}
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
@@ -7,6 +8,7 @@ import ch.hevs.gdx2d.lib.GdxGraphics
 import com.badlogic.gdx.Gdx
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   private val SPRITE_WIDTH: Int = 64
@@ -16,7 +18,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   private val RELATIVE_CENTER_HITBOX: Vector2d = new Vector2d(width/2, width/5)
 
   private val GROW_FACTOR = (width / (SPRITE_WIDTH / 2))/2
-  private val NUM_FRAME_RUN: Int = 4
+  private val NUM_FRAME_RUN: Int = 8
   private val FRAME_TIME: Double = 0.1
 
   val MAX_HP: Int = 50
@@ -24,22 +26,29 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
 
   private var textureY: Int = 0
   private var currentFrame: Int = 0
+  private var currentShootFrame: Int = 4
   private val runSs: Spritesheet = new Spritesheet("data/images/yeti_run.png", SPRITE_WIDTH, SPRITE_HEIGHT)
   private val chargeSs: Spritesheet = new Spritesheet("data/images/yeti_charge.png", SPRITE_WIDTH, SPRITE_HEIGHT)
+  private val shootSs: Spritesheet = new Spritesheet("data/images/yeti_poop.png", SPRITE_WIDTH, SPRITE_HEIGHT);
 
   private val runSpeed: Double = 0.6
   private val CHARGE_CASTING_CD = 3
   private var castingCharge = -1
   private val chargeSpeed: Double = 3
   private var speed: Double = runSpeed
-  private val SPECTIAL_COOLDOWN: Int = 6
-  private var lastSpecialTime: Double = System.currentTimeMillis() / 1000.0
+  private val SPECTIAL_COOLDOWN: Int = 6;
+  private var lastSpecialTime: Double = System.currentTimeMillis() / 1000.0;
+  private val SPECIAL_CHARGE: Int = 0;
+  private val SPECIAL_SHOOT: Int = 1;
   private var posToGo: Vector2d = new Vector2d(0, 0)
-  private var isCharging: Boolean = false
+  private var isCharging: Boolean = false;
+  private var isShooting: Boolean = false;
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
+  private val hitboxCenterHero: Vector2d = new Vector2d(0, 0)
+  private var projectileFactor: Float = 8
 
-  private var firstTimeManage: Boolean = true
+  private var firstTimeManage: Boolean = true;
 
   private var dt: Double = 0
 
@@ -69,7 +78,14 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       if(castingCharge > 0)
       {
         currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
-        castingCharge -= 1
+        castingCharge -= 1;
+      }
+      else if(isShooting) {
+        currentShootFrame = (currentShootFrame + 1) % NUM_FRAME_RUN
+        if(currentShootFrame == 2) {
+          val p: Projectile = new Arrow(hitbox.center, hitboxCenterHero.sub(hitbox.center), width * projectileFactor, width / 2, 1, false)
+          ProjectileHandler.projectiles.append(p)
+        }
       }
       else {
         currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
@@ -109,6 +125,9 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   def manageBoss(h: Hero): Unit = {
     animate(Gdx.graphics.getDeltaTime)
 
+    hitboxCenterHero.x = h.hitbox.center.x;
+    hitboxCenterHero.y = h.hitbox.center.y;
+
     val currentTime = System.currentTimeMillis() / 1000.0
 
     if(firstTimeManage) {
@@ -127,11 +146,19 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
     }
 
     if(currentTime > lastSpecialTime + SPECTIAL_COOLDOWN) {
-      posToGo.x = hitbox.center.x
-      posToGo.y = hitbox.center.y
-      castingCharge = CHARGE_CASTING_CD
-      isCharging = true
-      lastSpecialTime = currentTime
+      val randomType: Int = Random.nextInt(2);
+      posToGo.x = hitbox.center.x;
+      posToGo.y = hitbox.center.y;
+      lastSpecialTime = currentTime;
+
+      if(randomType == SPECIAL_CHARGE) {
+        castingCharge = CHARGE_CASTING_CD;
+        isCharging = true;
+      }
+      else if(randomType == SPECIAL_SHOOT) {
+        currentShootFrame = 4;
+        isShooting = true;
+      }
     }
     else if(castingCharge == 0) {
       speed = chargeSpeed
@@ -140,7 +167,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       castingCharge -= 1
     }
 
-    if(!isCharging) {
+    if(!isCharging && !isShooting) {
       if(invincibleFrameRemain <= 0 ) {
         speed = runSpeed
         posToGo.x = h.hitbox.center.x
@@ -150,8 +177,11 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
         posToGo.x = hitbox.center.x
         posToGo.y = hitbox.center.y
       }
-    } else if(castingCharge <= 0 && math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1) {
-      isCharging = false
+    } else if(isCharging && castingCharge <= 0 && math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1) {
+      isCharging = false;
+    }
+    else if(isShooting && currentShootFrame == 3) {
+      isShooting = false
     }
 
     go(posToGo)
@@ -159,13 +189,15 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
 
   def draw(g: GdxGraphics): Unit = {
     if(!invincibleTransparence) {
-      if(!isCharging) {
+      if(!isCharging && !isShooting) {
         g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
       }
-      else {
+      else if(isCharging) {
         g.draw(chargeSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)
       }
-
+      else if(isShooting) {
+        g.draw(shootSs.sprites(textureY)(currentShootFrame), position.x, position.y, width, width)
+      }
     }
   }
 }

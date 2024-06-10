@@ -192,7 +192,7 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
     var idx:Int = 0
     while (idx < monsters.length) {
       monsters(idx).asInstanceOf[Monster].manageMonster(h, room, roomVectors, squareWidth)
-      monsters(idx).asInstanceOf[Monster].setSpeed(0.6)
+      monsters(idx).asInstanceOf[Monster].setSpeed(1)
       if (monsters(idx).hp <= 0) {
         monsters.subtractOne(monsters(idx))
       }

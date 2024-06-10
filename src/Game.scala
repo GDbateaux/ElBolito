@@ -124,8 +124,8 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       manageSong()
 
       if(f.currentRoom.isInstanceOf[BossRoom] && onlyOne) {
-        onlyOne = false
-        songs(currentSong).dispose()
+        onlyOne = false;
+        songs(currentSong).stop()
         bossSong.play()
       }
 
