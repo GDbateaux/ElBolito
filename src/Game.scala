@@ -34,6 +34,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val SONG0_TIME: Float = 240
   private val SONG1_TIME: Float = 126
   private val SONG2_TIME: Float = 66
+  private val ALPHA_CHANGE_TIME: Float = 0.05f
 
   private var h: Hero = _
   private var f: Floor = _
@@ -47,6 +48,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private var menuSong: SoundSample = _
   private var menuImage: BitmapImage = _
   private var menuText: BitmapImage = _
+  private var alphaMenu: Float = 1
+  private var addAlpha: Float = -ALPHA_CHANGE_TIME
+  private var dt: Float = 0
   private var firstLoopGame: Boolean = true
   private var song0: SoundSample = _
   private var song1: SoundSample = _
@@ -71,7 +75,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     setTitle("El Bolito")
 
     menuSong = new SoundSample("data/sounds/mainMenu.mp3")
-    menuImage = new BitmapImage("data/images/menu/image.jpeg")
+    menuImage = new BitmapImage("data/images/menu/image.png")
     menuText = new BitmapImage("data/images/menu/text.png")
     menuSong.setVolume(SONG_VOLUME)
 
@@ -111,8 +115,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     g.clear()
 
     if(mainMenu){
+      manageAlpha()
       g.drawPicture(Screen.WIDTH/2,Screen.HEIGHT/2, menuImage)
-      g.drawPicture(Screen.WIDTH/2,Screen.HEIGHT/2, menuText)
+      g.drawAlphaPicture(Screen.WIDTH/2,Screen.HEIGHT/2, alphaMenu, menuText)
       manageMainMenu()
     }
     else{
@@ -147,6 +152,22 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       }
 
       g.drawFPS()
+    }
+  }
+
+  private def manageAlpha(): Unit = {
+    dt += Gdx.graphics.getDeltaTime
+
+    if(dt >= ALPHA_CHANGE_TIME){
+      dt -= ALPHA_CHANGE_TIME
+      alphaMenu += addAlpha
+
+      if(alphaMenu <= 0){
+        addAlpha = -addAlpha
+      }
+      if(alphaMenu >= 1){
+        addAlpha = -addAlpha
+      }
     }
   }
 
