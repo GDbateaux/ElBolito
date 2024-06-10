@@ -29,26 +29,26 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   private var currentShootFrame: Int = 4
   private val runSs: Spritesheet = new Spritesheet("data/images/yeti_run.png", SPRITE_WIDTH, SPRITE_HEIGHT)
   private val chargeSs: Spritesheet = new Spritesheet("data/images/yeti_charge.png", SPRITE_WIDTH, SPRITE_HEIGHT)
-  private val shootSs: Spritesheet = new Spritesheet("data/images/yeti_poop.png", SPRITE_WIDTH, SPRITE_HEIGHT);
+  private val shootSs: Spritesheet = new Spritesheet("data/images/yeti_poop.png", SPRITE_WIDTH, SPRITE_HEIGHT)
 
   private val runSpeed: Double = 0.6
   private val CHARGE_CASTING_CD = 3
   private var castingCharge = -1
   private val chargeSpeed: Double = 3
   private var speed: Double = runSpeed
-  private val SPECTIAL_COOLDOWN: Int = 6;
-  private var lastSpecialTime: Double = System.currentTimeMillis() / 1000.0;
-  private val SPECIAL_CHARGE: Int = 0;
-  private val SPECIAL_SHOOT: Int = 1;
+  private val SPECTIAL_COOLDOWN: Int = 6
+  private var lastSpecialTime: Double = System.currentTimeMillis() / 1000.0
+  private val SPECIAL_CHARGE: Int = 0
+  private val SPECIAL_SHOOT: Int = 1
   private var posToGo: Vector2d = new Vector2d(0, 0)
-  private var isCharging: Boolean = false;
-  private var isShooting: Boolean = false;
+  private var isCharging: Boolean = false
+  private var isShooting: Boolean = false
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
   private val hitboxCenterHero: Vector2d = new Vector2d(0, 0)
   private var projectileFactor: Float = 8
 
-  private var firstTimeManage: Boolean = true;
+  private var firstTimeManage: Boolean = true
 
   private var dt: Double = 0
 
@@ -78,7 +78,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       if(castingCharge > 0)
       {
         currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
-        castingCharge -= 1;
+        castingCharge -= 1
       }
       else if(isShooting) {
         currentShootFrame = (currentShootFrame + 1) % NUM_FRAME_RUN
@@ -141,8 +141,8 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
   def manageBoss(h: Hero): Unit = {
     animate(Gdx.graphics.getDeltaTime)
 
-    hitboxCenterHero.x = h.hitbox.center.x;
-    hitboxCenterHero.y = h.hitbox.center.y;
+    hitboxCenterHero.x = h.hitbox.center.x
+    hitboxCenterHero.y = h.hitbox.center.y
 
     val currentTime = System.currentTimeMillis() / 1000.0
 
@@ -162,18 +162,18 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
     }
 
     if(currentTime > lastSpecialTime + SPECTIAL_COOLDOWN) {
-      val randomType: Int = Random.nextInt(2);
-      posToGo.x = hitbox.center.x;
-      posToGo.y = hitbox.center.y;
-      lastSpecialTime = currentTime;
+      val randomType: Int = Random.nextInt(2)
+      posToGo.x = hitbox.center.x
+      posToGo.y = hitbox.center.y
+      lastSpecialTime = currentTime
 
       if(randomType == SPECIAL_CHARGE) {
-        castingCharge = CHARGE_CASTING_CD;
-        isCharging = true;
+        castingCharge = CHARGE_CASTING_CD
+        isCharging = true
       }
       else if(randomType == SPECIAL_SHOOT) {
-        currentShootFrame = 4;
-        isShooting = true;
+        currentShootFrame = 4
+        isShooting = true
       }
     }
     else if(castingCharge == 0) {
@@ -194,7 +194,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
         posToGo.y = hitbox.center.y
       }
     } else if(isCharging && castingCharge <= 0 && math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1) {
-      isCharging = false;
+      isCharging = false
     }
     else if(isShooting && currentShootFrame == 3) {
       isShooting = false

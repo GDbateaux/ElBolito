@@ -9,7 +9,6 @@ import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 
 import scala.collection.mutable.ArrayBuffer
-import scala.util.Random
 
 class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val HERO_SPRITE_WIDTH: Int = 16
