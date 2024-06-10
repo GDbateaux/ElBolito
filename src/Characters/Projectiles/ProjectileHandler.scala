@@ -1,5 +1,6 @@
-package Characters
+package Characters.Projectiles
 
+import Characters.{Enemy, Hero}
 import Map.{Obstacle, Room}
 import ch.hevs.gdx2d.lib.GdxGraphics
 

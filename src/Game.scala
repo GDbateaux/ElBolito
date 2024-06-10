@@ -1,4 +1,5 @@
-import Characters.{Hero, Monster, Projectile, ProjectileHandler}
+import Characters.Projectiles.{Projectile, ProjectileHandler}
+import Characters.{Hero, Monster}
 import Map.{BossRoom, Floor}
 import Utils.Direction.{Direction, EAST, NULL}
 import Utils.{Direction, Screen, Vector2d}
@@ -45,6 +46,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
   private var menuSong: SoundSample = _
   private var menuImage: BitmapImage = _
+  private var menuText: BitmapImage = _
   private var firstLoopGame: Boolean = true
   private var song0: SoundSample = _
   private var song1: SoundSample = _
@@ -70,6 +72,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
     menuSong = new SoundSample("data/sounds/mainMenu.mp3")
     menuImage = new BitmapImage("data/images/menu/image.jpeg")
+    menuText = new BitmapImage("data/images/menu/text.png")
     menuSong.setVolume(SONG_VOLUME)
 
     song0 = new SoundSample("data/sounds/song0.mp3")
@@ -109,7 +112,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
     if(mainMenu){
       g.drawPicture(Screen.WIDTH/2,Screen.HEIGHT/2, menuImage)
-      g.drawString(Screen.WIDTH/2,Screen.HEIGHT/2, "Appuyez sur espace pour commencer")
+      g.drawPicture(Screen.WIDTH/2,Screen.HEIGHT/2, menuText)
       manageMainMenu()
     }
     else{

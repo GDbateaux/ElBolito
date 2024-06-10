@@ -1,5 +1,6 @@
 package Characters
 
+import Characters.Projectiles.{Projectile, ProjectileHandler}
 import Utils.{Direction, Position, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
