@@ -1,7 +1,13 @@
-# Hello `gdx2d` for Scala !
+# ElBolito
 
-Desktop bootstrap project based on the latest `gdx2d` library. The project is ready to use in _IntelliJ_. It uses the `gdx2d-desktop` library version `1.2.1`.
+## Description du jeu
+Le jeu ElBolito en scala est un jeu inspiré de Binding of Isaac, où le joueur doit tuer des monstres dans plusieurs salles pour avancer.
+Le joueur tombera aussi sur d'autres salles comme une salle avec un boss.
 
-The `gdx2d` sources are available in the library Jar file (in the `libs` folder). The Javadoc API of the library can be found [here](https://hevs-isi.github.io/gdx2d/javadoc/).
+## Screenshots et vidéo du jeu
+![img.png](data/images/readme/room.png)
+![img_1.png](data/images/readme/boss.png)
 
-Java 11 or higher is required to run this project. An `Ant` build script is provided to export the project as a runnable Jar (available in the `dist` folder).
+## Mode d'emploi
+Utiliser les touches "W", "A", "S" et "D" pour vous déplacer.
+Pour frapper, utiliser le clic gauche et pour effectuer une roulade la touche "shift gauche".
