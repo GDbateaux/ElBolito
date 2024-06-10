@@ -83,8 +83,24 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       else if(isShooting) {
         currentShootFrame = (currentShootFrame + 1) % NUM_FRAME_RUN
         if(currentShootFrame == 2) {
-          val p: Projectile = new Balls(hitbox.center, hitboxCenterHero.sub(hitbox.center), width * projectileFactor, width / 2, 1, false)
-          ProjectileHandler.projectiles.append(p)
+          val dir0: Vector2d = hitboxCenterHero.sub(hitbox.center)
+          val angle: Double = Math.atan2(dir0.y, dir0.x)
+          val dir1: Vector2d = new Vector2d(Math.cos(angle-Math.PI/9).toFloat, Math.sin(angle-Math.PI/9).toFloat)
+          val dir2: Vector2d = new Vector2d(Math.cos(angle+Math.PI/9).toFloat, Math.sin(angle+Math.PI/9).toFloat)
+          val dir3: Vector2d = new Vector2d(Math.cos(angle-Math.PI/4.5).toFloat, Math.sin(angle-Math.PI/4.5).toFloat)
+          val dir4: Vector2d = new Vector2d(Math.cos(angle+Math.PI/4.5).toFloat, Math.sin(angle+Math.PI/4.5).toFloat)
+
+          val p0: Projectile = new Balls(hitbox.center, dir0, width * projectileFactor, width/5, 1, false)
+          val p1: Projectile = new Balls(hitbox.center, dir1, width * projectileFactor, width/5, 1, false)
+          val p2: Projectile = new Balls(hitbox.center, dir2, width * projectileFactor, width/5, 1, false)
+          val p3: Projectile = new Balls(hitbox.center, dir3, width * projectileFactor, width/5, 1, false)
+          val p4: Projectile = new Balls(hitbox.center, dir4, width * projectileFactor, width/5, 1, false)
+
+          ProjectileHandler.projectiles.append(p0)
+          ProjectileHandler.projectiles.append(p1)
+          ProjectileHandler.projectiles.append(p2)
+          ProjectileHandler.projectiles.append(p3)
+          ProjectileHandler.projectiles.append(p4)
         }
       }
       else {

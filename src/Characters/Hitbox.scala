@@ -74,7 +74,7 @@ class Hitbox(private var centerPos: Vector2d, width: Double, height: Double, pri
   override def draw(gdxGraphics: GdxGraphics): Unit = {
     updateCoordinates()
     gdxGraphics.setColor(Color.RED)
-    gdxGraphics.drawRectangle(centerPos.x, centerPos.y, width.toFloat, height.toFloat, angle.toFloat)
+    gdxGraphics.drawFilledRectangle(centerPos.x, centerPos.y, width.toFloat, height.toFloat, angle.toFloat)
   }
 
   def intersect(h: Hitbox): Boolean = {

@@ -21,7 +21,7 @@ class Balls(startPos: Vector2d, direction: Vector2d, distance: Float, hitboxWidt
   addHitbox()
 
   def addHitbox(): Unit = {
-    hitbox = new Hitbox(currentPos, hitboxWidth, hitboxWidth/2, rotation)
+    hitbox = new Hitbox(currentPos, hitboxWidth, hitboxWidth, rotation)
   }
 
   def animate(): Unit = {
@@ -41,9 +41,8 @@ class Balls(startPos: Vector2d, direction: Vector2d, distance: Float, hitboxWidt
       }
       else {
         g.draw(ballLeftSs.sprites(0)(currentFrame), hitbox.center.x - hitboxWidth / 2, hitbox.center.y - hitboxWidth / 2,
-          hitboxWidth / 2, hitboxWidth / 2, hitboxWidth, hitboxWidth, scaleX, scaleY, rotation)
+          hitboxWidth / 2, hitboxWidth / 2, hitboxWidth, hitboxWidth, scaleX, scaleY, rotation-180)
       }
-      hitbox.draw(g);
     }
     else {
       isFinish = true
