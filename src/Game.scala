@@ -1,13 +1,17 @@
-import Characters.{Hero, Monster, Projectile, ProjectileHandler}
-import Map.Floor
-import Utils.Direction.Direction
+import Characters.Projectiles.{Projectile, ProjectileHandler}
+import Characters.{Hero, Monster}
+import Map.{BossRoom, Floor}
+import Utils.Direction.{Direction, EAST, NULL}
 import Utils.{Direction, Screen, Vector2d}
+import ch.hevs.gdx2d.components.audio.SoundSample
+import ch.hevs.gdx2d.components.bitmaps.BitmapImage
 import ch.hevs.gdx2d.desktop.PortableApplication
 import ch.hevs.gdx2d.lib.GdxGraphics
 import com.badlogic.gdx.{Gdx, Input}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 
 /**
@@ -26,6 +30,10 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val ANIMATION_LENGTH_DAMAGE: Float = 1
   private val NUM_ROOM: Int = 10
   private val DRAW_HITBOX: Boolean = false
+  private val SONG_VOLUME: Float = 0.5F
+  private val SONG0_TIME: Float = 240
+  private val SONG1_TIME: Float = 126
+  private val SONG2_TIME: Float = 66
 
   private var h: Hero = _
   private var f: Floor = _
@@ -33,7 +41,20 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val buttonStatus: mutable.HashMap[Int, Boolean] = new mutable.HashMap[Int, Boolean]()
   private val pointerPos: Vector2d = new Vector2d(0, 0)
   private var currentTime: Float = 0
+  private var mainMenu: Boolean = true
   private var invincibilityTime: Float = 0
+
+  private var menuSong: SoundSample = _
+  private var menuImage: BitmapImage = _
+  private var menuText: BitmapImage = _
+  private var firstLoopGame: Boolean = true
+  private var song0: SoundSample = _
+  private var song1: SoundSample = _
+  private var song2: SoundSample = _
+  private var bossSong: SoundSample = _
+  private var currentSong: Int = Random.nextInt(3)
+  private val songTime: ArrayBuffer[Float] = new ArrayBuffer[Float]()
+  private val songs: ArrayBuffer[SoundSample] = new ArrayBuffer[SoundSample]()
 
   private val KEY_UP = Input.Keys.W
   private val KEY_RIGHT = Input.Keys.D
@@ -42,9 +63,30 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val KEY_SHIFT = Input.Keys.SHIFT_LEFT
   private val BUTTON_LEFT = Input.Buttons.LEFT
   private val BUTTON_RIGHT = Input.Buttons.RIGHT
+  private val SPACE = Input.Keys.SPACE
+
+  private var onlyOne: Boolean = true
 
   override def onInit(): Unit = {
     setTitle("El Bolito")
+
+    menuSong = new SoundSample("data/sounds/mainMenu.mp3")
+    menuImage = new BitmapImage("data/images/menu/image.jpeg")
+    menuText = new BitmapImage("data/images/menu/text.png")
+    menuSong.setVolume(SONG_VOLUME)
+
+    song0 = new SoundSample("data/sounds/song0.mp3")
+    song1 = new SoundSample("data/sounds/song1.mp3")
+    song2 = new SoundSample("data/sounds/song2.mp3")
+
+    bossSong = new SoundSample("data/sounds/boss.mp3")
+
+    songTime.append(SONG0_TIME)
+    songTime.append(SONG1_TIME)
+    songTime.append(SONG2_TIME)
+    songs.append(song0)
+    songs.append(song1)
+    songs.append(song2)
 
     f = new Floor(NUM_ROOM, 0)
     h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
@@ -53,8 +95,11 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     keyStatus(KEY_DOWN) = false
     keyStatus(KEY_LEFT) = false
     keyStatus(KEY_SHIFT) = false
+    keyStatus(SPACE) = false
     buttonStatus(BUTTON_LEFT) = false
     buttonStatus(BUTTON_RIGHT) = false
+
+    menuSong.loop()
   }
 
   /**
@@ -63,42 +108,63 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
    * @param g
    */
   override def onGraphicRender(g: GdxGraphics): Unit = {
-    // Clears the screen
     g.clear()
 
-    f.draw(g)
-    f.currentRoom.doorAnimate(Gdx.graphics.getDeltaTime)
-    /*for (d <- f.currentRoom.roomObstacles){
-      d.hitbox.draw(g)
-    }*/
-
-    manageHero()
-    h.draw(g)
-
-    ProjectileHandler.handle(g, f.currentRoom, h)
-
-    var idx:Int = 0
-    while (idx < f.currentRoom.monsters.length) {
-      f.currentRoom.monsters(idx).manageMonster(h, f.currentRoom.room, f.currentRoom.roomVectors, f.currentRoom.squareWidth)
-      //f.currentRoom.monsters(idx).manageMonster(h, path)
-      f.currentRoom.monsters(idx).setSpeed(0.6)
-      f.currentRoom.monsters(idx).draw(g)
-      if (f.currentRoom.monsters(idx).hp <= 0) {
-        f.currentRoom.monsters.subtractOne(f.currentRoom.monsters(idx))
-        //f.currentRoom.monsters = new ArrayBuffer[Monster]()
-      }
-      idx += 1
+    if(mainMenu){
+      g.drawPicture(Screen.WIDTH/2,Screen.HEIGHT/2, menuImage)
+      g.drawPicture(Screen.WIDTH/2,Screen.HEIGHT/2, menuText)
+      manageMainMenu()
     }
-
-    if(DRAW_HITBOX){
-      h.hitbox.draw(g)
-      h.attackHitbox.draw(g)
-      for(m <- f.currentRoom.monsters){
-        m.hitbox.draw(g)
+    else{
+      if(firstLoopGame){
+        firstLoopGame = false
+        menuSong.dispose()
+        songs(currentSong).play()
       }
-    }
+      manageSong()
 
-    g.drawFPS()
+      if(f.currentRoom.isInstanceOf[BossRoom] && onlyOne) {
+        onlyOne = false;
+        songs(currentSong).stop()
+        bossSong.play()
+      }
+
+      f.draw(g)
+      f.currentRoom.manageRoom(h)
+      f.currentRoom.doorAnimate(Gdx.graphics.getDeltaTime)
+
+      manageHero()
+      h.draw(g)
+
+      ProjectileHandler.handle(g, f.currentRoom, h)
+
+      if(DRAW_HITBOX){
+        h.hitbox.draw(g)
+        h.attackHitbox.draw(g)
+        for(m <- f.currentRoom.monsters){
+          m.hitbox.draw(g)
+        }
+      }
+
+      g.drawFPS()
+    }
+  }
+
+  private def manageMainMenu(): Unit = {
+    if (keyStatus(SPACE)) {
+      mainMenu = false
+    }
+  }
+
+  private def manageSong(): Unit = {
+    currentTime += Gdx.graphics.getDeltaTime
+
+    if(currentTime >= songTime(currentSong)){
+      songs(currentSong).stop()
+      currentTime = 0
+      currentSong = (currentSong + 1) % 3
+      songs(currentSong).play()
+    }
   }
 
   private def manageHero(): Unit = {
@@ -106,8 +172,8 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     val dirNoGo: ArrayBuffer[Direction] = f.currentRoom.wallContact(h.hitbox)
     val dirSwitchRoom: Direction = f.currentRoom.doorContact(h.hitbox)
 
-    h.setWeaponType(h.WEAPON_TYPE_BOW);
-    h.setWeaponType(h.WEAPON_TYPE_SWORD);
+    h.setWeaponType(h.WEAPON_TYPE_BOW)
+    h.setWeaponType(h.WEAPON_TYPE_SWORD)
 
     if (keyStatus(KEY_UP)) {
       h.turn(Direction.NORTH)

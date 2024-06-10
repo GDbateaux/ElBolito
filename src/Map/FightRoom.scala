@@ -1,7 +1,9 @@
 package Map
 
-import Utils.{Vector2d, Direction, Position}
+import Characters.{Enemy, Hero, Monster}
+import Utils.{Direction, Position, Vector2d}
 import Utils.Direction.Direction
+import ch.hevs.gdx2d.lib.GdxGraphics
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -12,6 +14,8 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
   private val OBSTACLE_SIZE_MAX = 5
   private val DIFFICULTY_MAX = 1
   var characterDir: Direction = Direction.NORTH
+
+  isClean = false
   doorsPositions = doorsDir
   curentDoorFrame = 0
   createRoom()
@@ -184,6 +188,28 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
     }
   }
 
+  override def manageRoom(h: Hero): Unit = {
+    var idx:Int = 0
+    while (idx < monsters.length) {
+      monsters(idx).asInstanceOf[Monster].manageMonster(h, room, roomVectors, squareWidth)
+      monsters(idx).asInstanceOf[Monster].setSpeed(1)
+      if (monsters(idx).hp <= 0) {
+        monsters.subtractOne(monsters(idx))
+      }
+      idx += 1
+    }
+
+    if(monsters.isEmpty){
+      isClean = true
+    }
+  }
+
+  override def draw(g: GdxGraphics): Unit = {
+    super.draw(g)
+    for(m: Enemy <- monsters){
+      m.draw(g)
+    }
+  }
 }
 
 /*

@@ -1,5 +1,6 @@
 package Characters
 
+import Characters.Projectiles.{Arrow, Projectile, ProjectileHandler}
 import Utils.{Direction, Position, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
@@ -22,7 +23,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val ROLL_SPRITE_WIDTH: Int = 16
   private val ROLL_SPRITE_HEIGHT: Int = ROLL_SPRITE_WIDTH
   private val ROLL_FRAME_NUMBER: Int = 9
-  private val ROLL_COOLDOWN: Double = 6.0
+  private val ROLL_COOLDOWN: Double = 5.0
 
   private val HEART_SPRITE_WIDTH: Int = 17
   private val HEART_SPRITE_HEIGHT: Int = HEART_SPRITE_WIDTH
@@ -59,8 +60,8 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   private var attackFrameRemain: Int = -1
   private var rollFrameRemain: Int = -1
-  private var weaponType: Int = 0;
-  private val pointerLastPos: Vector2d = new Vector2d(0, 0);
+  private var weaponType: Int = 0
+  private val pointerLastPos: Vector2d = new Vector2d(0, 0)
 
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
@@ -89,7 +90,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   def setWeaponType(t: Int): Unit = {
     if(attackFrameRemain < 0) {
       if(t == WEAPON_TYPE_BOW || t == WEAPON_TYPE_SWORD) {
-        weaponType = t;
+        weaponType = t
       }
     }
   }
@@ -134,7 +135,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         else if(weaponType == WEAPON_TYPE_BOW) {
           currentAttackFrame = (ATTACK_BOW_FRAME_NUMBER - 1) - attackFrameRemain
           if(currentAttackFrame == 4) {
-            val p: Projectile = new Projectile(hitbox.center, pointerLastPos.sub(position), projectileDistance, width / 6, 1, true)
+            val p: Projectile = new Arrow(hitbox.center, pointerLastPos.sub(hitbox.center), projectileDistance, width, 1, true)
             ProjectileHandler.projectiles.append(p)
           }
         }
@@ -166,8 +167,6 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
             currentRollFrame = 3
           }
         }
-
-        //currentRollFrame = (ROLL_FRAME_NUMBER - 1) - rollFrameRemain
 
         var length: Float = 1
 
@@ -269,8 +268,8 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   def attack(pointer: Vector2d): Unit = {
     if(attackFrameRemain < 0 && rollFrameRemain < 0) {
-      pointerLastPos.x = pointer.x;
-      pointerLastPos.y = pointer.y;
+      pointerLastPos.x = pointer.x
+      pointerLastPos.y = pointer.y
 
       val verticalDif = position.y - pointer.y
       val horizontalDif = position.x - pointer.x
@@ -291,7 +290,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def roll(): Unit = {
-    var currentTime: Double = System.currentTimeMillis() / 1000.0
+    val currentTime: Double = System.currentTimeMillis() / 1000.0
 
     if(attackFrameRemain < 0 && rollFrameRemain < 0 && currentTime > lastRollTime + ROLL_COOLDOWN) {
 
@@ -308,7 +307,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def drawHearts(g: GdxGraphics): Unit = {
-    val space: Float = Screen.HEIGHT / 100
+    val space: Float = Screen.HEIGHT / 50
     val heartWidth: Float = width/2
     val posY: Float = Screen.HEIGHT - heartWidth - space
     var currentRegion: TextureRegion = heartSs.sprites(0)(0)

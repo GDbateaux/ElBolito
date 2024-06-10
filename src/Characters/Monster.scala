@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Interpolation
 
 import scala.collection.mutable.ArrayBuffer
 
-class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
+class Monster(initialPos: Vector2d, width: Float) extends DrawableObject with Enemy {
   private val SPRITE_WIDTH: Int = 32
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
   private val HITBOX_WIDTH: Float = width / 2
@@ -46,6 +46,14 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
     dt += elapsedTime
 
     if (dt > frameTime) {
+      if(invincibleFrameRemain > 0) {
+        invincibleTransparence = !invincibleTransparence
+        invincibleFrameRemain -= 1
+      }
+      else {
+        invincibleTransparence = false
+      }
+
       dt -= frameTime
       currentFrame = (currentFrame + 1) % NUM_FRAME_RUN
     }
@@ -60,7 +68,7 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
       (normalizedVector.y * speed * GROW_FACTOR).toFloat
     )
 
-    if(relativeVector .length() != 0){
+    if(relativeVector.length() != 0){
       if (relativeVector.length() <= vectorToGo.length()) {
         position.x += relativeVector.x
         position.y += relativeVector.y
@@ -121,8 +129,9 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
       h.setInvisibility(true)
     }
 
-    if(hitbox.intersect(h.attackHitbox)) {
+    if(invincibleFrameRemain <= 0 && hitbox.intersect(h.attackHitbox)) {
       hp -= 1
+      invincibleFrameRemain = INVINCIBLE_FRAME
     }
 
     if(math.abs(posToGo.x - hitbox.center.x) < 0.1 && math.abs(posToGo.y - hitbox.center.y) < 0.1 || posToGo.x == 0 && posToGo.y == 0) {
@@ -132,19 +141,24 @@ class Monster(initialPos: Vector2d, width: Float) extends DrawableObject{
       if (path.length >= 2) {
         posToGo.x = path(1).x
         posToGo.y = path(1).y
-        go(posToGo)
       }
       else {
         posToGo = h.hitbox.center
-        go(posToGo)
       }
     }
-    else {
+
+    if(invincibleFrameRemain <= 0) {
       go(posToGo)
     }
+    else {
+      go(hitbox.center)
+    }
+
   }
 
   override def draw(g: GdxGraphics): Unit = {
-    g.draw(runSs.sprites(0)(currentFrame), position.x, position.y, width, width)
+    if(!invincibleTransparence) {
+      g.draw(runSs.sprites(0)(currentFrame), position.x, position.y, width, width)
+    }
   }
 }

@@ -1,6 +1,6 @@
 package Map
 
-import Characters.{Hitbox, Monster}
+import Characters.{Enemy, Hero, Hitbox, Monster}
 import Utils.{Direction, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
@@ -23,7 +23,7 @@ trait Room extends DrawableObject {
   var room: Array[Array[Int]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   var roomVectors: Array[Array[Vector2d]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   protected var doorsPositions: ArrayBuffer[Direction] = new ArrayBuffer[Direction]()
-  var monsters: ArrayBuffer[Monster] = new ArrayBuffer[Monster]()
+  var monsters: ArrayBuffer[Enemy] = new ArrayBuffer[Enemy]()
 
   private val nbrSquareX: Int = ROOM_WIDTH + 4 // 2 = les murs droites et gauches (+ over)
   private val nbrSquareY: Int = ROOM_HEIGHT + 4 // 2 = les murs en haut et en bas (+ over)
@@ -54,7 +54,7 @@ trait Room extends DrawableObject {
   val roomDoors: ArrayBuffer[Door] = new ArrayBuffer[Door]()
   val roomObstacles: ArrayBuffer[Obstacle] = new ArrayBuffer[Obstacle]()
   var squareWidth: Float = 0
-  var isClean: Boolean = false
+  var isClean: Boolean = true
   //var squareCoordinate: Array[Array[Coordinate]] = Array.ofDim(ROOM_HEIGHT, ROOM_WIDTH)
   init()
 
@@ -145,6 +145,8 @@ trait Room extends DrawableObject {
     }
   }
 
+  def manageRoom(h: Hero)
+
   override def draw(g: GdxGraphics): Unit = {
     //Mettre les différents murs
     //Ajouter les portes (trou pour les portes sur les coté et en bas). Porte du haut avec animation (déterminer si elle doit être ouverte ou fermée)
@@ -173,10 +175,6 @@ trait Room extends DrawableObject {
     val wallOverBot_cornerRight = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\wall\\wall_bot_inner_right.png"))
     val floor = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\tiles\\floor\\floor_2.png"))
     val obstacle = new Texture(Gdx.files.absolute("data\\images\\dungeonTextures\\props_itens\\barrel.png"))
-
-    if(firstDraw){
-      monsters = new ArrayBuffer[Monster]()
-    }
 
     for (y: Int <- 0 until nbrSquareY) {
       for (x: Int <- 0 until nbrSquareX) {
@@ -294,10 +292,6 @@ trait Room extends DrawableObject {
           }
         }
       }
-    }
-
-    if(monsters.isEmpty){
-      isClean = true
     }
 
     firstDraw = false
