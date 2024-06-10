@@ -1,6 +1,6 @@
 package Characters
 
-import Characters.Projectiles.{Projectile, ProjectileHandler}
+import Characters.Projectiles.{Arrow, Projectile, ProjectileHandler}
 import Utils.{Direction, Position, Screen, Vector2d}
 import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
@@ -135,7 +135,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         else if(weaponType == WEAPON_TYPE_BOW) {
           currentAttackFrame = (ATTACK_BOW_FRAME_NUMBER - 1) - attackFrameRemain
           if(currentAttackFrame == 4) {
-            val p: Projectile = new Projectile(hitbox.center, pointerLastPos.sub(hitbox.center), projectileDistance, width / 2, 1, true)
+            val p: Projectile = new Arrow(hitbox.center, pointerLastPos.sub(hitbox.center), projectileDistance, width, 1, true)
             ProjectileHandler.projectiles.append(p)
           }
         }
