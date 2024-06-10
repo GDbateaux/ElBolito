@@ -1,6 +1,6 @@
 package Characters
 
-import Characters.Projectiles.{Arrow, Projectile, ProjectileHandler}
+import Characters.Projectiles.{Balls, Projectile, ProjectileHandler}
 import Utils.Direction.Direction
 import Utils.{Direction, Vector2d}
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
@@ -83,7 +83,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
       else if(isShooting) {
         currentShootFrame = (currentShootFrame + 1) % NUM_FRAME_RUN
         if(currentShootFrame == 2) {
-          val p: Projectile = new Arrow(hitbox.center, hitboxCenterHero.sub(hitbox.center), width * projectileFactor, width / 2, 1, false)
+          val p: Projectile = new Balls(hitbox.center, hitboxCenterHero.sub(hitbox.center), width * projectileFactor, width / 2, 1, false)
           ProjectileHandler.projectiles.append(p)
         }
       }
