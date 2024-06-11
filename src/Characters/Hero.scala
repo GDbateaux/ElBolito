@@ -6,6 +6,8 @@ import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.{Color, Pixmap, Texture}
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 
 import scala.collection.mutable.ArrayBuffer
@@ -56,6 +58,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val heartSs: Spritesheet = new Spritesheet("data/images/heart.png", HEART_SPRITE_WIDTH, HEART_SPRITE_HEIGHT)
   private val bowSs: Spritesheet = new Spritesheet("data/images/hero_bow_attack.png", ATTACK_SPRITE_WIDTH, ATTACK_SPRITE_HEIGHT)
   private val deathSs: Spritesheet = new Spritesheet("data/images/hero_death.png", DEATH_SPRITE_WIDTH, DEATH_SPRITE_HEIGHT)
+  private val rollIcon: Texture = new Texture(Gdx.files.local("data\\images\\roll_icon.png"))
 
   private var speed: Double = 1
   private val rollSpeed: Double = 4
@@ -346,6 +349,31 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     }
   }
 
+  private def drawCooldown(g: GdxGraphics): Unit = {
+    val space: Float = Screen.HEIGHT / 5
+    val posX: Float = width/2 - space/13;
+    val posY: Float = Screen.HEIGHT - space
+    val squareWidth: Float = 100;
+    val currentTime: Double = System.currentTimeMillis() / 1000.0
+    val timeSinceLastRoll: Float = (currentTime - lastRollTime).toFloat;
+    var cooldownRemain: Float = 0;
+
+    if(ROLL_COOLDOWN - timeSinceLastRoll > 0) {
+      cooldownRemain = ROLL_COOLDOWN.toFloat - timeSinceLastRoll;
+    }
+
+    val squareHeight: Float = squareWidth * cooldownRemain / ROLL_COOLDOWN.toFloat
+
+    g.draw(rollIcon, posX, posY, squareWidth, squareWidth)
+
+    val pixmap = new Pixmap(squareWidth.toInt, squareWidth.toInt, Pixmap.Format.RGBA8888)
+    pixmap.setColor(new Color(0, 0, 0, 0.5f)) // Rouge avec 50% d'opacité
+    pixmap.fill()
+    val texture = new Texture(pixmap)
+    pixmap.dispose()
+    g.draw(texture, posX, posY, squareWidth, squareHeight)
+  }
+
   def death(): Unit = {
     this.heroDead = true;
     speed = 0.5
@@ -361,6 +389,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   override def draw(g: GdxGraphics): Unit = {
     drawHearts(g)
+    drawCooldown(g)
     if(isDead) {
       g.draw(deathSs.sprites(0)(currentDeathFrame), position.x, position.y, width, width)
     }
