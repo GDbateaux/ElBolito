@@ -6,10 +6,11 @@ import Utils.Direction.Direction
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.interfaces.DrawableObject
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.{Color, Pixmap, Texture}
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 
 import scala.collection.mutable.ArrayBuffer
-import scala.util.Random
 
 class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val HERO_SPRITE_WIDTH: Int = 16
@@ -28,6 +29,10 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val HEART_SPRITE_WIDTH: Int = 17
   private val HEART_SPRITE_HEIGHT: Int = HEART_SPRITE_WIDTH
 
+  private val DEATH_SPRITE_WIDTH: Int = 16
+  private val DEATH_SPRITE_HEIGHT: Int = DEATH_SPRITE_WIDTH
+  private val DEATH_FRAME_NUMBER: Int = 4
+
   private val HITBOX_WIDTH: Float = 6 * width / HERO_SPRITE_WIDTH
   private val HITBOX_HEIGHT: Float = width / 3
 
@@ -38,13 +43,13 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val GROW_FACTOR = width / HERO_SPRITE_WIDTH
   private val NUM_FRAME_RUN: Int = 6
   private val FRAME_TIME: Double = 0.1
-  private val MAX_HEALTH: Int = 6
+  val MAX_HEALTH: Int = 6
 
   private var textureY: Int = 0
   private var currentRunFrame: Int = 0
   private var currentAttackFrame: Int = 0
   private var currentRollFrame: Int = 0
-  private var currentTime: Double = 0.0
+  private var currentDeathFrame: Int = 0
   private val runSs: Spritesheet = new Spritesheet("data/images/hero_run.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
   private val swordAttackSs: Spritesheet = new Spritesheet("data/images/hero_sword_attack.png", ATTACK_SPRITE_WIDTH,
     ATTACK_SPRITE_HEIGHT)
@@ -52,17 +57,21 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private var curentDirections: ArrayBuffer[Direction] = new ArrayBuffer[Direction]().addOne(Direction.SOUTH)
   private val heartSs: Spritesheet = new Spritesheet("data/images/heart.png", HEART_SPRITE_WIDTH, HEART_SPRITE_HEIGHT)
   private val bowSs: Spritesheet = new Spritesheet("data/images/hero_bow_attack.png", ATTACK_SPRITE_WIDTH, ATTACK_SPRITE_HEIGHT)
+  private val deathSs: Spritesheet = new Spritesheet("data/images/hero_death.png", DEATH_SPRITE_WIDTH, DEATH_SPRITE_HEIGHT)
+  private val rollIcon: Texture = new Texture(Gdx.files.local("data\\images\\roll_icon.png"))
 
   private var speed: Double = 1
   private val rollSpeed: Double = 4
   private var lastRollTime: Double = 0.0
   private var move: Boolean = false
+  private var heroDead: Boolean = false
+  private var deathAnimEnd: Boolean = false
 
   private var attackFrameRemain: Int = -1
   private var rollFrameRemain: Int = -1
-  private var weaponType: Int = 0
   private val pointerLastPos: Vector2d = new Vector2d(0, 0)
 
+  var weaponType: Int = 0
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
   var isAttaking: Boolean = false
@@ -71,6 +80,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var invincibleTransparence: Boolean = false
   var hp = MAX_HEALTH
   var projectileFactor: Float = 8
+  var numberWeapons: Int = 1
 
   val WEAPON_TYPE_SWORD: Int = 0
   val WEAPON_TYPE_BOW: Int = 1
@@ -91,6 +101,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     if(attackFrameRemain < 0) {
       if(t == WEAPON_TYPE_BOW || t == WEAPON_TYPE_SWORD) {
         weaponType = t
+        currentAttackFrame = 0
       }
     }
   }
@@ -98,7 +109,21 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   def animate(elapsedTime: Double): Unit = {
     var frameTime = FRAME_TIME / speed
 
-    if(attackFrameRemain >= 0) {
+    if(isDead) {
+      dt += elapsedTime
+
+      if (dt > frameTime) {
+        dt -= frameTime
+
+        if(currentDeathFrame < DEATH_FRAME_NUMBER - 1) {
+          currentDeathFrame += 1
+        }
+        else {
+          deathAnimEnd = true
+        }
+      }
+    }
+    else if(attackFrameRemain >= 0) {
       dt += elapsedTime
       if (dt > frameTime) {
         dt -= frameTime
@@ -239,7 +264,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def go(directions: ArrayBuffer[Direction]): Unit = {
-    if(attackFrameRemain < 0 && rollFrameRemain < 0) {
+    if(attackFrameRemain < 0 && rollFrameRemain < 0 && !isDead) {
       if(directions.nonEmpty) {
         curentDirections = directions.clone()
       }
@@ -267,7 +292,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def attack(pointer: Vector2d): Unit = {
-    if(attackFrameRemain < 0 && rollFrameRemain < 0) {
+    if(attackFrameRemain < 0 && rollFrameRemain < 0 && !isDead) {
       pointerLastPos.x = pointer.x
       pointerLastPos.y = pointer.y
 
@@ -292,13 +317,13 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   def roll(): Unit = {
     val currentTime: Double = System.currentTimeMillis() / 1000.0
 
-    if(attackFrameRemain < 0 && rollFrameRemain < 0 && currentTime > lastRollTime + ROLL_COOLDOWN) {
+    if(attackFrameRemain < 0 && rollFrameRemain < 0 && currentTime > lastRollTime + ROLL_COOLDOWN && !isDead) {
 
       rollFrameRemain = ROLL_FRAME_NUMBER - 1 //Start at 0
     }
   }
 
-  def isMoving: Boolean = {
+  private def isMoving: Boolean = {
     return move
   }
 
@@ -306,7 +331,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     move = m
   }
 
-  def drawHearts(g: GdxGraphics): Unit = {
+  private def drawHearts(g: GdxGraphics): Unit = {
     val space: Float = Screen.HEIGHT / 50
     val heartWidth: Float = width/2
     val posY: Float = Screen.HEIGHT - heartWidth - space
@@ -326,9 +351,51 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     }
   }
 
+  private def drawCooldown(g: GdxGraphics): Unit = {
+    val space: Float = Screen.HEIGHT / 5
+    val posX: Float = width/2 - space/13
+    val posY: Float = Screen.HEIGHT - space
+    val squareWidth: Float = 100
+    val currentTime: Double = System.currentTimeMillis() / 1000.0
+    val timeSinceLastRoll: Float = (currentTime - lastRollTime).toFloat
+    var cooldownRemain: Float = 0
+
+    if(ROLL_COOLDOWN - timeSinceLastRoll > 0) {
+      cooldownRemain = ROLL_COOLDOWN.toFloat - timeSinceLastRoll
+    }
+
+    val squareHeight: Float = squareWidth * cooldownRemain / ROLL_COOLDOWN.toFloat
+
+    g.draw(rollIcon, posX, posY, squareWidth, squareWidth)
+
+    val pixmap = new Pixmap(squareWidth.toInt, squareWidth.toInt, Pixmap.Format.RGBA8888)
+    pixmap.setColor(new Color(0, 0, 0, 0.5f)) // Rouge avec 50% d'opacité
+    pixmap.fill()
+    val texture = new Texture(pixmap)
+    pixmap.dispose()
+    g.draw(texture, posX, posY, squareWidth, squareHeight)
+  }
+
+  def death(): Unit = {
+    this.heroDead = true
+    speed = 0.5
+  }
+
+  def isDead: Boolean = {
+   return heroDead
+  }
+
+  def isDeathAnimFinished: Boolean = {
+    return deathAnimEnd
+  }
+
   override def draw(g: GdxGraphics): Unit = {
     drawHearts(g)
-    if (attackFrameRemain >= 0) {
+    drawCooldown(g)
+    if(isDead) {
+      g.draw(deathSs.sprites(0)(currentDeathFrame), position.x, position.y, width, width)
+    }
+    else if (attackFrameRemain >= 0) {
       if(weaponType == WEAPON_TYPE_SWORD) {
         g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3)
       }
