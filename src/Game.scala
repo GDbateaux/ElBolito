@@ -34,7 +34,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val SONG1_TIME: Float = 126
   private val SONG2_TIME: Float = 66
   private val ALPHA_CHANGE_TIME: Float = 0.05f
-  private val INOX_SONG_TIME :Float = 6
+  private val INOX_SONG_TIME :Float = 7
 
   private var h: Hero = _
   private var f: Floor = _
