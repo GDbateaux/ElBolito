@@ -35,6 +35,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val SONG1_TIME: Float = 126
   private val SONG2_TIME: Float = 66
   private val ALPHA_CHANGE_TIME: Float = 0.05f
+  private val INOX_SONG_TIME :Float = 6
 
   private var h: Hero = _
   private var f: Floor = _
@@ -55,7 +56,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private var song0: SoundSample = _
   private var song1: SoundSample = _
   private var song2: SoundSample = _
+  private var inoxSong: SoundSample = _
   private var bossSong: SoundSample = _
+  private var isBossSong: Boolean = false
   private var currentSong: Int = Random.nextInt(3)
   private val songTime: ArrayBuffer[Float] = new ArrayBuffer[Float]()
   private val songs: ArrayBuffer[SoundSample] = new ArrayBuffer[SoundSample]()
@@ -83,6 +86,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     song1 = new SoundSample("data/sounds/song1.mp3")
     song2 = new SoundSample("data/sounds/song2.mp3")
 
+    inoxSong = new SoundSample("data/sounds/inox.mp3")
     bossSong = new SoundSample("data/sounds/boss.mp3")
 
     songTime.append(SONG0_TIME)
@@ -127,12 +131,6 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
         songs(currentSong).play()
       }
       manageSong()
-
-      if(f.currentRoom.isInstanceOf[BossRoom] && onlyOne) {
-        onlyOne = false
-        songs(currentSong).stop()
-        bossSong.play()
-      }
 
       f.draw(g)
       f.currentRoom.manageRoom(h)
@@ -180,11 +178,25 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private def manageSong(): Unit = {
     currentTime += Gdx.graphics.getDeltaTime
 
-    if(currentTime >= songTime(currentSong)){
+    if(currentTime >= songTime(currentSong) && !f.currentRoom.isInstanceOf[BossRoom]){
       songs(currentSong).stop()
       currentTime = 0
       currentSong = (currentSong + 1) % 3
       songs(currentSong).play()
+    }
+
+    if (f.currentRoom.isInstanceOf[BossRoom]) {
+      if(onlyOne){
+        currentTime = 0
+        onlyOne = false
+        songs(currentSong).stop()
+        inoxSong.play()
+      }
+      if(currentTime >= INOX_SONG_TIME && !isBossSong){
+        inoxSong.stop()
+        bossSong.loop()
+        isBossSong = true
+      }
     }
   }
 
