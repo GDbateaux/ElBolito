@@ -99,8 +99,10 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   }
 
   private def startGame(): Unit = {
-    mainMenu = true;
-    firstLoopGame = true;
+    mainMenu = true
+    firstLoopGame = true
+    isBossSong = false
+    onlyOne = true
     f = new Floor(NUM_ROOM, 0)
     h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
 
