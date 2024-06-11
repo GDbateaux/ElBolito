@@ -13,6 +13,8 @@ class SpecialRoom(val doorsDir: ArrayBuffer[Direction]) extends Room {
   private val CHEST_SPRITE_WIDTH: Int = 16
   private val CHEST_SPRITE_HEIGHT: Int = CHEST_SPRITE_WIDTH
   private val SPRITE_NUMBER: Int = 8
+  private val ANIMATION_TIME_PAUSE: Float = 2f
+  private val FRAME_TIME: Float = 0.1f
 
   var dt: Float = 0
   val characterDir: Direction = Direction.NORTH
@@ -26,7 +28,15 @@ class SpecialRoom(val doorsDir: ArrayBuffer[Direction]) extends Room {
 
   override def manageRoom(h: Hero): Unit = {
     dt += Gdx.graphics.getDeltaTime
-    srpiteX = (srpiteX+1) % SPRITE_NUMBER
+    if(dt >= ANIMATION_TIME_PAUSE){
+      if(dt >= FRAME_TIME + ANIMATION_TIME_PAUSE){
+        dt -= FRAME_TIME
+        srpiteX = (srpiteX + 1) % SPRITE_NUMBER
+        if (srpiteX == 0) {
+          dt = 0
+        }
+      }
+    }
   }
 
   override def draw(g: GdxGraphics): Unit = {
