@@ -41,7 +41,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val GROW_FACTOR = width / HERO_SPRITE_WIDTH
   private val NUM_FRAME_RUN: Int = 6
   private val FRAME_TIME: Double = 0.1
-  private val MAX_HEALTH: Int = 6
+  val MAX_HEALTH: Int = 6
 
   private var textureY: Int = 0
   private var currentRunFrame: Int = 0
@@ -61,14 +61,14 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val rollSpeed: Double = 4
   private var lastRollTime: Double = 0.0
   private var move: Boolean = false
-  private var heroDead: Boolean = false;
-  private var deathAnimEnd: Boolean = false;
+  private var heroDead: Boolean = false
+  private var deathAnimEnd: Boolean = false
 
   private var attackFrameRemain: Int = -1
   private var rollFrameRemain: Int = -1
-  private var weaponType: Int = 0
   private val pointerLastPos: Vector2d = new Vector2d(0, 0)
 
+  var weaponType: Int = 0
   val position: Vector2d = initialPos
   val hitbox: Hitbox = new Hitbox(position.add(RELATIVE_CENTER_HITBOX), HITBOX_WIDTH, HITBOX_HEIGHT)
   var isAttaking: Boolean = false
@@ -77,6 +77,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   var invincibleTransparence: Boolean = false
   var hp = MAX_HEALTH
   var projectileFactor: Float = 8
+  var numberWeapons: Int = 1
 
   val WEAPON_TYPE_SWORD: Int = 0
   val WEAPON_TYPE_BOW: Int = 1
@@ -97,6 +98,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     if(attackFrameRemain < 0) {
       if(t == WEAPON_TYPE_BOW || t == WEAPON_TYPE_SWORD) {
         weaponType = t
+        currentAttackFrame = 0
       }
     }
   }
@@ -111,10 +113,10 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
         dt -= frameTime
 
         if(currentDeathFrame < DEATH_FRAME_NUMBER - 1) {
-          currentDeathFrame += 1;
+          currentDeathFrame += 1
         }
         else {
-          deathAnimEnd = true;
+          deathAnimEnd = true
         }
       }
     }

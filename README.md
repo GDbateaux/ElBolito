@@ -11,3 +11,4 @@ Le joueur tombera aussi sur d'autres salles comme une salle avec un boss.
 ## Mode d'emploi
 Utiliser les touches "W", "A", "S" et "D" pour vous déplacer.
 Pour frapper, utiliser le clic gauche et pour effectuer une roulade la touche "shift gauche".
+Pour changer d'arme quand l'arc est débloqué, appuyer sur "E".
