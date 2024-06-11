@@ -1,5 +1,5 @@
 import Characters.Projectiles.{Projectile, ProjectileHandler}
-import Characters.{Enemy, Hero, Monster}
+import Characters.{Boss, Enemy, Hero, Monster}
 import Map.{BossRoom, Floor}
 import Utils.Direction.{Direction, EAST, NULL}
 import Utils.{Direction, Screen, Vector2d}
@@ -47,6 +47,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
   private var menuSong: SoundSample = _
   private var menuImage: BitmapImage = _
+  private var victoryImage: BitmapImage = _
   private var menuText: BitmapImage = _
   private var alphaMenu: Float = 1
   private var addAlpha: Float = -ALPHA_CHANGE_TIME
@@ -57,6 +58,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private var song2: SoundSample = _
   private var inoxSong: SoundSample = _
   private var bossSong: SoundSample = _
+  private var victorySong: SoundSample = _
   private var isBossSong: Boolean = false
   private var currentSong: Int = Random.nextInt(3)
   private val songTime: ArrayBuffer[Float] = new ArrayBuffer[Float]()
@@ -72,6 +74,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val SPACE = Input.Keys.SPACE
 
   private var onlyOne: Boolean = true
+  private var victoryOneTime: Boolean = true;
 
   override def onInit(): Unit = {
     setTitle("El Bolito")
@@ -87,6 +90,9 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
     inoxSong = new SoundSample("data/sounds/inox.mp3")
     bossSong = new SoundSample("data/sounds/boss.mp3")
+
+    victorySong = new SoundSample("data/sounds/victory.mp3")
+    victoryImage = new BitmapImage("data/images/victory/image.jpeg")
 
     songTime.append(SONG0_TIME)
     songTime.append(SONG1_TIME)
@@ -159,6 +165,20 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
         for(m <- f.currentRoom.monsters){
           m.hitbox.draw(g)
         }
+      }
+
+      if (f.currentRoom.isInstanceOf[BossRoom] && !h.isDead && f.currentRoom.monsters.isEmpty) {
+
+        songs(currentSong).stop()
+        inoxSong.stop()
+        bossSong.stop()
+
+        if(victoryOneTime) {
+          victorySong.loop()
+          victoryOneTime = false;
+        }
+
+        g.drawPicture(Screen.WIDTH / 2, Screen.HEIGHT / 2, victoryImage)
       }
 
       g.drawFPS()
