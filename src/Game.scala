@@ -76,7 +76,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private val BUTTON_RIGHT = Input.Buttons.RIGHT
 
   private var onlyOne: Boolean = true
-  private var victoryOneTime: Boolean = true;
+  private var victoryOneTime: Boolean = true
 
   override def onInit(): Unit = {
     setTitle("El Bolito")
@@ -178,7 +178,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
 
         if(victoryOneTime) {
           victorySong.loop()
-          victoryOneTime = false;
+          victoryOneTime = false
         }
 
         g.drawPicture(Screen.WIDTH / 2, Screen.HEIGHT / 2, victoryImage)
@@ -325,7 +325,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     }
 
     if(h.hp <= 0) {
-      f.currentRoom.monsters.clear();
+      f.currentRoom.monsters.clear()
       h.death()
       if(h.isDeathAnimFinished) {
         startGame()

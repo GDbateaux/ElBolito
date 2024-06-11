@@ -29,9 +29,9 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val HEART_SPRITE_WIDTH: Int = 17
   private val HEART_SPRITE_HEIGHT: Int = HEART_SPRITE_WIDTH
 
-  private val DEATH_SPRITE_WIDTH: Int = 16;
-  private val DEATH_SPRITE_HEIGHT: Int = DEATH_SPRITE_WIDTH;
-  private val DEATH_FRAME_NUMBER: Int = 4;
+  private val DEATH_SPRITE_WIDTH: Int = 16
+  private val DEATH_SPRITE_HEIGHT: Int = DEATH_SPRITE_WIDTH
+  private val DEATH_FRAME_NUMBER: Int = 4
 
   private val HITBOX_WIDTH: Float = 6 * width / HERO_SPRITE_WIDTH
   private val HITBOX_HEIGHT: Float = width / 3
@@ -353,15 +353,15 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
 
   private def drawCooldown(g: GdxGraphics): Unit = {
     val space: Float = Screen.HEIGHT / 5
-    val posX: Float = width/2 - space/13;
+    val posX: Float = width/2 - space/13
     val posY: Float = Screen.HEIGHT - space
-    val squareWidth: Float = 100;
+    val squareWidth: Float = 100
     val currentTime: Double = System.currentTimeMillis() / 1000.0
-    val timeSinceLastRoll: Float = (currentTime - lastRollTime).toFloat;
-    var cooldownRemain: Float = 0;
+    val timeSinceLastRoll: Float = (currentTime - lastRollTime).toFloat
+    var cooldownRemain: Float = 0
 
     if(ROLL_COOLDOWN - timeSinceLastRoll > 0) {
-      cooldownRemain = ROLL_COOLDOWN.toFloat - timeSinceLastRoll;
+      cooldownRemain = ROLL_COOLDOWN.toFloat - timeSinceLastRoll
     }
 
     val squareHeight: Float = squareWidth * cooldownRemain / ROLL_COOLDOWN.toFloat
@@ -377,16 +377,16 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def death(): Unit = {
-    this.heroDead = true;
+    this.heroDead = true
     speed = 0.5
   }
 
   def isDead: Boolean = {
-   return heroDead;
+   return heroDead
   }
 
   def isDeathAnimFinished: Boolean = {
-    return deathAnimEnd;
+    return deathAnimEnd
   }
 
   override def draw(g: GdxGraphics): Unit = {
