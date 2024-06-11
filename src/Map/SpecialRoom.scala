@@ -13,7 +13,7 @@ class SpecialRoom(val doorsDir: ArrayBuffer[Direction]) extends Room {
   private val CHEST_SPRITE_WIDTH: Int = 16
   private val CHEST_SPRITE_HEIGHT: Int = CHEST_SPRITE_WIDTH
   private val SPRITE_NUMBER: Int = 8
-  private val ANIMATION_TIME_PAUSE: Float = 2f
+  private val ANIMATION_TIME_PAUSE: Float = 1f
   private val FRAME_TIME: Float = 0.1f
 
   var dt: Float = 0

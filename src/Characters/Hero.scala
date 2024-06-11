@@ -27,6 +27,10 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private val HEART_SPRITE_WIDTH: Int = 17
   private val HEART_SPRITE_HEIGHT: Int = HEART_SPRITE_WIDTH
 
+  private val DEATH_SPRITE_WIDTH: Int = 16;
+  private val DEATH_SPRITE_HEIGHT: Int = DEATH_SPRITE_WIDTH;
+  private val DEATH_FRAME_NUMBER: Int = 4;
+
   private val HITBOX_WIDTH: Float = 6 * width / HERO_SPRITE_WIDTH
   private val HITBOX_HEIGHT: Float = width / 3
 
@@ -43,7 +47,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private var currentRunFrame: Int = 0
   private var currentAttackFrame: Int = 0
   private var currentRollFrame: Int = 0
-  private var currentTime: Double = 0.0
+  private var currentDeathFrame: Int = 0
   private val runSs: Spritesheet = new Spritesheet("data/images/hero_run.png", HERO_SPRITE_WIDTH, HERO_SPRITE_HEIGHT)
   private val swordAttackSs: Spritesheet = new Spritesheet("data/images/hero_sword_attack.png", ATTACK_SPRITE_WIDTH,
     ATTACK_SPRITE_HEIGHT)
@@ -51,11 +55,14 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   private var curentDirections: ArrayBuffer[Direction] = new ArrayBuffer[Direction]().addOne(Direction.SOUTH)
   private val heartSs: Spritesheet = new Spritesheet("data/images/heart.png", HEART_SPRITE_WIDTH, HEART_SPRITE_HEIGHT)
   private val bowSs: Spritesheet = new Spritesheet("data/images/hero_bow_attack.png", ATTACK_SPRITE_WIDTH, ATTACK_SPRITE_HEIGHT)
+  private val deathSs: Spritesheet = new Spritesheet("data/images/hero_death.png", DEATH_SPRITE_WIDTH, DEATH_SPRITE_HEIGHT)
 
   private var speed: Double = 1
   private val rollSpeed: Double = 4
   private var lastRollTime: Double = 0.0
   private var move: Boolean = false
+  private var heroDead: Boolean = false;
+  private var deathAnimEnd: Boolean = false;
 
   private var attackFrameRemain: Int = -1
   private var rollFrameRemain: Int = -1
@@ -97,7 +104,21 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   def animate(elapsedTime: Double): Unit = {
     var frameTime = FRAME_TIME / speed
 
-    if(attackFrameRemain >= 0) {
+    if(isDead) {
+      dt += elapsedTime
+
+      if (dt > frameTime) {
+        dt -= frameTime
+
+        if(currentDeathFrame < DEATH_FRAME_NUMBER - 1) {
+          currentDeathFrame += 1;
+        }
+        else {
+          deathAnimEnd = true;
+        }
+      }
+    }
+    else if(attackFrameRemain >= 0) {
       dt += elapsedTime
       if (dt > frameTime) {
         dt -= frameTime
@@ -238,7 +259,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def go(directions: ArrayBuffer[Direction]): Unit = {
-    if(attackFrameRemain < 0 && rollFrameRemain < 0) {
+    if(attackFrameRemain < 0 && rollFrameRemain < 0 && !isDead) {
       if(directions.nonEmpty) {
         curentDirections = directions.clone()
       }
@@ -266,7 +287,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   }
 
   def attack(pointer: Vector2d): Unit = {
-    if(attackFrameRemain < 0 && rollFrameRemain < 0) {
+    if(attackFrameRemain < 0 && rollFrameRemain < 0 && !isDead) {
       pointerLastPos.x = pointer.x
       pointerLastPos.y = pointer.y
 
@@ -291,13 +312,13 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
   def roll(): Unit = {
     val currentTime: Double = System.currentTimeMillis() / 1000.0
 
-    if(attackFrameRemain < 0 && rollFrameRemain < 0 && currentTime > lastRollTime + ROLL_COOLDOWN) {
+    if(attackFrameRemain < 0 && rollFrameRemain < 0 && currentTime > lastRollTime + ROLL_COOLDOWN && !isDead) {
 
       rollFrameRemain = ROLL_FRAME_NUMBER - 1 //Start at 0
     }
   }
 
-  def isMoving: Boolean = {
+  private def isMoving: Boolean = {
     return move
   }
 
@@ -305,7 +326,7 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     move = m
   }
 
-  def drawHearts(g: GdxGraphics): Unit = {
+  private def drawHearts(g: GdxGraphics): Unit = {
     val space: Float = Screen.HEIGHT / 50
     val heartWidth: Float = width/2
     val posY: Float = Screen.HEIGHT - heartWidth - space
@@ -325,9 +346,25 @@ class Hero(initialPos: Vector2d, width: Float) extends DrawableObject{
     }
   }
 
+  def death(): Unit = {
+    this.heroDead = true;
+    speed = 0.5
+  }
+
+  def isDead: Boolean = {
+   return heroDead;
+  }
+
+  def isDeathAnimFinished: Boolean = {
+    return deathAnimEnd;
+  }
+
   override def draw(g: GdxGraphics): Unit = {
     drawHearts(g)
-    if (attackFrameRemain >= 0) {
+    if(isDead) {
+      g.draw(deathSs.sprites(0)(currentDeathFrame), position.x, position.y, width, width)
+    }
+    else if (attackFrameRemain >= 0) {
       if(weaponType == WEAPON_TYPE_SWORD) {
         g.draw(swordAttackSs.sprites(textureY)(currentAttackFrame), position.x - width, position.y - width, width * 3 , width * 3)
       }

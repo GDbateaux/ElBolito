@@ -1,5 +1,5 @@
 import Characters.Projectiles.{Projectile, ProjectileHandler}
-import Characters.{Hero, Monster}
+import Characters.{Enemy, Hero, Monster}
 import Map.{BossRoom, Floor}
 import Utils.Direction.{Direction, EAST, NULL}
 import Utils.{Direction, Screen, Vector2d}
@@ -27,7 +27,6 @@ object Game {
 }
 
 class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windowWidth, windowHeigth) {
-  private val ANIMATION_LENGTH_DAMAGE: Float = 1
   private val NUM_ROOM: Int = 10
   private val DRAW_HITBOX: Boolean = false
   private val SONG_VOLUME: Float = 0.5F
@@ -96,8 +95,19 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     songs.append(song1)
     songs.append(song2)
 
+    startGame()
+  }
+
+  private def startGame(): Unit = {
+    mainMenu = true;
+    firstLoopGame = true;
     f = new Floor(NUM_ROOM, 0)
     h = new Hero(f.currentRoom.ROOM_CENTER, f.currentRoom.squareWidth)
+
+    songs(currentSong).stop()
+    inoxSong.stop()
+    bossSong.stop()
+
     keyStatus(KEY_UP) = false
     keyStatus(KEY_RIGHT) = false
     keyStatus(KEY_DOWN) = false
@@ -127,7 +137,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     else{
       if(firstLoopGame){
         firstLoopGame = false
-        menuSong.dispose()
+        menuSong.stop()
         songs(currentSong).play()
       }
       manageSong()
@@ -276,7 +286,11 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     }
 
     if(h.hp <= 0) {
-      h.setSpeed(0)
+      f.currentRoom.monsters.clear();
+      h.death()
+      if(h.isDeathAnimFinished) {
+        startGame()
+      }
     }
 
     h.animate(Gdx.graphics.getDeltaTime)

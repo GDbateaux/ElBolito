@@ -199,7 +199,7 @@ class FightRoom(val diffulty: Int, val doorsDir: ArrayBuffer[Direction]) extends
       idx += 1
     }
 
-    if(monsters.isEmpty){
+    if(monsters.isEmpty && !h.isDead){
       isClean = true
     }
   }
