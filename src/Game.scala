@@ -63,15 +63,17 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
   private var currentSong: Int = Random.nextInt(3)
   private val songTime: ArrayBuffer[Float] = new ArrayBuffer[Float]()
   private val songs: ArrayBuffer[SoundSample] = new ArrayBuffer[SoundSample]()
+  private var isSwitch: Boolean = false
 
   private val KEY_UP = Input.Keys.W
   private val KEY_RIGHT = Input.Keys.D
   private val KEY_DOWN = Input.Keys.S
   private val KEY_LEFT = Input.Keys.A
+  private val KEY_SWITCH = Input.Keys.E
+  private val SPACE = Input.Keys.SPACE
   private val KEY_SHIFT = Input.Keys.SHIFT_LEFT
   private val BUTTON_LEFT = Input.Buttons.LEFT
   private val BUTTON_RIGHT = Input.Buttons.RIGHT
-  private val SPACE = Input.Keys.SPACE
 
   private var onlyOne: Boolean = true
   private var victoryOneTime: Boolean = true;
@@ -120,6 +122,7 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     keyStatus(KEY_RIGHT) = false
     keyStatus(KEY_DOWN) = false
     keyStatus(KEY_LEFT) = false
+    keyStatus(KEY_SWITCH) = false
     keyStatus(KEY_SHIFT) = false
     keyStatus(SPACE) = false
     buttonStatus(BUTTON_LEFT) = false
@@ -237,9 +240,6 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
     val dirNoGo: ArrayBuffer[Direction] = f.currentRoom.wallContact(h.hitbox)
     val dirSwitchRoom: Direction = f.currentRoom.doorContact(h.hitbox)
 
-    h.setWeaponType(h.WEAPON_TYPE_BOW)
-    h.setWeaponType(h.WEAPON_TYPE_SWORD)
-
     if (keyStatus(KEY_UP)) {
       h.turn(Direction.NORTH)
       goDir.append(Direction.NORTH)
@@ -256,6 +256,23 @@ class Game(windowWidth: Int, windowHeigth:Int) extends PortableApplication(windo
       h.turn(Direction.WEST)
       goDir.append(Direction.WEST)
     }
+
+    if(keyStatus(KEY_SWITCH) && !isSwitch) {
+      isSwitch = true
+      if(h.numberWeapons > 1){
+        if(h.weaponType == 0){
+          h.setWeaponType(1)
+        }
+        else if(h.weaponType == 1){
+          h.setWeaponType(0)
+        }
+      }
+    }
+
+    if(!keyStatus(KEY_SWITCH)){
+      isSwitch = false
+    }
+
     if(buttonStatus(BUTTON_RIGHT)) {
       buttonStatus(BUTTON_RIGHT) = false
     }
