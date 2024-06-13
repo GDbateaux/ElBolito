@@ -7,8 +7,10 @@ Le joueur tombera aussi sur d'autres salles comme une salle avec un boss.
 ## Screenshots et vidéo du jeu
 ![img.png](data/images/readme/room.png)
 ![img_1.png](data/images/readme/boss.png)
+https://github.com/GDbateaux/ElBolito/assets/111980428/4f99f699-cbb0-4147-99c3-ab4032b55a17
 
 ## Mode d'emploi
+
 Utiliser les touches "W", "A", "S" et "D" pour vous déplacer.
 Pour frapper, utiliser le clic gauche et pour effectuer une roulade la touche "shift gauche".
 Pour changer d'arme quand l'arc est débloqué, appuyer sur "E".
