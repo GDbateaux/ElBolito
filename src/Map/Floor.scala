@@ -17,7 +17,7 @@ class Floor(private val numRoom: Int, private val floorNumber: Int) extends Draw
   private var floor: Array[Array[Room]] = _
   private var currentRoomPos: Position = Position(0,0)
   private var distanceRoom: Array[Array[Int]] = _
-  private var nearestRoomDifficulty: Int = floorNumber * 5
+  private val nearestRoomDifficulty: Int = floorNumber * 5
   var currentRoom: Room = _
 
   if(tmpSide % 2 == 0){
@@ -62,7 +62,7 @@ class Floor(private val numRoom: Int, private val floorNumber: Int) extends Draw
     currentRoom = floor(currentRoomPos.y)(currentRoomPos.x)
   }
 
-  def displayRooms(): Unit = {
+  def displayRoom(): Unit = {
     for (y: Int <- floorInt.indices) {
       for (x: Int <- floorInt(0).indices) {
         print(floorInt(y)(x))
@@ -112,7 +112,7 @@ class Floor(private val numRoom: Int, private val floorNumber: Int) extends Draw
     return res
   }
 
-  private def generateBlueprint(): Array[Array[Int]] ={
+  private def generateBlueprint(): Array[Array[Int]] = {
     val floorInt: Array[Array[Int]] = Array.ofDim(arraySide, arraySide)
     var currentNumRoom: Int = 1
     var previousRoomX: Int = arraySide/2

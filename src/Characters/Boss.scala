@@ -5,12 +5,13 @@ import Utils.Direction.Direction
 import Utils.{Direction, Vector2d}
 import ch.hevs.gdx2d.components.bitmaps.Spritesheet
 import ch.hevs.gdx2d.lib.GdxGraphics
+import ch.hevs.gdx2d.lib.interfaces.DrawableObject
 import com.badlogic.gdx.Gdx
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-class Boss(initialPos: Vector2d, width: Float) extends Enemy {
+class Boss(initialPos: Vector2d, width: Float) extends DrawableObject with Enemy {
   private val SPRITE_WIDTH: Int = 64
   private val SPRITE_HEIGHT: Int = SPRITE_WIDTH
   private val HITBOX_WIDTH: Float = width / 2
@@ -203,7 +204,7 @@ class Boss(initialPos: Vector2d, width: Float) extends Enemy {
     go(posToGo)
   }
 
-  def draw(g: GdxGraphics): Unit = {
+  override def draw(g: GdxGraphics): Unit = {
     if(!invincibleTransparence) {
       if(!isCharging && !isShooting) {
         g.draw(runSs.sprites(textureY)(currentFrame), position.x, position.y, width, width)

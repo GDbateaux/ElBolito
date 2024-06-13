@@ -6,6 +6,7 @@ Le joueur tombera aussi sur d'autres salles comme une salle avec un boss.
 
 ## Screenshots et vidéo du jeu
 ![img.png](data/images/readme/room.png)
+
 ![img_1.png](data/images/readme/boss.png)
 https://github.com/GDbateaux/ElBolito/assets/111980428/4f99f699-cbb0-4147-99c3-ab4032b55a17
 
@@ -23,5 +24,6 @@ Pour changer d'arme quand l'arc est débloqué, appuyer sur "E".
 - https://opengameart.org/content/yeti-supertux-advance
 - https://fliflifly.itch.io/hearts-and-health-bar
 - https://www.youtube.com/watch?v=WNO5acv-uhA
+- https://game-endeavor.itch.io/mystic-woods
 - https://copilot.microsoft.com/
 - https://suno.com/create
