@@ -15,7 +15,6 @@ class Balls(startPos: Vector2d, direction: Vector2d, distance: Float, hitboxWidt
   private val ballRightSs: Spritesheet = new Spritesheet("data/images/yeti_ball_right.png", BALL_SPRITE_WIDTH, BALL_SPRITE_HEIGHT)
   private val ballLeftSs: Spritesheet = new Spritesheet("data/images/yeti_ball_left.png", BALL_SPRITE_WIDTH, BALL_SPRITE_HEIGHT)
   private val rotation: Float = Math.toDegrees(Math.atan2(direction.y, direction.x)).toFloat // angle de rotation en degrés
-  private val NUM_FRAME_RUN: Int = 4
 
   private var currentFrame: Int = 0
   addHitbox()
